@@ -12,7 +12,7 @@
  * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.4
- * Requires PHP: 7.3
+ * Requires PHP: 7.4
  * Network: false
  */
 
@@ -76,17 +76,19 @@ final class EstateplanningManager {
      * Load plugin dependencies
      */
     private function load_dependencies() {
-        // Core classes - only load files that exist
+        // Core classes
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-database.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-security.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-suitecrm-api.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-pdf-generator.php';
+        require_once EPM_PLUGIN_DIR . 'includes/class-epm-data-sync.php';
+        require_once EPM_PLUGIN_DIR . 'includes/class-epm-permissions.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-audit-logger.php';
-        require_once EPM_PLUGIN_DIR . 'includes/class-epm-field-definitions.php';
         
         // Admin classes
         if (is_admin()) {
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-settings.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-selectors.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-suggested-updates.php';
         }
@@ -114,6 +116,9 @@ final class EstateplanningManager {
             EPM_Admin_Suggested_Updates::instance()->init();
         }
         
+        // Initialize SuiteCRM API
+        EPM_SuiteCRM_API::instance()->init();
+        
         // Initialize frontend
         EPM_Frontend::instance()->init();
         
@@ -123,8 +128,8 @@ final class EstateplanningManager {
         // Initialize AJAX handlers
         EPM_Ajax_Handler::instance()->init();
         
-        // Initialize SuiteCRM API
-        EPM_SuiteCRM_API::instance()->init();
+        // Initialize data sync
+        EPM_Data_Sync::instance()->init();
         
         do_action('epm_init');
     }

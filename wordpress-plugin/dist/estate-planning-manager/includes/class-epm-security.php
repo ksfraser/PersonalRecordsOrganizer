@@ -310,25 +310,7 @@ class EPM_Security {
      * Generate secure token
      */
     public function generate_secure_token($length = 32) {
-        // Use random_bytes if available (PHP 7.0+)
-        if (function_exists('random_bytes')) {
-            try {
-                return bin2hex(random_bytes($length / 2));
-            } catch (Exception $e) {
-                // Fall through to alternative method
-            }
-        }
-        
-        // Fallback using OpenSSL (available in PHP 5.3+)
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            $bytes = openssl_random_pseudo_bytes($length / 2, $strong);
-            if ($strong) {
-                return bin2hex($bytes);
-            }
-        }
-        
-        // Final fallback using WordPress function
-        return substr(str_replace(array('+', '/', '='), '', base64_encode(wp_generate_password($length, true, true))), 0, $length);
+        return bin2hex(random_bytes($length / 2));
     }
     
     /**

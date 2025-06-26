@@ -7,7 +7,7 @@ This guide provides step-by-step instructions for installing the SuiteCRM custom
 - SuiteCRM 7.10 or higher installed and running
 - Admin access to SuiteCRM
 - Command line access to the SuiteCRM server
-- PHP 7.4 or higher
+- PHP 7.3 or higher
 - MySQL 5.7 or higher
 
 ## Installation Steps
