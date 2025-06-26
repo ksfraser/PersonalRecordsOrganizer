@@ -145,6 +145,12 @@ class PluginPackager {
             unlink($zipPath);
         }
         
+        // Check if ZipArchive is available
+        if (!class_exists('ZipArchive')) {
+            echo "ZipArchive extension not available. Trying alternative method...\n";
+            return $this->createZipFileAlternative();
+        }
+        
         $zip = new ZipArchive();
         
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
@@ -169,6 +175,43 @@ class PluginPackager {
         }
         
         $zip->close();
+    }
+    
+    private function createZipFileAlternative() {
+        $zipPath = $this->outputDir . '/' . $this->zipName;
+        $sourceDir = $this->outputDir . '/' . $this->pluginDir;
+        
+        // Try using system zip command
+        if (PHP_OS_FAMILY === 'Windows') {
+            // Windows - try PowerShell Compress-Archive
+            $command = sprintf(
+                'powershell -Command "Compress-Archive -Path \'%s\*\' -DestinationPath \'%s\' -Force"',
+                str_replace('/', '\\', $sourceDir),
+                str_replace('/', '\\', $zipPath)
+            );
+        } else {
+            // Unix/Linux - try zip command
+            $command = sprintf(
+                'cd %s && zip -r %s %s',
+                escapeshellarg(dirname($sourceDir)),
+                escapeshellarg($zipPath),
+                escapeshellarg(basename($sourceDir))
+            );
+        }
+        
+        echo "Executing: $command\n";
+        $output = array();
+        $returnCode = 0;
+        exec($command, $output, $returnCode);
+        
+        if ($returnCode !== 0 || !file_exists($zipPath)) {
+            // If system commands fail, create a simple directory copy
+            echo "ZIP creation failed. Plugin files are available in: {$this->outputDir}/{$this->pluginDir}\n";
+            echo "You can manually create a ZIP file from this directory.\n";
+            return false;
+        }
+        
+        return true;
     }
     
     private function cleanup() {

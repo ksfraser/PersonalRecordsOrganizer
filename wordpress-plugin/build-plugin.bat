@@ -14,6 +14,9 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
+REM Change to the script directory
+cd /d "%~dp0"
+
 REM Run the packaging script
 echo Running packaging script...
 php create-plugin-package.php
