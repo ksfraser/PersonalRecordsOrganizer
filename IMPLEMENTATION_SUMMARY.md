@@ -2,201 +2,282 @@
 
 ## Project Overview
 
-Successfully converted a spreadsheet-based estate planning system into a multi-user WordPress plugin with the following key features:
+The Estate Planning Manager is a comprehensive WordPress plugin that converts spreadsheet-based estate planning records into a multi-user database application with SuiteCRM integration. The system provides secure data management, PDF generation, and selective data sharing capabilities while maintaining PIPEDA compliance.
 
-### ✅ Core Features Implemented
+## Architecture Overview
 
-1. **Multi-User Database System**
-   - WordPress plugin architecture with proper security
-   - 17 database tables covering all spreadsheet sections
-   - User authentication and role-based access control
-   - Client-advisor relationship management
+The plugin follows WordPress best practices with a modular, object-oriented architecture:
 
-2. **Data Sections (Spreadsheet Tabs → App Screens)**
-   - Basic Personal Information
-   - Family Contacts
-   - Key Contacts (Lawyers, Doctors, etc.)
-   - Wills & Power of Attorney
-   - Funeral & Organ Donation
-   - Taxes
-   - Military Service
-   - Employment History
-   - Volunteer Work
-   - Bank Accounts
-   - Investments
-   - Real Estate
-   - Personal Property
-   - Digital Assets
-   - Scheduled Payments
-   - Debtors & Creditors
-   - Insurance
+### Core Components
 
-3. **PDF Generation System**
-   - TCPDF integration for professional document output
-   - Each section becomes a separate page in the PDF
-   - Customizable templates with proper formatting
-   - Support for selective data export (PIPEDA compliance)
+1. **Database Layer** (`EPM_Database`)
+   - Handles all database operations
+   - Creates and manages custom tables for different data sections
+   - Provides secure data access methods
 
-4. **Privacy & Security (PIPEDA Compliant)**
-   - Granular sharing permissions system
-   - Field-level access control
-   - Data encryption for sensitive information
-   - Audit logging for all data access and modifications
-   - Secure data export with user-selected fields only
+2. **Security Layer** (`EPM_Security`)
+   - Implements data encryption for sensitive information
+   - Manages user permissions and access controls
+   - Ensures PIPEDA compliance
 
-5. **SuiteCRM Integration**
-   - Two-way data synchronization
-   - Automatic contact management
-   - Lead and opportunity tracking
-   - Sync logging and error handling
+3. **SuiteCRM Integration** (`EPM_SuiteCRM_API`)
+   - Bidirectional data synchronization
+   - Suggested updates management
+   - Contact and record management
 
-6. **Advanced Features**
-   - Predefined selectors with "Other" options for common fields
-   - Comprehensive field validation
-   - Data import/export capabilities
-   - Responsive design for mobile access
-   - Progress tracking (completion percentage)
+4. **PDF Generation** (`EPM_PDF_Generator`)
+   - Dynamic PDF creation from database records
+   - Customizable templates
+   - Selective data export capabilities
 
-### 🏗️ Technical Architecture
+5. **Audit Logging** (`EPM_Audit_Logger`)
+   - Comprehensive activity tracking
+   - Security event monitoring
+   - Compliance reporting
 
-**WordPress Plugin Structure:**
+## Database Schema
+
+### Core Tables
+
+1. **epm_clients** - Client master records
+2. **epm_basic_personal** - Personal information
+3. **epm_bank_accounts** - Banking information
+4. **epm_investments** - Investment accounts
+5. **epm_real_estate** - Property records
+6. **epm_insurance** - Insurance policies
+7. **epm_legal_documents** - Legal document references
+8. **epm_emergency_contacts** - Emergency contact information
+9. **epm_suggested_updates** - SuiteCRM sync suggestions
+10. **epm_sync_log** - Synchronization history
+11. **epm_audit_log** - Activity audit trail
+
+### Security Features
+
+- Encrypted storage for sensitive data (account numbers, SSNs)
+- Role-based access control
+- Audit logging for all data access
+- Secure data sharing mechanisms
+
+## Key Features Implemented
+
+### 1. Multi-User Database Application
+- Converted spreadsheet tabs into database tables
+- Implemented user roles (Estate Client, Financial Advisor)
+- Secure multi-user access with proper permissions
+
+### 2. SuiteCRM Integration
+- **Bidirectional Sync**: Data flows both ways between WordPress and SuiteCRM
+- **Suggested Updates**: System compares data and suggests updates
+- **Contact Management**: Automatic contact creation and updates
+- **Custom Modules**: Bank accounts, investments, real estate, insurance
+
+### 3. PDF Generation System
+- **Dynamic Templates**: Generate PDFs from database records
+- **Selective Export**: Users can choose which data to include
+- **Multiple Formats**: Complete estate plan, financial summary, etc.
+- **Privacy Controls**: Exclude sensitive information as needed
+
+### 4. Admin Interface
+- **Data Selectors**: Choose which fields to include in exports
+- **Suggested Updates**: Review and approve SuiteCRM changes
+- **Settings Management**: Configure SuiteCRM connection and options
+- **Audit Reports**: View system activity and changes
+
+### 5. Security & Compliance
+- **Data Encryption**: Sensitive fields encrypted at rest
+- **Access Controls**: Role-based permissions
+- **Audit Logging**: Complete activity tracking
+- **PIPEDA Compliance**: Privacy controls and data handling
+
+## File Structure
+
 ```
-estate-planning-manager/
-├── estate-planning-manager.php (Main plugin file)
+wordpress-plugin/estate-planning-manager/
+├── estate-planning-manager.php          # Main plugin file
 ├── includes/
-│   ├── class-epm-database.php (Database operations)
-│   ├── class-epm-security.php (Security & permissions)
-│   ├── class-epm-pdf-generator.php (PDF creation)
-│   ├── class-epm-suitecrm-api.php (CRM integration)
-│   ├── class-epm-audit-logger.php (Activity logging)
-│   └── class-epm-field-definitions.php (Form definitions)
-├── admin/ (Admin interface)
-├── public/ (Public interface)
-├── assets/ (CSS, JS, images)
-└── tests/ (Comprehensive test suite)
+│   ├── class-epm-database.php          # Database operations
+│   ├── class-epm-security.php          # Security & encryption
+│   ├── class-epm-suitecrm-api.php      # SuiteCRM integration
+│   ├── class-epm-pdf-generator.php     # PDF generation
+│   ├── class-epm-audit-logger.php      # Audit logging
+│   └── class-epm-field-definitions.php # Field definitions
+├── admin/
+│   ├── class-epm-admin-selectors.php   # Data selector interface
+│   └── class-epm-admin-suggested-updates.php # Suggested updates UI
+├── assets/
+│   ├── js/
+│   │   ├── admin-selectors.js          # Selector interface JS
+│   │   └── admin-suggested-updates.js  # Suggested updates JS
+│   └── css/
+│       └── admin-suggested-updates.css # Admin interface styles
+└── tests/                              # Comprehensive test suite
+    ├── test-epm-database.php
+    ├── test-epm-security.php
+    ├── test-epm-pdf-generator.php
+    ├── test-epm-audit-logger.php
+    └── test-epm-suitecrm-api.php
 ```
 
-**Database Schema:**
-- 21 tables total (17 data sections + 4 system tables)
-- Proper foreign key relationships
-- Audit trail for all changes
-- Sharing permissions matrix
-- Sync status tracking
+## SuiteCRM Integration Details
 
-### 🔒 Security Features
+### Data Synchronization Flow
 
-1. **Data Protection**
-   - WordPress nonces for CSRF protection
-   - Input sanitization and validation
-   - SQL injection prevention
-   - XSS protection
+1. **WordPress to SuiteCRM**:
+   - Client data automatically synced when saved
+   - Creates contacts and related records
+   - Maps WordPress fields to SuiteCRM modules
 
-2. **Access Control**
-   - Role-based permissions (Client, Advisor, Admin)
-   - Section-level sharing controls
-   - Time-limited access grants
-   - IP address logging
+2. **SuiteCRM to WordPress**:
+   - Scheduled pulls from SuiteCRM
+   - Compares data and creates suggested updates
+   - Admin can review and approve changes
 
-3. **PIPEDA Compliance**
-   - Selective data export
-   - User consent tracking
-   - Data retention policies
-   - Right to be forgotten implementation
+### Custom SuiteCRM Modules
 
-### 📊 Data Management
+- **EPM_BankAccounts**: Banking information
+- **EPM_Investments**: Investment accounts
+- **EPM_RealEstate**: Property records
+- **EPM_Insurance**: Insurance policies
 
-**Field Types Supported:**
-- Text fields with validation
-- Date pickers
-- Email validation
-- Phone number formatting
-- Currency fields
-- Yes/No selectors
-- Predefined dropdowns with "Other" options
-- File upload references
-- Multi-line text areas
+### Suggested Updates System
 
-**Predefined Selectors:**
-- Relationship types (spouse, child, parent, sibling, other)
-- Account types (chequing, savings, investment, other)
-- Insurance categories (life, health, auto, property, other)
-- Property types (primary residence, rental, commercial, other)
+- Automatic comparison of WordPress vs SuiteCRM data
+- Admin interface to review differences
+- Bulk approval/rejection capabilities
+- Audit trail of all decisions
 
-### 🧪 Testing & Quality Assurance
+## PDF Generation Capabilities
 
-**Comprehensive Test Suite:**
+### Template Types
+
+1. **Complete Estate Plan**: All client information
+2. **Financial Summary**: Financial accounts only
+3. **Emergency Contacts**: Contact information
+4. **Legal Documents**: Document references
+
+### Selective Export Features
+
+- **Field-level selection**: Choose specific fields to include
+- **Section filtering**: Include/exclude entire sections
+- **Privacy controls**: Automatically exclude sensitive data
+- **Custom templates**: Admin can define export templates
+
+## Security Implementation
+
+### Data Encryption
+
+- AES-256 encryption for sensitive fields
+- Secure key management
+- Encrypted storage of account numbers, SSNs, etc.
+
+### Access Controls
+
+- Role-based permissions system
+- User can only access their own data
+- Advisors can access assigned clients
+- Admin controls for all data
+
+### Audit Logging
+
+- All data access logged
+- User actions tracked
+- Security events monitored
+- Compliance reporting available
+
+## Testing Framework
+
+Comprehensive PHPUnit test suite covering:
+
+- Database operations and data integrity
+- Security and encryption functions
+- PDF generation and templates
+- SuiteCRM API integration
+- Audit logging functionality
+
+### Test Coverage
+
 - Unit tests for all core classes
-- Database operation testing
-- Security validation tests
-- PDF generation tests
-- API integration tests
-- Mock data factories for testing
+- Integration tests for API interactions
+- Security tests for encryption/decryption
+- Database tests for CRUD operations
 
-**Code Quality:**
-- PSR-4 autoloading
-- WordPress coding standards
-- Comprehensive documentation
-- Error handling and logging
+## Installation & Configuration
 
-### 📈 Benefits Achieved
+### Requirements
 
-1. **Multi-User Capability**
-   - Multiple clients can use the system simultaneously
-   - Advisors can manage multiple client accounts
-   - Real-time collaboration features
+- WordPress 5.0+
+- PHP 7.4+
+- MySQL 5.7+
+- SuiteCRM 7.10+ (optional)
 
-2. **Data Security & Privacy**
-   - PIPEDA compliant data handling
-   - Granular sharing controls
-   - Comprehensive audit trails
+### Setup Process
 
-3. **Professional Output**
-   - High-quality PDF generation
-   - Customizable document templates
-   - Selective data export for sharing
+1. Install and activate plugin
+2. Configure SuiteCRM connection (optional)
+3. Set up user roles and permissions
+4. Configure PDF templates
+5. Test data synchronization
 
-4. **Business Integration**
-   - SuiteCRM synchronization
-   - Lead management
-   - Client relationship tracking
+### Configuration Options
 
-5. **Scalability**
-   - WordPress plugin architecture
-   - Database optimization
-   - Caching support
-   - Multi-site compatibility
+- SuiteCRM URL and credentials
+- Encryption settings
+- Audit logging preferences
+- Auto-sync intervals
+- PDF template options
 
-### 🚀 Deployment Ready
+## Future Enhancements
 
-The plugin is ready for deployment with:
-- Proper WordPress plugin headers
-- Activation/deactivation hooks
-- Database migration system
-- Configuration management
-- Error logging and monitoring
+### Planned Features
 
-### 📋 Next Steps for Production
+1. **Mobile App**: React Native app for client access
+2. **Document Upload**: File attachment system
+3. **Workflow Automation**: Automated processes and notifications
+4. **Advanced Reporting**: Business intelligence dashboards
+5. **Multi-language Support**: Internationalization
 
-1. **WordPress Installation**
-   - Upload plugin to WordPress site
-   - Activate and configure
-   - Set up user roles and permissions
+### Technical Improvements
 
-2. **SuiteCRM Configuration**
-   - Configure API credentials
-   - Set up synchronization schedules
-   - Test data flow
+1. **Performance Optimization**: Caching and query optimization
+2. **API Expansion**: RESTful API for third-party integrations
+3. **Advanced Security**: Two-factor authentication, SSO
+4. **Backup System**: Automated data backup and recovery
 
-3. **User Training**
-   - Admin interface walkthrough
-   - Client onboarding process
-   - PDF generation training
+## Compliance & Privacy
 
-4. **Monitoring & Maintenance**
-   - Set up error monitoring
-   - Regular database backups
-   - Security updates schedule
+### PIPEDA Compliance
+
+- Data minimization principles
+- Consent management
+- Right to access/modify data
+- Secure data handling
+- Privacy impact assessments
+
+### Security Standards
+
+- Industry-standard encryption
+- Secure coding practices
+- Regular security audits
+- Vulnerability management
+
+## Support & Maintenance
+
+### Documentation
+
+- User manuals for clients and advisors
+- Admin configuration guides
+- Developer API documentation
+- Troubleshooting guides
+
+### Maintenance Schedule
+
+- Regular security updates
+- Performance monitoring
+- Backup verification
+- User training sessions
 
 ## Conclusion
 
-Successfully transformed a single-user spreadsheet into a robust, multi-user, PIPEDA-compliant estate planning management system with professional PDF output capabilities and CRM integration. The system maintains all original functionality while adding enterprise-level features for security, collaboration, and business integration.
+The Estate Planning Manager successfully transforms a spreadsheet-based system into a robust, multi-user database application with enterprise-grade features. The integration with SuiteCRM provides seamless data synchronization, while the PDF generation system ensures clients can easily share their information with relevant parties while maintaining privacy and security.
+
+The modular architecture ensures the system can grow and adapt to changing requirements, while the comprehensive security implementation provides peace of mind for handling sensitive financial and personal information.

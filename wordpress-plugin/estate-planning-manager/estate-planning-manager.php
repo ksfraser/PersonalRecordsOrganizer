@@ -90,6 +90,7 @@ final class EstateplanningManager {
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-settings.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-selectors.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-suggested-updates.php';
         }
         
         // Public classes
@@ -112,7 +113,11 @@ final class EstateplanningManager {
         if (is_admin()) {
             EPM_Admin::instance()->init();
             EPM_Admin_Selectors::instance()->init();
+            EPM_Admin_Suggested_Updates::instance()->init();
         }
+        
+        // Initialize SuiteCRM API
+        EPM_SuiteCRM_API::instance()->init();
         
         // Initialize frontend
         EPM_Frontend::instance()->init();

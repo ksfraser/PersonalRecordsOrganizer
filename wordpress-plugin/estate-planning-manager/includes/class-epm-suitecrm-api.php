@@ -505,4 +505,465 @@ class EPM_SuiteCRM_API {
             wp_schedule_single_event(time(), 'epm_sync_client_data', array($client_id, $section, $data));
         }
     }
+    
+    /**
+     * Pull updates from SuiteCRM and create suggested updates
+     */
+    public function pull_suitecrm_updates($client_id) {
+        if (!get_option('epm_suitecrm_enabled', false)) {
+            return false;
+        }
+        
+        // Get client's SuiteCRM contact ID
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'epm_clients';
+        
+        $suitecrm_contact_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT suitecrm_contact_id FROM $table_name WHERE id = %d",
+            $client_id
+        ));
+        
+        if (!$suitecrm_contact_id) {
+            return new WP_Error('no_contact_id', __('No SuiteCRM contact ID found for client.', 'estate-planning-manager'));
+        }
+        
+        // Get contact data from SuiteCRM
+        $contact_response = $this->make_request('module/' . $suitecrm_contact_id);
+        
+        if (is_wp_error($contact_response)) {
+            return $contact_response;
+        }
+        
+        if (isset($contact_response['data']['attributes'])) {
+            $this->process_contact_updates($client_id, $contact_response['data']['attributes']);
+        }
+        
+        // Get related records (bank accounts, investments, etc.)
+        $this->pull_related_records($client_id, $suitecrm_contact_id);
+        
+        return true;
+    }
+    
+    /**
+     * Process contact updates and create suggested updates
+     */
+    private function process_contact_updates($client_id, $suitecrm_data) {
+        global $wpdb;
+        
+        // Get current WordPress data
+        $wp_data = EPM_Database::instance()->get_client_data($client_id, 'basic_personal');
+        $current_data = !empty($wp_data) ? $wp_data[0] : new stdClass();
+        
+        // Map SuiteCRM fields to WordPress fields
+        $field_mapping = array(
+            'first_name' => 'first_name',
+            'last_name' => 'last_name',
+            'email1' => 'email',
+            'phone_work' => 'phone',
+            'birthdate' => 'date_of_birth'
+        );
+        
+        foreach ($field_mapping as $suitecrm_field => $wp_field) {
+            if (isset($suitecrm_data[$suitecrm_field])) {
+                $suggested_value = $suitecrm_data[$suitecrm_field];
+                $current_value = isset($current_data->$wp_field) ? $current_data->$wp_field : '';
+                
+                // Only create suggestion if values are different
+                if ($suggested_value !== $current_value) {
+                    $this->create_suggested_update(
+                        $client_id,
+                        'basic_personal',
+                        null,
+                        $wp_field,
+                        $current_value,
+                        $suggested_value,
+                        'suitecrm',
+                        $suitecrm_data['id'] ?? null
+                    );
+                }
+            }
+        }
+    }
+    
+    /**
+     * Pull related records from SuiteCRM
+     */
+    private function pull_related_records($client_id, $suitecrm_contact_id) {
+        // Pull bank accounts
+        $this->pull_bank_accounts($client_id, $suitecrm_contact_id);
+        
+        // Pull investments
+        $this->pull_investments($client_id, $suitecrm_contact_id);
+        
+        // Pull real estate
+        $this->pull_real_estate($client_id, $suitecrm_contact_id);
+        
+        // Pull insurance
+        $this->pull_insurance($client_id, $suitecrm_contact_id);
+    }
+    
+    /**
+     * Pull bank accounts from SuiteCRM
+     */
+    private function pull_bank_accounts($client_id, $suitecrm_contact_id) {
+        $response = $this->make_request('module/EPM_BankAccounts?filter[contact_id]=' . $suitecrm_contact_id);
+        
+        if (is_wp_error($response) || !isset($response['data'])) {
+            return;
+        }
+        
+        foreach ($response['data'] as $bank_account) {
+            $this->process_bank_account_update($client_id, $bank_account['attributes']);
+        }
+    }
+    
+    /**
+     * Process bank account updates
+     */
+    private function process_bank_account_update($client_id, $suitecrm_data) {
+        // Get current WordPress bank accounts
+        $wp_accounts = EPM_Database::instance()->get_client_data($client_id, 'bank_accounts');
+        
+        // Try to match by bank name and account type
+        $matched_account = null;
+        foreach ($wp_accounts as $account) {
+            if ($account->bank === $suitecrm_data['bank_name'] && 
+                $account->account_type === $suitecrm_data['account_type']) {
+                $matched_account = $account;
+                break;
+            }
+        }
+        
+        if ($matched_account) {
+            // Compare and create suggestions for differences
+            $field_mapping = array(
+                'bank_name' => 'bank',
+                'account_type' => 'account_type',
+                'branch' => 'branch'
+            );
+            
+            foreach ($field_mapping as $suitecrm_field => $wp_field) {
+                if (isset($suitecrm_data[$suitecrm_field])) {
+                    $suggested_value = $suitecrm_data[$suitecrm_field];
+                    $current_value = $matched_account->$wp_field ?? '';
+                    
+                    if ($suggested_value !== $current_value) {
+                        $this->create_suggested_update(
+                            $client_id,
+                            'bank_accounts',
+                            $matched_account->id,
+                            $wp_field,
+                            $current_value,
+                            $suggested_value,
+                            'suitecrm',
+                            $suitecrm_data['id'] ?? null
+                        );
+                    }
+                }
+            }
+        } else {
+            // New bank account from SuiteCRM - suggest adding it
+            $this->create_suggested_update(
+                $client_id,
+                'bank_accounts',
+                null,
+                'new_record',
+                '',
+                json_encode($suitecrm_data),
+                'suitecrm',
+                $suitecrm_data['id'] ?? null
+            );
+        }
+    }
+    
+    /**
+     * Pull investments from SuiteCRM
+     */
+    private function pull_investments($client_id, $suitecrm_contact_id) {
+        $response = $this->make_request('module/EPM_Investments?filter[contact_id]=' . $suitecrm_contact_id);
+        
+        if (is_wp_error($response) || !isset($response['data'])) {
+            return;
+        }
+        
+        foreach ($response['data'] as $investment) {
+            $this->process_investment_update($client_id, $investment['attributes']);
+        }
+    }
+    
+    /**
+     * Process investment updates
+     */
+    private function process_investment_update($client_id, $suitecrm_data) {
+        // Similar logic to bank accounts but for investments
+        $wp_investments = EPM_Database::instance()->get_client_data($client_id, 'investments');
+        
+        $matched_investment = null;
+        foreach ($wp_investments as $investment) {
+            if ($investment->financial_company === $suitecrm_data['financial_company'] && 
+                $investment->investment_type === $suitecrm_data['investment_type']) {
+                $matched_investment = $investment;
+                break;
+            }
+        }
+        
+        if ($matched_investment) {
+            $field_mapping = array(
+                'investment_type' => 'investment_type',
+                'financial_company' => 'financial_company',
+                'account_type' => 'account_type',
+                'advisor' => 'advisor'
+            );
+            
+            foreach ($field_mapping as $suitecrm_field => $wp_field) {
+                if (isset($suitecrm_data[$suitecrm_field])) {
+                    $suggested_value = $suitecrm_data[$suitecrm_field];
+                    $current_value = $matched_investment->$wp_field ?? '';
+                    
+                    if ($suggested_value !== $current_value) {
+                        $this->create_suggested_update(
+                            $client_id,
+                            'investments',
+                            $matched_investment->id,
+                            $wp_field,
+                            $current_value,
+                            $suggested_value,
+                            'suitecrm',
+                            $suitecrm_data['id'] ?? null
+                        );
+                    }
+                }
+            }
+        } else {
+            $this->create_suggested_update(
+                $client_id,
+                'investments',
+                null,
+                'new_record',
+                '',
+                json_encode($suitecrm_data),
+                'suitecrm',
+                $suitecrm_data['id'] ?? null
+            );
+        }
+    }
+    
+    /**
+     * Pull real estate from SuiteCRM
+     */
+    private function pull_real_estate($client_id, $suitecrm_contact_id) {
+        $response = $this->make_request('module/EPM_RealEstate?filter[contact_id]=' . $suitecrm_contact_id);
+        
+        if (is_wp_error($response) || !isset($response['data'])) {
+            return;
+        }
+        
+        foreach ($response['data'] as $property) {
+            $this->process_real_estate_update($client_id, $property['attributes']);
+        }
+    }
+    
+    /**
+     * Process real estate updates
+     */
+    private function process_real_estate_update($client_id, $suitecrm_data) {
+        $wp_properties = EPM_Database::instance()->get_client_data($client_id, 'real_estate');
+        
+        $matched_property = null;
+        foreach ($wp_properties as $property) {
+            if ($property->address === $suitecrm_data['address']) {
+                $matched_property = $property;
+                break;
+            }
+        }
+        
+        if ($matched_property) {
+            $field_mapping = array(
+                'property_type' => 'property_type',
+                'address' => 'address',
+                'title_held_by' => 'title_held_by',
+                'has_mortgage' => 'has_mortgage',
+                'mortgage_held_by' => 'mortgage_held_by'
+            );
+            
+            foreach ($field_mapping as $suitecrm_field => $wp_field) {
+                if (isset($suitecrm_data[$suitecrm_field])) {
+                    $suggested_value = $suitecrm_data[$suitecrm_field];
+                    $current_value = $matched_property->$wp_field ?? '';
+                    
+                    if ($suggested_value !== $current_value) {
+                        $this->create_suggested_update(
+                            $client_id,
+                            'real_estate',
+                            $matched_property->id,
+                            $wp_field,
+                            $current_value,
+                            $suggested_value,
+                            'suitecrm',
+                            $suitecrm_data['id'] ?? null
+                        );
+                    }
+                }
+            }
+        } else {
+            $this->create_suggested_update(
+                $client_id,
+                'real_estate',
+                null,
+                'new_record',
+                '',
+                json_encode($suitecrm_data),
+                'suitecrm',
+                $suitecrm_data['id'] ?? null
+            );
+        }
+    }
+    
+    /**
+     * Pull insurance from SuiteCRM
+     */
+    private function pull_insurance($client_id, $suitecrm_contact_id) {
+        $response = $this->make_request('module/EPM_Insurance?filter[contact_id]=' . $suitecrm_contact_id);
+        
+        if (is_wp_error($response) || !isset($response['data'])) {
+            return;
+        }
+        
+        foreach ($response['data'] as $insurance) {
+            $this->process_insurance_update($client_id, $insurance['attributes']);
+        }
+    }
+    
+    /**
+     * Process insurance updates
+     */
+    private function process_insurance_update($client_id, $suitecrm_data) {
+        $wp_insurance = EPM_Database::instance()->get_client_data($client_id, 'insurance');
+        
+        $matched_insurance = null;
+        foreach ($wp_insurance as $insurance) {
+            if ($insurance->insurance_company === $suitecrm_data['insurance_company'] && 
+                $insurance->insurance_type === $suitecrm_data['insurance_type']) {
+                $matched_insurance = $insurance;
+                break;
+            }
+        }
+        
+        if ($matched_insurance) {
+            $field_mapping = array(
+                'insurance_category' => 'insurance_category',
+                'insurance_type' => 'insurance_type',
+                'insurance_company' => 'insurance_company',
+                'advisor' => 'advisor',
+                'beneficiary' => 'beneficiary'
+            );
+            
+            foreach ($field_mapping as $suitecrm_field => $wp_field) {
+                if (isset($suitecrm_data[$suitecrm_field])) {
+                    $suggested_value = $suitecrm_data[$suitecrm_field];
+                    $current_value = $matched_insurance->$wp_field ?? '';
+                    
+                    if ($suggested_value !== $current_value) {
+                        $this->create_suggested_update(
+                            $client_id,
+                            'insurance',
+                            $matched_insurance->id,
+                            $wp_field,
+                            $current_value,
+                            $suggested_value,
+                            'suitecrm',
+                            $suitecrm_data['id'] ?? null
+                        );
+                    }
+                }
+            }
+        } else {
+            $this->create_suggested_update(
+                $client_id,
+                'insurance',
+                null,
+                'new_record',
+                '',
+                json_encode($suitecrm_data),
+                'suitecrm',
+                $suitecrm_data['id'] ?? null
+            );
+        }
+    }
+    
+    /**
+     * Create a suggested update record
+     */
+    private function create_suggested_update($client_id, $section, $record_id, $field_name, $current_value, $suggested_value, $source = 'suitecrm', $source_record_id = null) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_suggested_updates';
+        
+        // Check if suggestion already exists
+        $existing = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM $table_name WHERE client_id = %d AND section = %s AND record_id = %s AND field_name = %s AND status = 'pending'",
+            $client_id,
+            $section,
+            $record_id,
+            $field_name
+        ));
+        
+        if ($existing) {
+            // Update existing suggestion
+            $wpdb->update(
+                $table_name,
+                array(
+                    'current_value' => $current_value,
+                    'suggested_value' => $suggested_value,
+                    'source_record_id' => $source_record_id
+                ),
+                array('id' => $existing),
+                array('%s', '%s', '%s'),
+                array('%d')
+            );
+        } else {
+            // Create new suggestion
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'client_id' => $client_id,
+                    'section' => $section,
+                    'record_id' => $record_id,
+                    'field_name' => $field_name,
+                    'current_value' => $current_value,
+                    'suggested_value' => $suggested_value,
+                    'source' => $source,
+                    'source_record_id' => $source_record_id,
+                    'status' => 'pending'
+                ),
+                array('%d', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s')
+            );
+        }
+    }
+    
+    /**
+     * Schedule regular sync from SuiteCRM
+     */
+    public function schedule_sync_from_suitecrm() {
+        if (!wp_next_scheduled('epm_pull_suitecrm_updates')) {
+            wp_schedule_event(time(), 'hourly', 'epm_pull_suitecrm_updates');
+        }
+    }
+    
+    /**
+     * Pull updates for all clients
+     */
+    public function pull_all_client_updates() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_clients';
+        
+        $clients = $wpdb->get_results(
+            "SELECT id FROM $table_name WHERE suitecrm_contact_id IS NOT NULL AND status = 'active'"
+        );
+        
+        foreach ($clients as $client) {
+            $this->pull_suitecrm_updates($client->id);
+        }
+    }
 }

@@ -83,6 +83,7 @@ class EPM_Database {
         $this->create_debtors_creditors_table($charset_collate);
         $this->create_insurance_table($charset_collate);
         $this->create_sharing_permissions_table($charset_collate);
+        $this->create_suggested_updates_table($charset_collate);
         $this->create_audit_log_table($charset_collate);
         $this->create_sync_log_table($charset_collate);
         $this->create_selector_tables($charset_collate);
@@ -681,6 +682,41 @@ class EPM_Database {
             UNIQUE KEY unique_permission (client_id, shared_with_user_id, section),
             KEY client_id (client_id),
             KEY shared_with_user_id (shared_with_user_id),
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create suggested updates table
+     */
+    private function create_suggested_updates_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_suggested_updates';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            client_id bigint(20) NOT NULL,
+            section varchar(100) NOT NULL,
+            record_id bigint(20) DEFAULT NULL,
+            field_name varchar(100) NOT NULL,
+            current_value longtext DEFAULT NULL,
+            suggested_value longtext DEFAULT NULL,
+            source varchar(50) DEFAULT 'suitecrm',
+            source_record_id varchar(36) DEFAULT NULL,
+            status varchar(20) DEFAULT 'pending',
+            suggested_by_user_id bigint(20) DEFAULT NULL,
+            reviewed_by_user_id bigint(20) DEFAULT NULL,
+            review_notes text DEFAULT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            reviewed_at datetime DEFAULT NULL,
+            PRIMARY KEY (id),
+            KEY client_id (client_id),
+            KEY section (section),
+            KEY status (status),
+            KEY created_at (created_at),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
         ) $charset_collate;";
         
