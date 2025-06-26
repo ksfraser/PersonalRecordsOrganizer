@@ -237,8 +237,9 @@ class EPM_Shortcodes {
     
     /**
      * Get form sections configuration
+     * @return array Form sections configuration
      */
-    private function get_form_sections() {
+    public function get_form_sections() {
         return array(
             'personal' => array(
                 'title' => 'Personal Information',
