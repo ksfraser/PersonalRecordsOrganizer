@@ -85,6 +85,7 @@ class EPM_Database {
         $this->create_sharing_permissions_table($charset_collate);
         $this->create_audit_log_table($charset_collate);
         $this->create_sync_log_table($charset_collate);
+        $this->create_selector_tables($charset_collate);
     }
     
     /**
@@ -158,6 +159,7 @@ class EPM_Database {
             client_id bigint(20) NOT NULL,
             name varchar(255) DEFAULT NULL,
             relationship varchar(100) DEFAULT NULL,
+            relationship_other varchar(255) DEFAULT NULL,
             address text DEFAULT NULL,
             phone varchar(50) DEFAULT NULL,
             email varchar(255) DEFAULT NULL,
@@ -388,6 +390,7 @@ class EPM_Database {
             client_id bigint(20) NOT NULL,
             bank varchar(255) DEFAULT NULL,
             account_type varchar(100) DEFAULT NULL,
+            account_type_other varchar(255) DEFAULT NULL,
             account_number varchar(255) DEFAULT NULL,
             branch varchar(255) DEFAULT NULL,
             address text DEFAULT NULL,
@@ -740,6 +743,563 @@ class EPM_Database {
         ) $charset_collate;";
         
         $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create selector tables for dropdown options
+     */
+    private function create_selector_tables($charset_collate) {
+        $this->create_relationship_types_table($charset_collate);
+        $this->create_account_types_table($charset_collate);
+        $this->create_contact_types_table($charset_collate);
+        $this->create_insurance_categories_table($charset_collate);
+        $this->create_insurance_types_table($charset_collate);
+        $this->create_property_types_table($charset_collate);
+        $this->create_investment_types_table($charset_collate);
+        $this->create_payment_types_table($charset_collate);
+        $this->create_debt_types_table($charset_collate);
+        $this->create_employment_status_table($charset_collate);
+        $this->create_document_types_table($charset_collate);
+        $this->create_digital_asset_types_table($charset_collate);
+        $this->create_personal_property_categories_table($charset_collate);
+        $this->populate_default_selectors();
+    }
+    
+    /**
+     * Create relationship types table
+     */
+    private function create_relationship_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_relationship_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create account types table
+     */
+    private function create_account_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_account_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create contact types table
+     */
+    private function create_contact_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_contact_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create insurance categories table
+     */
+    private function create_insurance_categories_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_insurance_categories';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create insurance types table
+     */
+    private function create_insurance_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_insurance_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            category varchar(100) DEFAULT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value),
+            KEY category (category)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create property types table
+     */
+    private function create_property_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_property_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create investment types table
+     */
+    private function create_investment_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_investment_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create payment types table
+     */
+    private function create_payment_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_payment_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create debt types table
+     */
+    private function create_debt_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_debt_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create employment status table
+     */
+    private function create_employment_status_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_employment_status';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create document types table
+     */
+    private function create_document_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_document_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create digital asset types table
+     */
+    private function create_digital_asset_types_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_digital_asset_types';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Create personal property categories table
+     */
+    private function create_personal_property_categories_table($charset_collate) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'epm_personal_property_categories';
+        
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
+        ) $charset_collate;";
+        
+        $this->execute_sql($sql);
+    }
+    
+    /**
+     * Populate default selector values
+     */
+    private function populate_default_selectors() {
+        global $wpdb;
+        
+        // Relationship types
+        $relationship_types = array(
+            array('spouse', 'Spouse'),
+            array('child', 'Child'),
+            array('parent', 'Parent'),
+            array('sibling', 'Sibling'),
+            array('grandparent', 'Grandparent'),
+            array('grandchild', 'Grandchild'),
+            array('other_family', 'Other Family'),
+            array('friend', 'Friend'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_relationship_types', $relationship_types);
+        
+        // Account types
+        $account_types = array(
+            array('chequing', 'Chequing'),
+            array('savings', 'Savings'),
+            array('investment', 'Investment'),
+            array('credit_line', 'Line of Credit'),
+            array('mortgage', 'Mortgage'),
+            array('loan', 'Loan'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_account_types', $account_types);
+        
+        // Contact types
+        $contact_types = array(
+            array('lawyer', 'Lawyer'),
+            array('accountant', 'Accountant'),
+            array('financial_advisor', 'Financial Advisor'),
+            array('doctor', 'Doctor'),
+            array('dentist', 'Dentist'),
+            array('insurance_agent', 'Insurance Agent'),
+            array('real_estate_agent', 'Real Estate Agent'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_contact_types', $contact_types);
+        
+        // Insurance categories
+        $insurance_categories = array(
+            array('life', 'Life Insurance'),
+            array('health', 'Health Insurance'),
+            array('auto', 'Auto Insurance'),
+            array('property', 'Property Insurance'),
+            array('disability', 'Disability Insurance'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_insurance_categories', $insurance_categories);
+        
+        // Property types
+        $property_types = array(
+            array('primary_residence', 'Primary Residence'),
+            array('rental_property', 'Rental Property'),
+            array('commercial_property', 'Commercial Property'),
+            array('vacant_land', 'Vacant Land'),
+            array('cottage', 'Cottage/Vacation Home'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_property_types', $property_types);
+        
+        // Investment types
+        $investment_types = array(
+            array('stocks', 'Stocks'),
+            array('bonds', 'Bonds'),
+            array('mutual_funds', 'Mutual Funds'),
+            array('etfs', 'Exchange-Traded Funds (ETFs)'),
+            array('gics', 'Guaranteed Investment Certificates (GICs)'),
+            array('term_deposits', 'Term Deposits'),
+            array('cryptocurrency', 'Cryptocurrency'),
+            array('reits', 'Real Estate Investment Trusts (REITs)'),
+            array('pension_plans', 'Pension Plans'),
+            array('annuities', 'Annuities'),
+            array('life_insurance', 'Life Insurance Policies'),
+            array('segregated_funds', 'Segregated Funds'),
+            array('options', 'Options'),
+            array('futures', 'Futures'),
+            array('commodities', 'Commodities'),
+            array('foreign_currency', 'Foreign Currency'),
+            array('rrsp', 'RRSP'),
+            array('tfsa', 'TFSA'),
+            array('rrif', 'RRIF'),
+            array('resp', 'RESP'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_investment_types', $investment_types);
+        
+        // Payment types
+        $payment_types = array(
+            array('mortgage', 'Mortgage'),
+            array('rent', 'Rent'),
+            array('utilities', 'Utilities'),
+            array('insurance', 'Insurance'),
+            array('loan_payment', 'Loan Payment'),
+            array('subscription', 'Subscription'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_payment_types', $payment_types);
+        
+        // Debt types
+        $debt_types = array(
+            array('mortgage', 'Mortgage'),
+            array('personal_loan', 'Personal Loan'),
+            array('credit_card', 'Credit Card'),
+            array('line_of_credit', 'Line of Credit'),
+            array('student_loan', 'Student Loan'),
+            array('business_loan', 'Business Loan'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_debt_types', $debt_types);
+        
+        // Employment status types
+        $employment_status_types = array(
+            array('full_time_employee', 'Full-time Employee'),
+            array('part_time_employee', 'Part-time Employee'),
+            array('self_employed', 'Self-employed'),
+            array('contractor', 'Contractor/Freelancer'),
+            array('retired', 'Retired'),
+            array('unemployed', 'Unemployed'),
+            array('student', 'Student'),
+            array('homemaker', 'Homemaker'),
+            array('on_leave', 'On Leave'),
+            array('seasonal', 'Seasonal Worker'),
+            array('volunteer', 'Volunteer'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_employment_status', $employment_status_types);
+        
+        // Document types
+        $document_types = array(
+            array('will', 'Will'),
+            array('poa_financial', 'Power of Attorney (Financial)'),
+            array('poa_personal_care', 'Power of Attorney (Personal Care)'),
+            array('living_will', 'Living Will/Advance Directive'),
+            array('trust_document', 'Trust Document'),
+            array('beneficiary_designation', 'Beneficiary Designation'),
+            array('funeral_instructions', 'Funeral Instructions'),
+            array('organ_donation', 'Organ Donation Consent'),
+            array('guardianship', 'Guardianship Document'),
+            array('business_succession', 'Business Succession Plan'),
+            array('prenuptial_agreement', 'Prenuptial Agreement'),
+            array('separation_agreement', 'Separation Agreement'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_document_types', $document_types);
+        
+        // Digital asset types
+        $digital_asset_types = array(
+            array('email_accounts', 'Email Accounts'),
+            array('social_media', 'Social Media Accounts'),
+            array('cloud_storage', 'Cloud Storage'),
+            array('cryptocurrency', 'Cryptocurrency Wallets'),
+            array('online_banking', 'Online Banking'),
+            array('investment_accounts', 'Online Investment Accounts'),
+            array('domain_names', 'Domain Names'),
+            array('websites', 'Websites/Blogs'),
+            array('digital_photos', 'Digital Photos/Videos'),
+            array('software_licenses', 'Software Licenses'),
+            array('gaming_accounts', 'Gaming Accounts'),
+            array('subscription_services', 'Subscription Services'),
+            array('loyalty_programs', 'Loyalty Programs'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_digital_asset_types', $digital_asset_types);
+        
+        // Personal property categories
+        $personal_property_categories = array(
+            array('jewelry', 'Jewelry'),
+            array('artwork', 'Artwork'),
+            array('antiques', 'Antiques'),
+            array('collectibles', 'Collectibles'),
+            array('vehicles', 'Vehicles'),
+            array('boats', 'Boats/Watercraft'),
+            array('electronics', 'Electronics'),
+            array('furniture', 'Furniture'),
+            array('appliances', 'Appliances'),
+            array('tools', 'Tools/Equipment'),
+            array('books', 'Books/Library'),
+            array('musical_instruments', 'Musical Instruments'),
+            array('sports_equipment', 'Sports Equipment'),
+            array('clothing', 'Clothing/Accessories'),
+            array('household_items', 'Household Items'),
+            array('business_assets', 'Business Assets'),
+            array('other', 'Other')
+        );
+        
+        $this->populate_selector_table('epm_personal_property_categories', $personal_property_categories);
+    }
+    
+    /**
+     * Populate a selector table with default values
+     */
+    private function populate_selector_table($table_name, $values) {
+        global $wpdb;
+        
+        $full_table_name = $wpdb->prefix . $table_name;
+        
+        // Check if table already has data
+        $count = $wpdb->get_var("SELECT COUNT(*) FROM $full_table_name");
+        
+        if ($count > 0) {
+            return; // Table already populated
+        }
+        
+        $sort_order = 0;
+        foreach ($values as $value_data) {
+            $wpdb->insert(
+                $full_table_name,
+                array(
+                    'value' => $value_data[0],
+                    'label' => $value_data[1],
+                    'is_active' => 1,
+                    'sort_order' => $sort_order++
+                ),
+                array('%s', '%s', '%d', '%d')
+            );
+        }
     }
     
     /**

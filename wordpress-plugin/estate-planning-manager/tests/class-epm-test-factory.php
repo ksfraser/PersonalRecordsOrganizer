@@ -41,7 +41,8 @@ class EPM_Test_Factory {
             case 'family_contacts':
                 $data = array(
                     'name' => 'Jane Test Doe',
-                    'relationship' => 'Spouse',
+                    'relationship' => 'spouse',
+                    'relationship_other' => '',
                     'address' => '123 Test Street, Toronto, ON M1M 1M1',
                     'phone' => '416-555-0123',
                     'email' => 'jane.doe@test.com'
@@ -76,7 +77,8 @@ class EPM_Test_Factory {
             case 'bank_accounts':
                 $data = array(
                     'bank' => 'Test Bank of Canada',
-                    'account_type' => 'Checking',
+                    'account_type' => 'chequing',
+                    'account_type_other' => '',
                     'account_number' => '1234567890',
                     'branch' => 'Main Branch',
                     'address' => '789 Bank St, Toronto, ON M3M 3M3',

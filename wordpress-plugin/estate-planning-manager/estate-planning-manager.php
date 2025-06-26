@@ -89,6 +89,7 @@ final class EstateplanningManager {
         if (is_admin()) {
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-settings.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-selectors.php';
         }
         
         // Public classes
@@ -110,6 +111,7 @@ final class EstateplanningManager {
         // Initialize admin interface
         if (is_admin()) {
             EPM_Admin::instance()->init();
+            EPM_Admin_Selectors::instance()->init();
         }
         
         // Initialize frontend
