@@ -87,6 +87,7 @@ class EPM_Database {
         $this->create_audit_log_table($charset_collate);
         $this->create_sync_log_table($charset_collate);
         $this->create_selector_tables($charset_collate);
+        $this->create_share_invites_table($charset_collate); // Add invites table
     }
     
     /**
@@ -1102,6 +1103,32 @@ class EPM_Database {
         $this->execute_sql($sql);
     }
     
+    /**
+     * Create share invites table
+     */
+    private function create_share_invites_table($charset_collate) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'epm_share_invites';
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            client_id bigint(20) NOT NULL,
+            invitee_email varchar(255) NOT NULL,
+            invited_by_user_id bigint(20) NOT NULL,
+            sections text NOT NULL,
+            permission_level varchar(20) DEFAULT 'view',
+            invite_token varchar(64) NOT NULL,
+            status varchar(20) DEFAULT 'pending',
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            accepted_at datetime DEFAULT NULL,
+            PRIMARY KEY (id),
+            KEY client_id (client_id),
+            KEY invitee_email (invitee_email),
+            KEY invite_token (invite_token),
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
+        ) $charset_collate;";
+        $this->execute_sql($sql);
+    }
+
     /**
      * Populate default selector values
      */

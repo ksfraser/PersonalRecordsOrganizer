@@ -42,6 +42,8 @@ class EPM_Shortcodes {
     public function init() {
         add_shortcode('epm_client_form', array($this, 'client_form_shortcode'));
         add_shortcode('epm_client_data', array($this, 'client_data_shortcode'));
+        add_shortcode('epm_manage_shares', array($this, 'manage_shares_shortcode'));
+        add_shortcode('epm_shared_with_you', array($this, 'shared_with_you_shortcode'));
     }
     
     /**
@@ -68,6 +70,30 @@ class EPM_Shortcodes {
         
         ob_start();
         $this->render_client_data($atts['section'], $atts['client_id']);
+        return ob_get_clean();
+    }
+    
+    /**
+     * Manage Shares Shortcode
+     */
+    public function manage_shares_shortcode($atts) {
+        if (!is_user_logged_in()) {
+            return '<div class="epm-error">Please log in to manage your shares.</div>';
+        }
+        ob_start();
+        $this->render_manage_shares();
+        return ob_get_clean();
+    }
+
+    /**
+     * Shared With You Shortcode
+     */
+    public function shared_with_you_shortcode($atts) {
+        if (!is_user_logged_in()) {
+            return '<div class="epm-error">Please log in to view shares.</div>';
+        }
+        ob_start();
+        $this->render_shared_with_you();
         return ob_get_clean();
     }
     
@@ -112,50 +138,163 @@ class EPM_Shortcodes {
     }
     
     /**
-     * Render client data display
+     * Render Manage Shares screen
      */
-    private function render_client_data($section, $client_id = null) {
+    private function render_manage_shares() {
+        $current_user = wp_get_current_user();
+        $db = EPM_Database::instance();
+        global $wpdb;
+        $client_id = $db->get_client_id_by_user_id($current_user->ID);
+        $table = $wpdb->prefix . 'epm_share_invites';
+        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d ORDER BY created_at DESC", $client_id));
+        echo '<h3>Manage Shares</h3>';
+        if (!$results) {
+            echo '<p>No shares found.</p>';
+            return;
+        }
+        echo '<table class="epm-manage-shares-table" style="width:100%; border-collapse:collapse;">';
+        echo '<tr><th>Email</th><th>Sections</th><th>Permission</th><th>Status</th><th>Actions</th></tr>';
+        foreach ($results as $row) {
+            $sections = esc_html(implode(', ', json_decode($row->sections, true)));
+            echo '<tr>';
+            echo '<td>' . esc_html($row->invitee_email) . '</td>';
+            echo '<td>' . $sections . '</td>';
+            echo '<td>' . esc_html($row->permission_level) . '</td>';
+            echo '<td>' . esc_html($row->status) . '</td>';
+            echo '<td>';
+            if ($row->status === 'pending' || $row->status === 'accepted') {
+                echo '<button class="epm-btn epm-btn-danger epm-revoke-share-btn" data-invite-id="' . esc_attr($row->id) . '">Revoke</button>';
+            } else {
+                echo '-';
+            }
+            echo '</td>';
+            echo '</tr>';
+        }
+        echo '</table>';
+        // JS for revoke
+        echo "<script>jQuery(document).ready(function($){\n$('.epm-revoke-share-btn').on('click',function(){\nif(!confirm('Are you sure you want to revoke this share?'))return;\nvar btn=$(this);\nbtn.prop('disabled',true);\n$.post('" . admin_url('admin-ajax.php') . "',{action:'epm_revoke_share',invite_id:btn.data('invite-id'),nonce:'" . wp_create_nonce('epm_revoke_share') . "'},function(resp){if(resp.success){btn.closest('tr').find('td').eq(3).text('revoked');btn.remove();}else{alert('Error: '+resp.data);btn.prop('disabled',false);}});\n});\n});</script>";
+    }
+
+    /**
+     * Render Shared With You screen
+     */
+    private function render_shared_with_you() {
+        $current_user = wp_get_current_user();
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_share_invites';
+        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE invitee_email = %s AND status = 'accepted'", $current_user->user_email));
+        echo '<h3>Data Shared With You</h3>';
+        if (!$results) {
+            echo '<p>No data has been shared with you.</p>';
+            return;
+        }
+        foreach ($results as $row) {
+            $sections = json_decode($row->sections, true);
+            $owner_id = $wpdb->get_var($wpdb->prepare("SELECT user_id FROM {$wpdb->prefix}epm_clients WHERE id = %d", $row->client_id));
+            $owner = get_user_by('ID', $owner_id);
+            echo '<div class="epm-shared-block" style="border:1px solid #ccc; margin-bottom:20px; padding:10px;">';
+            echo '<div><strong>From:</strong> ' . esc_html($owner ? $owner->display_name : 'Unknown') . ' (' . esc_html($owner ? $owner->user_email : '') . ')</div>';
+            echo '<div><strong>Sections:</strong> ' . esc_html(implode(', ', $sections)) . '</div>';
+            echo '<div><strong>Permission:</strong> ' . esc_html($row->permission_level) . '</div>';
+            // Render each shared section in read-only mode
+            foreach ($sections as $section) {
+                $this->render_client_data($section, $owner_id, true); // read-only
+            }
+            echo '</div>';
+        }
+    }
+
+    /**
+     * Render client data display (add $readonly param)
+     */
+    private function render_client_data($section, $client_id = null, $readonly = false) {
         if (!is_user_logged_in()) {
             echo '<div class="epm-error">Please log in to view this data.</div>';
             return;
         }
-        
         $current_user = wp_get_current_user();
         $display_client_id = $client_id ? $client_id : $current_user->ID;
-        
-        // Check permissions
-        if (!$this->can_view_client_data($current_user->ID, $display_client_id)) {
-            echo '<div class="epm-error">You do not have permission to view this data.</div>';
+        $is_owner = ($display_client_id == $current_user->ID);
+        $sections = $this->get_form_sections();
+        $edit_mode = isset($_GET['edit']) && $_GET['edit'] == '1';
+        // Only allow edit mode for owner and not readonly
+        if ($readonly) $edit_mode = false;
+        // If section is 'all', just show all sections in view mode
+        if ($section === 'all') {
+            echo '<div class="epm-client-data-wrapper">';
+            foreach ($sections as $section_key => $section_config) {
+                $this->render_client_data($section_key, $display_client_id, $readonly);
+            }
+            echo '</div>';
             return;
         }
-        
-        $sections = $this->get_form_sections();
-        
-        echo '<div class="epm-client-data-wrapper">';
-        
-        if ($section === 'all') {
-            foreach ($sections as $section_key => $section_config) {
-                $this->render_data_section($section_key, $section_config, $display_client_id);
-            }
-        } else {
-            if (isset($sections[$section])) {
-                $this->render_data_section($section, $sections[$section], $display_client_id);
-            } else {
-                echo '<div class="epm-error">Invalid section specified.</div>';
-            }
+        // Get data for this section
+        $data = $this->get_client_data($section, $display_client_id);
+        // If no data and owner, go straight to form
+        if ($is_owner && !$readonly && empty($data)) {
+            $this->render_client_form($section);
+            return;
         }
-        
+        // If edit mode and owner, show form
+        if ($is_owner && !$readonly && $edit_mode) {
+            $this->render_client_form($section);
+            return;
+        }
+        // Otherwise, show read-only data
+        echo '<div class="epm-client-data-wrapper">';
+        if ($is_owner && !$readonly && !empty($data)) {
+            // Show Edit button
+            $edit_url = add_query_arg(array_merge($_GET, ['edit' => 1]));
+            echo '<div style="text-align:right;"><a href="' . esc_url($edit_url) . '" class="epm-btn epm-btn-primary">Edit</a></div>';
+        }
+        // Share button and modal (only for owner)
+        if (!$readonly && $is_owner) {
+            echo '<button type="button" class="epm-btn epm-btn-secondary epm-share-btn">Share Data</button>';
+            echo '<div class="epm-share-modal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#fff; border:1px solid #ccc; border-radius:5px; padding:30px; z-index:9999; max-width:500px; width:90%;">';
+            echo '<h3>Share Your Data</h3>';
+            echo '<form class="epm-share-form">';
+            echo '<label>Email to share with:</label> <input type="email" name="share_email" required style="width:250px; margin-bottom:10px;">';
+            echo '<div style="margin:10px 0;"><strong>Select sections to share:</strong></div>';
+            foreach ($sections as $section_key => $section_config) {
+                echo '<div><label><input type="checkbox" name="share_sections[]" value="' . esc_attr($section_key) . '"> ' . esc_html($section_config['title']) . '</label></div>';
+            }
+            echo '<div style="margin:10px 0;"><label>Permission: <select name="permission_level"><option value="view">View</option><option value="edit">Edit</option></select></label></div>';
+            echo '<button type="submit" class="epm-btn epm-btn-primary">Share</button>';
+            echo '<button type="button" class="epm-btn epm-btn-secondary epm-share-cancel" style="margin-left:10px;">Cancel</button>';
+            echo '<span class="epm-share-status" style="margin-left:10px;"></span>';
+            echo '</form>';
+            echo '</div>';
+        }
+        // Show the data section in read-only mode
+        if (isset($sections[$section])) {
+            $this->render_data_section($section, $sections[$section], $display_client_id, true);
+        } else {
+            echo '<div class="epm-error">Invalid section specified.</div>';
+        }
         echo '</div>';
     }
     
     /**
-     * Render a single data section
+     * Render a single data section (add $readonly param)
      */
-    private function render_data_section($section_key, $section_config, $client_id) {
+    private function render_data_section($section_key, $section_config, $client_id, $readonly = false) {
         $data = $this->get_client_data($section_key, $client_id);
         
         echo '<div class="epm-data-section" data-section="' . esc_attr($section_key) . '">';
         echo '<h3>' . esc_html($section_config['title']) . '</h3>';
+        
+        // Invite button (only if not readonly)
+        if (!$readonly && $client_id == get_current_user_id()) {
+            echo '<button type="button" class="epm-btn epm-btn-secondary epm-invite-btn" data-section="' . esc_attr($section_key) . '">Invite Someone to View/Edit</button>';
+            echo '<div class="epm-invite-form-wrapper" style="display:none; margin:10px 0;">';
+            echo '<form class="epm-invite-form" data-section="' . esc_attr($section_key) . '">';
+            echo '<input type="email" name="invite_email" placeholder="Enter email address" required style="width:250px; margin-right:10px;">';
+            echo '<select name="permission_level"><option value="view">View</option><option value="edit">Edit</option></select>';
+            echo '<button type="submit" class="epm-btn epm-btn-primary">Send Invite</button>';
+            echo '<span class="epm-invite-status" style="margin-left:10px;"></span>';
+            echo '</form>';
+            echo '</div>';
+        }
         
         if (empty($data)) {
             echo '<p class="epm-no-data">No data available for this section.</p>';
@@ -171,65 +310,6 @@ class EPM_Shortcodes {
                 }
             }
             echo '</div>';
-        }
-        
-        echo '</div>';
-    }
-    
-    /**
-     * Render a form field
-     */
-    private function render_form_field($field, $user_id) {
-        $value = $this->get_field_value($field['name'], $user_id);
-        
-        echo '<div class="epm-form-field">';
-        echo '<label for="' . esc_attr($field['name']) . '">' . esc_html($field['label']) . '</label>';
-        
-        switch ($field['type']) {
-            case 'text':
-            case 'email':
-            case 'tel':
-            case 'date':
-                echo '<input type="' . esc_attr($field['type']) . '" ';
-                echo 'id="' . esc_attr($field['name']) . '" ';
-                echo 'name="' . esc_attr($field['name']) . '" ';
-                echo 'value="' . esc_attr($value) . '" ';
-                if (isset($field['required']) && $field['required']) {
-                    echo 'required ';
-                }
-                echo '/>';
-                break;
-                
-            case 'textarea':
-                echo '<textarea ';
-                echo 'id="' . esc_attr($field['name']) . '" ';
-                echo 'name="' . esc_attr($field['name']) . '" ';
-                if (isset($field['required']) && $field['required']) {
-                    echo 'required ';
-                }
-                echo '>' . esc_textarea($value) . '</textarea>';
-                break;
-                
-            case 'select':
-                echo '<select ';
-                echo 'id="' . esc_attr($field['name']) . '" ';
-                echo 'name="' . esc_attr($field['name']) . '" ';
-                if (isset($field['required']) && $field['required']) {
-                    echo 'required ';
-                }
-                echo '>';
-                echo '<option value="">Select...</option>';
-                if (isset($field['options'])) {
-                    foreach ($field['options'] as $option_value => $option_label) {
-                        echo '<option value="' . esc_attr($option_value) . '"';
-                        if ($value == $option_value) {
-                            echo ' selected';
-                        }
-                        echo '>' . esc_html($option_label) . '</option>';
-                    }
-                }
-                echo '</select>';
-                break;
         }
         
         echo '</div>';
@@ -298,7 +378,7 @@ class EPM_Shortcodes {
                 'title' => 'Emergency Contacts',
                 'fields' => array(
                     array('name' => 'contact_name', 'label' => 'Contact Name', 'type' => 'text'),
-                    array('name' => 'relationship', 'label' => 'Relationship', 'type' => 'text'),
+                    array('name' => 'relationship', 'label' => 'Relationship', 'type' => 'select', 'options' => $db->get_selector_options('epm_relationship_types')),
                     array('name' => 'phone', 'label' => 'Phone Number', 'type' => 'tel'),
                     array('name' => 'email', 'label' => 'Email', 'type' => 'email'),
                     array('name' => 'address', 'label' => 'Address', 'type' => 'textarea'),
@@ -398,88 +478,111 @@ class EPM_Shortcodes {
                 var section = $(this).closest('form').data('section');
                 window.open('" . admin_url('admin-ajax.php') . "?action=epm_generate_pdf&section=' + section, '_blank');
             });
+            
+            // Invite form handling
+            $('.epm-invite-btn').on('click', function() {
+                var section = $(this).data('section');
+                $('.epm-invite-form-wrapper[data-section=\"' + section + '\"]').toggle();
+            });
+            
+            $('.epm-invite-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                var form = $(this);
+                var formData = form.serialize();
+                var section = form.data('section');
+                
+                $.ajax({
+                    url: '" . admin_url('admin-ajax.php') . "',
+                    type: 'POST',
+                    data: {
+                        action: 'epm_send_invite',
+                        section: section,
+                        form_data: formData,
+                        nonce: $('[name=\"epm_nonce\"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            form.find('.epm-invite-status').text('Invite sent successfully!').css('color', 'green');
+                        } else {
+                            form.find('.epm-invite-status').text('Error sending invite: ' + response.data).css('color', 'red');
+                        }
+                    },
+                    error: function() {
+                        form.find('.epm-invite-status').text('Error sending invite. Please try again.').css('color', 'red');
+                    }
+                });
+            });
+            
+            // Share modal open/close
+            $('.epm-share-btn').on('click', function() {
+                $('.epm-share-modal').fadeIn();
+            });
+            $('.epm-share-cancel').on('click', function(e) {
+                e.preventDefault();
+                $('.epm-share-modal').fadeOut();
+            });
+            // Share form submit
+            $('.epm-share-form').on('submit', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var formData = form.serialize();
+                $.ajax({
+                    url: '" . admin_url('admin-ajax.php') . "',
+                    type: 'POST',
+                    data: {
+                        action: 'epm_send_share',
+                        form_data: formData,
+                        nonce: $('[name=\"epm_nonce\"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            form.find('.epm-share-status').text('Shared successfully!').css('color', 'green');
+                        } else {
+                            form.find('.epm-share-status').text('Error: ' + response.data).css('color', 'red');
+                        }
+                    },
+                    error: function() {
+                        form.find('.epm-share-status').text('Error sharing. Please try again.').css('color', 'red');
+                    }
+                });
+            });
         });
         ";
         
         wp_add_inline_script('jquery', $script);
         
-        // Add basic CSS
-        $css = "
-        .epm-client-form-wrapper, .epm-client-data-wrapper {
-            max-width: 800px;
-            margin: 20px 0;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: #fff;
+        // Enqueue frontend CSS
+        wp_enqueue_style('epm-frontend', plugins_url('../assets/css/epm-frontend.css', __FILE__), array(), EPM_VERSION);
+    }
+    
+    /**
+     * Helper for tests: render a form field (for unit testing)
+     */
+    public function test_render_form_field($field, $user_id) {
+        $this->render_form_field($field, $user_id);
+    }
+
+    /**
+     * Create pages for each main shortcode on install/update
+     */
+    public static function create_pages_on_install() {
+        $shortcodes = array(
+            'epm_client_form' => array('title' => 'Estate Planning Form', 'content' => '[epm_client_form]'),
+            'epm_client_data' => array('title' => 'My Estate Data', 'content' => '[epm_client_data]'),
+            'epm_manage_shares' => array('title' => 'Manage Shares', 'content' => '[epm_manage_shares]'),
+            'epm_shared_with_you' => array('title' => 'Shared With Me', 'content' => '[epm_shared_with_you]'),
+        );
+        foreach ($shortcodes as $slug => $info) {
+            if (!get_page_by_path($slug)) {
+                wp_insert_post(array(
+                    'post_title'   => $info['title'],
+                    'post_name'    => $slug,
+                    'post_content' => $info['content'],
+                    'post_status'  => 'publish',
+                    'post_type'    => 'page',
+                ));
+            }
         }
-        .epm-form-field {
-            margin-bottom: 15px;
-        }
-        .epm-form-field label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .epm-form-field input,
-        .epm-form-field textarea,
-        .epm-form-field select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-        .epm-form-actions {
-            margin-top: 20px;
-            text-align: right;
-        }
-        .epm-btn {
-            padding: 10px 20px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .epm-btn-primary {
-            background: #0073aa;
-            color: white;
-        }
-        .epm-btn-secondary {
-            background: #666;
-            color: white;
-        }
-        .epm-data-section {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 3px;
-        }
-        .epm-data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-        .epm-data-item label {
-            font-weight: bold;
-            color: #666;
-        }
-        .epm-data-item span {
-            display: block;
-            margin-top: 5px;
-        }
-        .epm-error {
-            color: #d63638;
-            background: #fcf0f1;
-            border: 1px solid #d63638;
-            padding: 10px;
-            border-radius: 3px;
-        }
-        .epm-no-data {
-            color: #666;
-            font-style: italic;
-        }
-        ";
-        
-        wp_add_inline_style('wp-admin', $css);
     }
 }

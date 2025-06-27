@@ -135,4 +135,65 @@ class EPM_Ajax_Handler {
         
         wp_send_json_success(array('data' => array()));
     }
+
+    /**
+     * Handle AJAX for sharing sections with a user by email
+     */
+    public function send_share() {
+        if (!check_ajax_referer('epm_save_data', 'nonce', false)) {
+            wp_send_json_error('Invalid security token');
+        }
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        $user_id = get_current_user_id();
+        parse_str($_POST['form_data'], $form_data);
+        $email = sanitize_email($form_data['share_email']);
+        $sections = isset($form_data['share_sections']) ? (array)$form_data['share_sections'] : array();
+        $permission = sanitize_text_field($form_data['permission_level']);
+        if (empty($email) || empty($sections)) {
+            wp_send_json_error('Email and at least one section are required');
+        }
+        $existing_user = get_user_by('email', $email);
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_sharing_permissions';
+        if ($existing_user) {
+            // Grant access for each section
+            foreach ($sections as $section) {
+                $wpdb->replace($table, array(
+                    'client_id' => $user_id,
+                    'shared_with_user_id' => $existing_user->ID,
+                    'section' => $section,
+                    'permission_level' => $permission
+                ));
+            }
+            wp_send_json_success('Access granted to existing user.');
+        } else {
+            // Generate invite token
+            $token = wp_generate_password(32, false);
+            $invite_data = array(
+                'client_id' => $user_id,
+                'email' => $email,
+                'sections' => $sections,
+                'permission_level' => $permission,
+                'token' => $token,
+                'created_at' => current_time('mysql')
+            );
+            $invites_table = $wpdb->prefix . 'epm_share_invites';
+            $wpdb->insert($invites_table, array(
+                'client_id' => $user_id,
+                'email' => $email,
+                'sections' => maybe_serialize($sections),
+                'permission_level' => $permission,
+                'token' => $token,
+                'created_at' => current_time('mysql')
+            ));
+            // Send invite email
+            $register_url = wp_registration_url();
+            $invite_url = add_query_arg(array('epm_invite' => $token, 'email' => rawurlencode($email)), $register_url);
+            wp_mail($email, 'You are invited to Estate Planning Manager',
+                "You have been invited to access shared data. Register here: $invite_url");
+            wp_send_json_success('Invite sent to email.');
+        }
+    }
 }
