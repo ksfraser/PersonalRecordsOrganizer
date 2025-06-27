@@ -1495,4 +1495,22 @@ class EPM_Database {
         
         return round(($completed_sections / $total_sections) * 100, 2);
     }
+    
+    /**
+     * Get selector options from a selector table
+     * @param string $selector_table (e.g. 'epm_account_types')
+     * @return array key => label
+     */
+    public function get_selector_options($selector_table) {
+        global $wpdb;
+        $table = $wpdb->prefix . $selector_table;
+        $results = $wpdb->get_results("SELECT value, label FROM $table WHERE is_active = 1 ORDER BY sort_order ASC, label ASC", ARRAY_A);
+        $options = array();
+        if ($results) {
+            foreach ($results as $row) {
+                $options[$row['value']] = $row['label'];
+            }
+        }
+        return $options;
+    }
 }

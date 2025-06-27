@@ -240,6 +240,7 @@ class EPM_Shortcodes {
      * @return array Form sections configuration
      */
     public function get_form_sections() {
+        $db = EPM_Database::instance();
         return array(
             'personal' => array(
                 'title' => 'Personal Information',
@@ -257,12 +258,7 @@ class EPM_Shortcodes {
                 'title' => 'Banking Information',
                 'fields' => array(
                     array('name' => 'bank_name', 'label' => 'Bank Name', 'type' => 'text'),
-                    array('name' => 'account_type', 'label' => 'Account Type', 'type' => 'select', 'options' => array(
-                        'checking' => 'Checking',
-                        'savings' => 'Savings',
-                        'money_market' => 'Money Market',
-                        'cd' => 'Certificate of Deposit'
-                    )),
+                    array('name' => 'account_type', 'label' => 'Account Type', 'type' => 'select', 'options' => $db->get_selector_options('epm_account_types')),
                     array('name' => 'account_number', 'label' => 'Account Number', 'type' => 'text'),
                     array('name' => 'branch', 'label' => 'Branch', 'type' => 'text'),
                     array('name' => 'balance', 'label' => 'Current Balance', 'type' => 'text'),
@@ -271,13 +267,7 @@ class EPM_Shortcodes {
             'investments' => array(
                 'title' => 'Investment Accounts',
                 'fields' => array(
-                    array('name' => 'investment_type', 'label' => 'Investment Type', 'type' => 'select', 'options' => array(
-                        'rrsp' => 'RRSP',
-                        'rrif' => 'RRIF',
-                        'tfsa' => 'TFSA',
-                        'resp' => 'RESP',
-                        'non_registered' => 'Non-Registered'
-                    )),
+                    array('name' => 'investment_type', 'label' => 'Investment Type', 'type' => 'select', 'options' => $db->get_selector_options('epm_investment_types')),
                     array('name' => 'institution', 'label' => 'Financial Institution', 'type' => 'text'),
                     array('name' => 'account_number', 'label' => 'Account Number', 'type' => 'text'),
                     array('name' => 'current_value', 'label' => 'Current Value', 'type' => 'text'),
@@ -287,12 +277,7 @@ class EPM_Shortcodes {
             'insurance' => array(
                 'title' => 'Insurance Policies',
                 'fields' => array(
-                    array('name' => 'policy_type', 'label' => 'Policy Type', 'type' => 'select', 'options' => array(
-                        'life' => 'Life Insurance',
-                        'disability' => 'Disability Insurance',
-                        'health' => 'Health Insurance',
-                        'property' => 'Property Insurance'
-                    )),
+                    array('name' => 'policy_type', 'label' => 'Policy Type', 'type' => 'select', 'options' => $db->get_selector_options('epm_insurance_types')),
                     array('name' => 'insurance_company', 'label' => 'Insurance Company', 'type' => 'text'),
                     array('name' => 'policy_number', 'label' => 'Policy Number', 'type' => 'text'),
                     array('name' => 'coverage_amount', 'label' => 'Coverage Amount', 'type' => 'text'),
@@ -302,12 +287,7 @@ class EPM_Shortcodes {
             'real_estate' => array(
                 'title' => 'Real Estate',
                 'fields' => array(
-                    array('name' => 'property_type', 'label' => 'Property Type', 'type' => 'select', 'options' => array(
-                        'primary_residence' => 'Primary Residence',
-                        'vacation_home' => 'Vacation Home',
-                        'rental_property' => 'Rental Property',
-                        'commercial' => 'Commercial Property'
-                    )),
+                    array('name' => 'property_type', 'label' => 'Property Type', 'type' => 'select', 'options' => $db->get_selector_options('epm_property_types')),
                     array('name' => 'property_address', 'label' => 'Property Address', 'type' => 'textarea'),
                     array('name' => 'estimated_value', 'label' => 'Estimated Value', 'type' => 'text'),
                     array('name' => 'mortgage_balance', 'label' => 'Mortgage Balance', 'type' => 'text'),
