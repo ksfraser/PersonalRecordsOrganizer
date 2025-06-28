@@ -11,6 +11,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/tables/TableFactory.php';
+
 class EPM_Database {
     
     /**
@@ -60,36 +62,12 @@ class EPM_Database {
      */
     public function create_tables() {
         global $wpdb;
-        
         $charset_collate = $wpdb->get_charset_collate();
-        
-        // Create tables for each section
-        $this->create_clients_table($charset_collate);
-        $this->create_basic_personal_table($charset_collate);
-        $this->create_family_contacts_table($charset_collate);
-        $this->create_key_contacts_table($charset_collate);
-        $this->create_wills_poa_table($charset_collate);
-        $this->create_funeral_organ_table($charset_collate);
-        $this->create_taxes_table($charset_collate);
-        $this->create_military_service_table($charset_collate);
-        $this->create_employment_table($charset_collate);
-        $this->create_volunteer_table($charset_collate);
-        $this->create_bank_accounts_table($charset_collate);
-        $this->create_investments_table($charset_collate);
-        $this->create_real_estate_table($charset_collate);
-        $this->create_personal_property_table($charset_collate);
-        $this->create_digital_assets_table($charset_collate);
-        $this->create_scheduled_payments_table($charset_collate);
-        $this->create_debtors_creditors_table($charset_collate);
-        $this->create_insurance_table($charset_collate);
-        $this->create_sharing_permissions_table($charset_collate);
-        $this->create_suggested_updates_table($charset_collate);
-        $this->create_audit_log_table($charset_collate);
-        $this->create_sync_log_table($charset_collate);
-        $this->create_selector_tables($charset_collate);
-        $this->create_share_invites_table($charset_collate); // Add invites table
-        $this->create_user_preferences_table($charset_collate); // Add user preferences table
-        $this->create_defaults_table($charset_collate); // Add advisor defaults table
+        // Use new table classes for creation
+        foreach (TableFactory::getTables() as $table) {
+            $table->create_table($wpdb, $charset_collate);
+            $table->populate_defaults($wpdb);
+        }
     }
     
     /**
@@ -669,15 +647,14 @@ class EPM_Database {
      */
     private function create_sharing_permissions_table($charset_collate) {
         global $wpdb;
-        
         $table_name = $wpdb->prefix . 'epm_sharing_permissions';
-        
         $sql = "CREATE TABLE $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             client_id bigint(20) NOT NULL,
             shared_with_user_id bigint(20) NOT NULL,
             section varchar(100) NOT NULL,
             permission_level varchar(20) DEFAULT 'view',
+            password_sharing_options text DEFAULT NULL,
             expires_at datetime DEFAULT NULL,
             created datetime DEFAULT CURRENT_TIMESTAMP,
             lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -1119,6 +1096,7 @@ class EPM_Database {
             sections text NOT NULL,
             permission_level varchar(20) DEFAULT 'view',
             invite_token varchar(64) NOT NULL,
+            password_sharing_options text DEFAULT NULL,
             status varchar(20) DEFAULT 'pending',
             created datetime DEFAULT CURRENT_TIMESTAMP,
             accepted_at datetime DEFAULT NULL,

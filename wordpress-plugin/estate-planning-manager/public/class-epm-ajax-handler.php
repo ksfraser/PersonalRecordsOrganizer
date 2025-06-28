@@ -45,6 +45,7 @@ class EPM_Ajax_Handler {
         add_action('wp_ajax_nopriv_epm_save_client_data', array($this, 'save_client_data'));
         add_action('wp_ajax_nopriv_epm_load_client_data', array($this, 'load_client_data'));
         add_action('wp_ajax_epm_set_ui_mode', array($this, 'set_ui_mode'));
+        add_action('wp_ajax_epm_generate_pdf_and_send', array($this, 'generate_pdf_and_send'));
     }
     
     /**
@@ -157,6 +158,11 @@ class EPM_Ajax_Handler {
         $email = sanitize_email($form_data['share_email']);
         $sections = isset($form_data['share_sections']) ? (array)$form_data['share_sections'] : array();
         $permission = sanitize_text_field($form_data['permission_level']);
+        // Extract password sharing options (default masked)
+        $password_sharing_options = array();
+        if (isset($form_data['show_password']) && is_array($form_data['show_password'])) {
+            $password_sharing_options = $form_data['show_password']; // [section][field] => 1
+        }
         if (empty($email) || empty($sections)) {
             wp_send_json_error('Email and at least one section are required');
         }
@@ -166,11 +172,13 @@ class EPM_Ajax_Handler {
         if ($existing_user) {
             // Grant access for each section
             foreach ($sections as $section) {
+                $section_password_opts = isset($password_sharing_options[$section]) ? $password_sharing_options[$section] : array();
                 $wpdb->replace($table, array(
                     'client_id' => $user_id,
                     'shared_with_user_id' => $existing_user->ID,
                     'section' => $section,
-                    'permission_level' => $permission
+                    'permission_level' => $permission,
+                    'password_sharing_options' => maybe_serialize($section_password_opts)
                 ));
             }
             wp_send_json_success('Access granted to existing user.');
@@ -183,7 +191,8 @@ class EPM_Ajax_Handler {
                 'sections' => $sections,
                 'permission_level' => $permission,
                 'token' => $token,
-                'created_at' => current_time('mysql')
+                'created_at' => current_time('mysql'),
+                'password_sharing_options' => maybe_serialize($password_sharing_options)
             );
             $invites_table = $wpdb->prefix . 'epm_share_invites';
             $wpdb->insert($invites_table, array(
@@ -192,7 +201,8 @@ class EPM_Ajax_Handler {
                 'sections' => maybe_serialize($sections),
                 'permission_level' => $permission,
                 'token' => $token,
-                'created_at' => current_time('mysql')
+                'created_at' => current_time('mysql'),
+                'password_sharing_options' => maybe_serialize($password_sharing_options)
             ));
             // Send invite email
             $register_url = wp_registration_url();
@@ -215,5 +225,53 @@ class EPM_Ajax_Handler {
         $db = EPM_Database::instance();
         $db->set_user_preference($user_id, 'ui_mode', $ui_mode);
         wp_send_json_success('Preference saved');
+    }
+
+    /**
+     * Generate PDF for a share and email it to the invitee
+     */
+    public function generate_pdf_and_send() {
+        if (!check_ajax_referer('epm_generate_pdf_and_send', 'nonce', false)) {
+            wp_send_json_error('Invalid security token');
+        }
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        $invite_id = isset($_POST['invite_id']) ? intval($_POST['invite_id']) : 0;
+        if (!$invite_id) {
+            wp_send_json_error('Missing invite ID');
+        }
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_share_invites';
+        $invite = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $invite_id));
+        if (!$invite) {
+            wp_send_json_error('Invite not found');
+        }
+        $sections = json_decode($invite->sections, true);
+        $client_id = $invite->client_id;
+        $email = $invite->invitee_email;
+        $permission = $invite->permission_level;
+        $password_sharing_options = $invite->password_sharing_options ? @unserialize($invite->password_sharing_options) : array();
+        // Generate PDF (use existing PDF generator class)
+        if (!class_exists('EPM_PDF_Generator')) {
+            require_once dirname(__FILE__) . '/../includes/class-epm-pdf-generator.php';
+        }
+        $pdf = new EPM_PDF_Generator();
+        $pdf_content = $pdf->generate_pdf_for_sections($client_id, $sections, $permission, $password_sharing_options);
+        // Save PDF to temp file
+        $tmpfile = tempnam(sys_get_temp_dir(), 'epm_pdf_') . '.pdf';
+        file_put_contents($tmpfile, $pdf_content);
+        // Email PDF
+        $subject = 'Estate Planning Data PDF';
+        $message = 'Attached is the PDF for the data shared with you.';
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        $attachments = array($tmpfile);
+        $sent = wp_mail($email, $subject, $message, $headers, $attachments);
+        @unlink($tmpfile);
+        if ($sent) {
+            wp_send_json_success('PDF sent to ' . esc_html($email));
+        } else {
+            wp_send_json_error('Failed to send email');
+        }
     }
 }

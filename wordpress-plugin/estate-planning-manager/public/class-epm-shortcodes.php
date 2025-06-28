@@ -164,6 +164,8 @@ class EPM_Shortcodes {
             echo '<td>';
             if ($row->status === 'pending' || $row->status === 'accepted') {
                 echo '<button class="epm-btn epm-btn-danger epm-revoke-share-btn" data-invite-id="' . esc_attr($row->id) . '">Revoke</button>';
+                // Add Generate PDF and Send button
+                echo '<button class="epm-btn epm-btn-secondary epm-generate-pdf-send-btn" data-invite-id="' . esc_attr($row->id) . '" style="margin-left:8px;">Generate PDF and Send</button>';
             } else {
                 echo '-';
             }
@@ -171,8 +173,8 @@ class EPM_Shortcodes {
             echo '</tr>';
         }
         echo '</table>';
-        // JS for revoke
-        echo "<script>jQuery(document).ready(function($){\n$('.epm-revoke-share-btn').on('click',function(){\nif(!confirm('Are you sure you want to revoke this share?'))return;\nvar btn=$(this);\nbtn.prop('disabled',true);\n$.post('" . admin_url('admin-ajax.php') . "',{action:'epm_revoke_share',invite_id:btn.data('invite-id'),nonce:'" . wp_create_nonce('epm_revoke_share') . "'},function(resp){if(resp.success){btn.closest('tr').find('td').eq(3).text('revoked');btn.remove();}else{alert('Error: '+resp.data);btn.prop('disabled',false);}});\n});\n});</script>";
+        // JS for revoke and PDF send
+        echo "<script>jQuery(document).ready(function($){\n$('.epm-revoke-share-btn').on('click',function(){\nif(!confirm('Are you sure you want to revoke this share?'))return;\nvar btn=$(this);\nbtn.prop('disabled',true);\n$.post('" . admin_url('admin-ajax.php') . "',{action:'epm_revoke_share',invite_id:btn.data('invite-id'),nonce:'" . wp_create_nonce('epm_revoke_share') . "'},function(resp){if(resp.success){btn.closest('tr').find('td').eq(3).text('revoked');btn.remove();}else{alert('Error: '+resp.data);btn.prop('disabled',false);}});\n});\n// PDF and send\n$('.epm-generate-pdf-send-btn').on('click',function(){\nvar btn=$(this);\nbtn.prop('disabled',true);\nbtn.text('Sending...');\n$.post('" . admin_url('admin-ajax.php') . "',{action:'epm_generate_pdf_and_send',invite_id:btn.data('invite-id'),nonce:'" . wp_create_nonce('epm_generate_pdf_and_send') . "'},function(resp){if(resp.success){btn.text('Sent!').css('color','green');}else{btn.text('Error').css('color','red');alert('Error: '+resp.data);}btn.prop('disabled',false);});\n});\n});</script>";
     }
 
     /**
@@ -301,10 +303,22 @@ class EPM_Shortcodes {
             echo '<form class="epm-share-form">';
             echo '<label>Email to share with:</label> <input type="email" name="share_email" required style="width:250px; margin-bottom:10px;">';
             echo '<div style="margin:10px 0;"><strong>Select sections to share:</strong></div>';
-            foreach ($sections as $section_key => $section_config) {
+            foreach (
+                $sections as $section_key => $section_config) {
                 echo '<div><label><input type="checkbox" name="share_sections[]" value="' . esc_attr($section_key) . '"> ' . esc_html($section_config['title']) . '</label></div>';
             }
             echo '<div style="margin:10px 0;"><label>Permission: <select name="permission_level"><option value="view">View</option><option value="edit">Edit</option></select></label></div>';
+            // Password sharing options
+            echo '<div style="margin:10px 0;"><strong>Password Sharing Options:</strong></div>';
+            foreach ($sections as $section_key => $section_config) {
+                foreach ($section_config['fields'] as $field) {
+                    if (stripos($field['name'], 'password') !== false) {
+                        echo '<div style="margin-left:15px;">';
+                        echo '<label><input type="checkbox" name="show_password[' . esc_attr($section_key) . '][' . esc_attr($field['name']) . ']" value="1"> Show ' . esc_html($field['label']) . ' as plaintext</label>';
+                        echo '</div>';
+                    }
+                }
+            }
             echo '<button type="submit" class="epm-btn epm-btn-primary">Share</button>';
             echo '<button type="button" class="epm-btn epm-btn-secondary epm-share-cancel" style="margin-left:10px;">Cancel</button>';
             echo '<span class="epm-share-status" style="margin-left:10px;"></span>';
@@ -313,7 +327,13 @@ class EPM_Shortcodes {
         }
         // Show the data section in read-only mode
         if (isset($sections[$section])) {
-            $this->render_data_section($section, $sections[$section], $display_client_id, true);
+            // Pass share masking info if available
+            $mask_passwords = true;
+            if (isset($_GET['share_id'])) {
+                // TODO: Load share preferences from DB for this share_id
+                // $mask_passwords = ...
+            }
+            $this->render_data_section($section, $sections[$section], $display_client_id, true, $mask_passwords);
         } else {
             echo '<div class="epm-error">Invalid section specified.</div>';
         }
@@ -321,14 +341,12 @@ class EPM_Shortcodes {
     }
     
     /**
-     * Render a single data section (add $readonly param)
+     * Render a single data section (add $readonly param, $mask_passwords param)
      */
-    private function render_data_section($section_key, $section_config, $client_id, $readonly = false) {
+    private function render_data_section($section_key, $section_config, $client_id, $readonly = false, $mask_passwords = true) {
         $data = $this->get_client_data($section_key, $client_id);
-        
         echo '<div class="epm-data-section" data-section="' . esc_attr($section_key) . '">';
         echo '<h3>' . esc_html($section_config['title']) . '</h3>';
-        
         // Invite button (only if not readonly)
         if (!$readonly && $client_id == get_current_user_id()) {
             echo '<button type="button" class="epm-btn epm-btn-secondary epm-invite-btn" data-section="' . esc_attr($section_key) . '">Invite Someone to View/Edit</button>';
@@ -336,12 +354,17 @@ class EPM_Shortcodes {
             echo '<form class="epm-invite-form" data-section="' . esc_attr($section_key) . '">';
             echo '<input type="email" name="invite_email" placeholder="Enter email address" required style="width:250px; margin-right:10px;">';
             echo '<select name="permission_level"><option value="view">View</option><option value="edit">Edit</option></select>';
+            // Password sharing option for invite
+            foreach ($section_config['fields'] as $field) {
+                if (stripos($field['name'], 'password') !== false) {
+                    echo '<label style="margin-left:10px;"><input type="checkbox" name="show_password[' . esc_attr($field['name']) . ']" value="1"> Show ' . esc_html($field['label']) . ' as plaintext</label>';
+                }
+            }
             echo '<button type="submit" class="epm-btn epm-btn-primary">Send Invite</button>';
             echo '<span class="epm-invite-status" style="margin-left:10px;"></span>';
             echo '</form>';
             echo '</div>';
         }
-        
         if (empty($data)) {
             echo '<p class="epm-no-data">No data available for this section.</p>';
         } else {
@@ -351,13 +374,17 @@ class EPM_Shortcodes {
                 if (!empty($value)) {
                     echo '<div class="epm-data-item">';
                     echo '<label>' . esc_html($field['label']) . ':</label>';
-                    echo '<span>' . esc_html($value) . '</span>';
+                    // Mask password fields if needed
+                    if (stripos($field['name'], 'password') !== false && $mask_passwords) {
+                        echo '<span>********</span>';
+                    } else {
+                        echo '<span>' . esc_html($value) . '</span>';
+                    }
                     echo '</div>';
                 }
             }
             echo '</div>';
         }
-        
         echo '</div>';
     }
     
