@@ -2,26 +2,59 @@
 require_once __DIR__ . '/TableInterface.php';
 
 class InvestmentTypesTable implements TableInterface {
-    public function create_table($wpdb, $charset_collate) {
+    public function create($charset_collate) {
+        global $wpdb;
         $table_name = $wpdb->prefix . 'epm_investment_types';
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            description VARCHAR(255) DEFAULT NULL
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
         ) $charset_collate;";
-        $wpdb->query($sql);
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
     }
-    public function populate_defaults($wpdb) {
+    public function populate($charset_collate) {
+        global $wpdb;
         $table_name = $wpdb->prefix . 'epm_investment_types';
         $defaults = [
-            ['name' => 'Stocks', 'description' => 'Equity investments'],
-            ['name' => 'Bonds', 'description' => 'Fixed income investments'],
-            ['name' => 'Mutual Funds', 'description' => 'Pooled investments'],
-            ['name' => 'Real Estate', 'description' => 'Property investments'],
-            ['name' => 'Other', 'description' => 'Other investment types'],
+            ['stocks', 'Stocks'],
+            ['bonds', 'Bonds'],
+            ['mutual_funds', 'Mutual Funds'],
+            ['etfs', 'Exchange-Traded Funds (ETFs)'],
+            ['gics', 'Guaranteed Investment Certificates (GICs)'],
+            ['term_deposits', 'Term Deposits'],
+            ['cryptocurrency', 'Cryptocurrency'],
+            ['reits', 'Real Estate Investment Trusts (REITs)'],
+            ['pension_plans', 'Pension Plans'],
+            ['annuities', 'Annuities'],
+            ['life_insurance', 'Life Insurance Policies'],
+            ['segregated_funds', 'Segregated Funds'],
+            ['options', 'Options'],
+            ['futures', 'Futures'],
+            ['commodities', 'Commodities'],
+            ['foreign_currency', 'Foreign Currency'],
+            ['rrsp', 'RRSP'],
+            ['tfsa', 'TFSA'],
+            ['rrif', 'RRIF'],
+            ['resp', 'RESP'],
+            ['other', 'Other']
         ];
+        $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+        if ($count > 0) return;
+        $sort_order = 0;
         foreach ($defaults as $row) {
-            $wpdb->insert($table_name, $row);
+            $wpdb->insert($table_name, [
+                'value' => $row[0],
+                'label' => $row[1],
+                'is_active' => 1,
+                'sort_order' => $sort_order++
+            ], ['%s', '%s', '%d', '%d']);
         }
     }
 }

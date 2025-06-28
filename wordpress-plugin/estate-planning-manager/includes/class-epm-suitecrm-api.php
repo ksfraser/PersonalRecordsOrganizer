@@ -966,4 +966,91 @@ class EPM_SuiteCRM_API {
             $this->pull_suitecrm_updates($client->id);
         }
     }
+    
+    /**
+     * Search for a contact or lead by email in SuiteCRM
+     */
+    public function find_contact_or_lead_by_email($email) {
+        // Search Contacts
+        $contacts = $this->make_request('module/Contacts?filter[email1]=' . urlencode($email));
+        if (!is_wp_error($contacts) && !empty($contacts['data'])) {
+            return array('type' => 'Contacts', 'id' => $contacts['data'][0]['id']);
+        }
+        // Search Leads
+        $leads = $this->make_request('module/Leads?filter[email1]=' . urlencode($email));
+        if (!is_wp_error($leads) && !empty($leads['data'])) {
+            return array('type' => 'Leads', 'id' => $leads['data'][0]['id']);
+        }
+        return false;
+    }
+
+    /**
+     * Create a new lead in SuiteCRM
+     */
+    public function create_lead($email, $first_name = '', $last_name = '', $phone = '') {
+        $lead_data = array(
+            'type' => 'Leads',
+            'attributes' => array(
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'email1' => $email,
+                'phone_work' => $phone,
+                'lead_source' => 'WordPress Estate Planning Manager'
+            )
+        );
+        $response = $this->make_request('module', 'POST', array('data' => $lead_data));
+        if (!is_wp_error($response) && isset($response['data']['id'])) {
+            return array('type' => 'Leads', 'id' => $response['data']['id']);
+        }
+        return false;
+    }
+
+    /**
+     * Create or get SuiteCRM contact/lead for invited user
+     */
+    public function sync_invited_user($invitee_email, $first_name = '', $last_name = '', $phone = '') {
+        $found = $this->find_contact_or_lead_by_email($invitee_email);
+        if ($found) {
+            return $found;
+        }
+        // Not found, create as lead
+        return $this->create_lead($invitee_email, $first_name, $last_name, $phone);
+    }
+
+    /**
+     * Create or update a custom module record with wp_record_id
+     */
+    public function sync_custom_module_record($module, $data, $suitecrm_guid = null, $wp_record_id = null, $contact_id = null) {
+        $attributes = $data;
+        if ($wp_record_id) {
+            $attributes['wp_record_id'] = $wp_record_id;
+        }
+        if ($contact_id) {
+            $attributes['contact_id'] = $contact_id;
+        }
+        $payload = array(
+            'type' => $module,
+            'attributes' => $attributes
+        );
+        if ($suitecrm_guid) {
+            // Update
+            $payload['id'] = $suitecrm_guid;
+            $response = $this->make_request('module/' . $suitecrm_guid, 'PATCH', array('data' => $payload));
+        } else {
+            // Create
+            $response = $this->make_request('module', 'POST', array('data' => $payload));
+        }
+        return $response;
+    }
+
+    /**
+     * Fetch SuiteCRM GUID for a custom module record by wp_record_id
+     */
+    public function get_suitecrm_guid_by_wp_record_id($module, $wp_record_id) {
+        $response = $this->make_request('module/' . $module . '?filter[wp_record_id]=' . urlencode($wp_record_id));
+        if (!is_wp_error($response) && !empty($response['data'])) {
+            return $response['data'][0]['id'];
+        }
+        return false;
+    }
 }

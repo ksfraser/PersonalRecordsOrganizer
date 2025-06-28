@@ -2,26 +2,55 @@
 require_once __DIR__ . '/TableInterface.php';
 
 class PersonalPropertyCategoriesTable implements TableInterface {
-    public function create_table($wpdb, $charset_collate) {
+    public function create($charset_collate) {
+        global $wpdb;
         $table_name = $wpdb->prefix . 'epm_personal_property_categories';
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            description VARCHAR(255) DEFAULT NULL
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            value varchar(100) NOT NULL,
+            label varchar(255) NOT NULL,
+            is_active tinyint(1) DEFAULT 1,
+            sort_order int(11) DEFAULT 0,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY value (value)
         ) $charset_collate;";
-        $wpdb->query($sql);
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
     }
-    public function populate_defaults($wpdb) {
+    public function populate($charset_collate) {
+        global $wpdb;
         $table_name = $wpdb->prefix . 'epm_personal_property_categories';
         $defaults = [
-            ['name' => 'Jewelry', 'description' => 'Jewelry and valuables'],
-            ['name' => 'Art', 'description' => 'Artwork and collectibles'],
-            ['name' => 'Vehicles', 'description' => 'Cars, boats, etc.'],
-            ['name' => 'Electronics', 'description' => 'Personal electronics'],
-            ['name' => 'Other', 'description' => 'Other personal property'],
+            ['jewelry', 'Jewelry'],
+            ['artwork', 'Artwork'],
+            ['antiques', 'Antiques'],
+            ['collectibles', 'Collectibles'],
+            ['vehicles', 'Vehicles'],
+            ['boats', 'Boats/Watercraft'],
+            ['electronics', 'Electronics'],
+            ['furniture', 'Furniture'],
+            ['appliances', 'Appliances'],
+            ['tools', 'Tools/Equipment'],
+            ['books', 'Books/Library'],
+            ['musical_instruments', 'Musical Instruments'],
+            ['sports_equipment', 'Sports Equipment'],
+            ['clothing', 'Clothing/Accessories'],
+            ['household_items', 'Household Items'],
+            ['business_assets', 'Business Assets'],
+            ['other', 'Other']
         ];
+        $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+        if ($count > 0) return;
+        $sort_order = 0;
         foreach ($defaults as $row) {
-            $wpdb->insert($table_name, $row);
+            $wpdb->insert($table_name, [
+                'value' => $row[0],
+                'label' => $row[1],
+                'is_active' => 1,
+                'sort_order' => $sort_order++
+            ], ['%s', '%s', '%d', '%d']);
         }
     }
 }

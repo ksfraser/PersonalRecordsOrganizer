@@ -158,10 +158,9 @@ class EPM_Ajax_Handler {
         $email = sanitize_email($form_data['share_email']);
         $sections = isset($form_data['share_sections']) ? (array)$form_data['share_sections'] : array();
         $permission = sanitize_text_field($form_data['permission_level']);
-        // Extract password sharing options (default masked)
         $password_sharing_options = array();
         if (isset($form_data['show_password']) && is_array($form_data['show_password'])) {
-            $password_sharing_options = $form_data['show_password']; // [section][field] => 1
+            $password_sharing_options = $form_data['show_password'];
         }
         if (empty($email) || empty($sections)) {
             wp_send_json_error('Email and at least one section are required');
@@ -170,7 +169,6 @@ class EPM_Ajax_Handler {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_sharing_permissions';
         if ($existing_user) {
-            // Grant access for each section
             foreach ($sections as $section) {
                 $section_password_opts = isset($password_sharing_options[$section]) ? $password_sharing_options[$section] : array();
                 $wpdb->replace($table, array(
@@ -185,24 +183,22 @@ class EPM_Ajax_Handler {
         } else {
             // Generate invite token
             $token = wp_generate_password(32, false);
-            $invite_data = array(
-                'client_id' => $user_id,
-                'email' => $email,
-                'sections' => $sections,
-                'permission_level' => $permission,
-                'token' => $token,
-                'created_at' => current_time('mysql'),
-                'password_sharing_options' => maybe_serialize($password_sharing_options)
-            );
+            // Sync invited user with SuiteCRM
+            $suitecrm_result = EPM_SuiteCRM_API::instance()->sync_invited_user($email);
+            $suitecrm_contact_id = '';
+            if ($suitecrm_result && isset($suitecrm_result['id'])) {
+                $suitecrm_contact_id = $suitecrm_result['id'];
+            }
             $invites_table = $wpdb->prefix . 'epm_share_invites';
             $wpdb->insert($invites_table, array(
                 'client_id' => $user_id,
-                'email' => $email,
+                'invitee_email' => $email,
                 'sections' => maybe_serialize($sections),
                 'permission_level' => $permission,
-                'token' => $token,
-                'created_at' => current_time('mysql'),
-                'password_sharing_options' => maybe_serialize($password_sharing_options)
+                'invite_token' => $token,
+                'created' => current_time('mysql'),
+                'password_sharing_options' => maybe_serialize($password_sharing_options),
+                'suitecrm_contact_id' => $suitecrm_contact_id
             ));
             // Send invite email
             $register_url = wp_registration_url();

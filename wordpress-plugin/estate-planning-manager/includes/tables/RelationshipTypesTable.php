@@ -2,7 +2,8 @@
 require_once __DIR__ . '/TableInterface.php';
 
 class RelationshipTypesTable implements TableInterface {
-    public function create_table($wpdb, $charset_collate) {
+    public function create($charset_collate) {
+        global $wpdb;
         $table_name = $wpdb->prefix . 'epm_relationship_types';
         $sql = "CREATE TABLE $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -18,34 +19,30 @@ class RelationshipTypesTable implements TableInterface {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
     }
-
-    public function populate_defaults($wpdb) {
+    public function populate($charset_collate) {
+        global $wpdb;
         $table_name = $wpdb->prefix . 'epm_relationship_types';
-        $defaults = array(
-            array('spouse', 'Spouse'),
-            array('child', 'Child'),
-            array('parent', 'Parent'),
-            array('sibling', 'Sibling'),
-            array('grandparent', 'Grandparent'),
-            array('grandchild', 'Grandchild'),
-            array('other_family', 'Other Family'),
-            array('friend', 'Friend'),
-            array('other', 'Other')
-        );
+        $defaults = [
+            ['spouse', 'Spouse'],
+            ['child', 'Child'],
+            ['parent', 'Parent'],
+            ['sibling', 'Sibling'],
+            ['grandparent', 'Grandparent'],
+            ['grandchild', 'Grandchild'],
+            ['other_family', 'Other Family'],
+            ['friend', 'Friend'],
+            ['other', 'Other']
+        ];
         $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
         if ($count > 0) return;
         $sort_order = 0;
         foreach ($defaults as $row) {
-            $wpdb->insert(
-                $table_name,
-                array(
-                    'value' => $row[0],
-                    'label' => $row[1],
-                    'is_active' => 1,
-                    'sort_order' => $sort_order++
-                ),
-                array('%s', '%s', '%d', '%d')
-            );
+            $wpdb->insert($table_name, [
+                'value' => $row[0],
+                'label' => $row[1],
+                'is_active' => 1,
+                'sort_order' => $sort_order++
+            ], ['%s', '%s', '%d', '%d']);
         }
     }
 }

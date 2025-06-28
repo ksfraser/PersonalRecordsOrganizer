@@ -12,6 +12,14 @@ require_once __DIR__ . '/EmploymentStatusTable.php';
 require_once __DIR__ . '/DocumentTypesTable.php';
 require_once __DIR__ . '/DigitalAssetTypesTable.php';
 require_once __DIR__ . '/PersonalPropertyCategoriesTable.php';
+require_once __DIR__ . '/BankAccountsTable.php';
+require_once __DIR__ . '/InvestmentsTable.php';
+require_once __DIR__ . '/RealEstateTable.php';
+require_once __DIR__ . '/PersonalPropertyTable.php';
+require_once __DIR__ . '/DigitalAssetsTable.php';
+require_once __DIR__ . '/ScheduledPaymentsTable.php';
+require_once __DIR__ . '/DebtorsCreditorsTable.php';
+require_once __DIR__ . '/InsuranceTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -29,6 +37,14 @@ class TableFactory {
             new DocumentTypesTable(),
             new DigitalAssetTypesTable(),
             new PersonalPropertyCategoriesTable(),
+            new BankAccountsTable(),
+            new InvestmentsTable(),
+            new RealEstateTable(),
+            new PersonalPropertyTable(),
+            new DigitalAssetsTable(),
+            new ScheduledPaymentsTable(),
+            new DebtorsCreditorsTable(),
+            new InsuranceTable(),
         ];
     }
 }

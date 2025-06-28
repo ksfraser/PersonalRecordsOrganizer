@@ -1,7 +1,9 @@
 <?php
 require_once __DIR__ . '/TableInterface.php';
+
 class AccountTypesTable implements TableInterface {
-    public function create_table($wpdb, $charset_collate) {
+    public function create($charset_collate) {
+        global $wpdb;
         $table_name = $wpdb->prefix . 'epm_account_types';
         $sql = "CREATE TABLE $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -17,7 +19,8 @@ class AccountTypesTable implements TableInterface {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
     }
-    public function populate_defaults($wpdb) {
+    public function populate($charset_collate) {
+        global $wpdb;
         $table_name = $wpdb->prefix . 'epm_account_types';
         $defaults = [
             ['chequing', 'Chequing'],
