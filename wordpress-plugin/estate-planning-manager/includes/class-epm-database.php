@@ -88,6 +88,7 @@ class EPM_Database {
         $this->create_sync_log_table($charset_collate);
         $this->create_selector_tables($charset_collate);
         $this->create_share_invites_table($charset_collate); // Add invites table
+        $this->create_user_preferences_table($charset_collate); // Add user preferences table
     }
     
     /**
@@ -104,8 +105,8 @@ class EPM_Database {
             advisor_id bigint(20) DEFAULT NULL,
             suitecrm_contact_id varchar(36) DEFAULT NULL,
             status varchar(20) DEFAULT 'active',
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY user_id (user_id),
             KEY advisor_id (advisor_id),
@@ -138,8 +139,8 @@ class EPM_Database {
             drivers_license_location text DEFAULT NULL,
             marriage_certificate_location text DEFAULT NULL,
             divorce_papers_location text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -165,8 +166,8 @@ class EPM_Database {
             address text DEFAULT NULL,
             phone varchar(50) DEFAULT NULL,
             email varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -192,8 +193,8 @@ class EPM_Database {
             address text DEFAULT NULL,
             phone varchar(50) DEFAULT NULL,
             email varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY contact_type (contact_type),
@@ -225,8 +226,8 @@ class EPM_Database {
             representative_phone varchar(50) DEFAULT NULL,
             representative_address text DEFAULT NULL,
             law_firm varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY document_type (document_type),
@@ -261,8 +262,8 @@ class EPM_Database {
             plot_deed_location text DEFAULT NULL,
             organ_donation varchar(10) DEFAULT NULL,
             organ_donation_explanation text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -288,8 +289,8 @@ class EPM_Database {
             advisor_phone varchar(50) DEFAULT NULL,
             advisor_email varchar(255) DEFAULT NULL,
             tax_info_location text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -313,8 +314,8 @@ class EPM_Database {
             country_served varchar(100) DEFAULT NULL,
             veteran_number varchar(100) DEFAULT NULL,
             discharge_papers_location text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -340,8 +341,8 @@ class EPM_Database {
             address text DEFAULT NULL,
             phone varchar(50) DEFAULT NULL,
             email varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -369,8 +370,8 @@ class EPM_Database {
             email varchar(255) DEFAULT NULL,
             is_charitable_gift tinyint(1) DEFAULT 0,
             information_location text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -398,8 +399,8 @@ class EPM_Database {
             address text DEFAULT NULL,
             phone varchar(50) DEFAULT NULL,
             email varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -442,8 +443,8 @@ class EPM_Database {
             beneficiary varchar(255) DEFAULT NULL,
             beneficiary_phone varchar(50) DEFAULT NULL,
             beneficiary_email varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY investment_type (investment_type),
@@ -479,8 +480,8 @@ class EPM_Database {
             tax_receipts text DEFAULT NULL,
             leases text DEFAULT NULL,
             accounting_docs text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
@@ -513,8 +514,8 @@ class EPM_Database {
             box_access_names text DEFAULT NULL,
             keys_location text DEFAULT NULL,
             contents_list_location text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY property_type (property_type),
@@ -543,8 +544,8 @@ class EPM_Database {
             username varchar(255) DEFAULT NULL,
             password_reference text DEFAULT NULL,
             account_number varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY asset_type (asset_type),
@@ -574,8 +575,8 @@ class EPM_Database {
             account_number varchar(255) DEFAULT NULL,
             amount decimal(10,2) DEFAULT NULL,
             due_date varchar(100) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY payment_type (payment_type),
@@ -608,8 +609,8 @@ class EPM_Database {
             date_of_loan date DEFAULT NULL,
             document_location text DEFAULT NULL,
             description text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY relationship_type (relationship_type),
@@ -650,8 +651,8 @@ class EPM_Database {
             owner_email varchar(255) DEFAULT NULL,
             will_someone_become_owner varchar(10) DEFAULT NULL,
             company_association varchar(255) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY insurance_category (insurance_category),
@@ -677,8 +678,8 @@ class EPM_Database {
             section varchar(100) NOT NULL,
             permission_level varchar(20) DEFAULT 'view',
             expires_at datetime DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY unique_permission (client_id, shared_with_user_id, section),
             KEY client_id (client_id),
@@ -711,13 +712,13 @@ class EPM_Database {
             suggested_by_user_id bigint(20) DEFAULT NULL,
             reviewed_by_user_id bigint(20) DEFAULT NULL,
             review_notes text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
             reviewed_at datetime DEFAULT NULL,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY section (section),
             KEY status (status),
-            KEY created_at (created_at),
+            KEY created_at (created),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
         ) $charset_collate;";
         
@@ -743,12 +744,12 @@ class EPM_Database {
             new_values longtext DEFAULT NULL,
             ip_address varchar(45) DEFAULT NULL,
             user_agent text DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY user_id (user_id),
             KEY client_id (client_id),
             KEY action (action),
-            KEY created_at (created_at)
+            KEY created_at (created)
         ) $charset_collate;";
         
         $this->execute_sql($sql);
@@ -770,12 +771,12 @@ class EPM_Database {
             status varchar(20) NOT NULL,
             error_message text DEFAULT NULL,
             suitecrm_record_id varchar(36) DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY section (section),
             KEY status (status),
-            KEY created_at (created_at),
+            KEY created_at (created),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
         ) $charset_collate;";
         
@@ -816,8 +817,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -839,8 +840,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -862,8 +863,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -885,8 +886,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -909,8 +910,8 @@ class EPM_Database {
             category varchar(100) DEFAULT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value),
             KEY category (category)
@@ -933,8 +934,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -956,8 +957,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -979,8 +980,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -1002,8 +1003,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -1025,8 +1026,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -1048,8 +1049,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -1071,8 +1072,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -1094,8 +1095,8 @@ class EPM_Database {
             label varchar(255) NOT NULL,
             is_active tinyint(1) DEFAULT 1,
             sort_order int(11) DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY value (value)
         ) $charset_collate;";
@@ -1118,13 +1119,34 @@ class EPM_Database {
             permission_level varchar(20) DEFAULT 'view',
             invite_token varchar(64) NOT NULL,
             status varchar(20) DEFAULT 'pending',
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
             accepted_at datetime DEFAULT NULL,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY invitee_email (invitee_email),
             KEY invite_token (invite_token),
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
+        ) $charset_collate;";
+        $this->execute_sql($sql);
+    }
+
+    /**
+     * Create user preferences table
+     */
+    private function create_user_preferences_table($charset_collate) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'epm_user_preferences';
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) NOT NULL,
+            preference_name varchar(100) NOT NULL,
+            preference_value varchar(255) DEFAULT NULL,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY user_pref (user_id, preference_name),
+            KEY user_id (user_id),
+            FOREIGN KEY (user_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
         ) $charset_collate;";
         $this->execute_sql($sql);
     }
@@ -1445,7 +1467,7 @@ class EPM_Database {
         
         if ($existing_record) {
             // Update existing record
-            $data['updated_at'] = current_time('mysql');
+            $data['lastupdated'] = current_time('mysql');
             $result = $wpdb->update(
                 $table_name,
                 $data,
@@ -1453,8 +1475,8 @@ class EPM_Database {
             );
         } else {
             // Insert new record
-            $data['created_at'] = current_time('mysql');
-            $data['updated_at'] = current_time('mysql');
+            $data['created'] = current_time('mysql');
+            $data['lastupdated'] = current_time('mysql');
             $result = $wpdb->insert($table_name, $data);
         }
         
@@ -1539,5 +1561,47 @@ class EPM_Database {
             }
         }
         return $options;
+    }
+
+    /**
+     * Get a user preference
+     */
+    public function get_user_preference($user_id, $preference_name) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_user_preferences';
+        return $wpdb->get_var($wpdb->prepare(
+            "SELECT preference_value FROM $table WHERE user_id = %d AND preference_name = %s",
+            $user_id, $preference_name
+        ));
+    }
+
+    /**
+     * Set a user preference
+     */
+    public function set_user_preference($user_id, $preference_name, $preference_value) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_user_preferences';
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM $table WHERE user_id = %d AND preference_name = %s",
+            $user_id, $preference_name
+        ));
+        if ($exists) {
+            return $wpdb->update(
+                $table,
+                array('preference_value' => $preference_value, 'lastupdated' => current_time('mysql')),
+                array('user_id' => $user_id, 'preference_name' => $preference_name)
+            );
+        } else {
+            return $wpdb->insert(
+                $table,
+                array(
+                    'user_id' => $user_id,
+                    'preference_name' => $preference_name,
+                    'preference_value' => $preference_value,
+                    'created' => current_time('mysql'),
+                    'lastupdated' => current_time('mysql')
+                )
+            );
+        }
     }
 }

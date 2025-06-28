@@ -44,6 +44,7 @@ class EPM_Ajax_Handler {
         add_action('wp_ajax_epm_load_client_data', array($this, 'load_client_data'));
         add_action('wp_ajax_nopriv_epm_save_client_data', array($this, 'save_client_data'));
         add_action('wp_ajax_nopriv_epm_load_client_data', array($this, 'load_client_data'));
+        add_action('wp_ajax_epm_set_ui_mode', array($this, 'set_ui_mode'));
     }
     
     /**
@@ -72,31 +73,36 @@ class EPM_Ajax_Handler {
         $section_config = $sections[$section];
         $valid_fields = array_column($section_config['fields'], 'name');
 
-        // Save each field to user meta
-        $updated_fields = array();
+        // Prepare data for DB
+        $data = array();
         foreach ($form_data as $field => $value) {
-            // Skip non-epm fields and invalid fields
+            // Only process valid fields
             if (strpos($field, 'epm_') !== 0 || !in_array(substr($field, 4), $valid_fields)) {
                 continue;
             }
-
+            $field_name = substr($field, 4);
             // Sanitize value based on field type
             foreach ($section_config['fields'] as $field_config) {
-                if ('epm_' . $field_config['name'] === $field) {
+                if ($field_config['name'] === $field_name) {
                     $sanitized_value = $this->sanitize_field_value($value, $field_config['type']);
+                    $data[$field_name] = $sanitized_value;
                     break;
                 }
             }
-
-            // Update user meta
-            if (update_user_meta($user_id, $field, $sanitized_value)) {
-                $updated_fields[] = $field;
-            }
         }
 
-        if (!empty($updated_fields)) {
-            // Log the update
-            do_action('epm_data_updated', $user_id, $section, $updated_fields);
+        // Get client_id for this user
+        $db = EPM_Database::instance();
+        $client_id = $db->get_client_id_by_user_id($user_id);
+        if (!$client_id) {
+            // Create client record if not exists
+            $client_id = $db->create_client($user_id);
+        }
+
+        // Save to custom table
+        $result = $db->save_client_data($client_id, $section, $data);
+        if ($result) {
+            do_action('epm_data_updated', $user_id, $section, array_keys($data));
             wp_send_json_success('Data saved successfully');
         } else {
             wp_send_json_error('No fields were updated');
@@ -195,5 +201,19 @@ class EPM_Ajax_Handler {
                 "You have been invited to access shared data. Register here: $invite_url");
             wp_send_json_success('Invite sent to email.');
         }
+    }
+
+    /**
+     * AJAX: Set UI mode preference (tabs/twisties)
+     */
+    public function set_ui_mode() {
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Not logged in');
+        }
+        $user_id = get_current_user_id();
+        $ui_mode = isset($_POST['ui_mode']) && in_array($_POST['ui_mode'], ['tabs','twisties']) ? $_POST['ui_mode'] : 'tabs';
+        $db = EPM_Database::instance();
+        $db->set_user_preference($user_id, 'ui_mode', $ui_mode);
+        wp_send_json_success('Preference saved');
     }
 }

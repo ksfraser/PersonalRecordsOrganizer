@@ -217,16 +217,62 @@ class EPM_Shortcodes {
         $is_owner = ($display_client_id == $current_user->ID);
         $sections = $this->get_form_sections();
         $edit_mode = isset($_GET['edit']) && $_GET['edit'] == '1';
-        // Only allow edit mode for owner and not readonly
         if ($readonly) $edit_mode = false;
-        // If section is 'all', just show all sections in view mode
-        if ($section === 'all') {
-            echo '<div class="epm-client-data-wrapper">';
-            foreach ($sections as $section_key => $section_config) {
-                $this->render_client_data($section_key, $display_client_id, $readonly);
-            }
+        $db = EPM_Database::instance();
+        // UI preference switch (only for owner)
+        if ($section === 'all' && $is_owner && !$readonly) {
+            $ui_pref = $db->get_user_preference($current_user->ID, 'ui_mode');
+            if (!$ui_pref) $ui_pref = 'tabs';
+            echo '<div class="epm-ui-switcher" style="margin-bottom:15px;">';
+            echo 'View mode: ';
+            echo '<button class="epm-ui-mode-btn' . ($ui_pref === 'tabs' ? ' epm-ui-active' : '') . '" data-ui-mode="tabs">Tabs</button>';
+            echo '<button class="epm-ui-mode-btn' . ($ui_pref === 'twisties' ? ' epm-ui-active' : '') . '" data-ui-mode="twisties">Twisties</button>';
+            echo '<span class="epm-ui-mode-status" style="margin-left:10px;"></span>';
             echo '</div>';
-            return;
+            echo '<script>jQuery(function($){$(".epm-ui-mode-btn").on("click",function(e){e.preventDefault();var btn=$(this);var mode=btn.data("ui-mode");$.post(ajaxurl,{action:"epm_set_ui_mode",ui_mode:mode},function(resp){if(resp.success){$(".epm-ui-mode-btn").removeClass("epm-ui-active");btn.addClass("epm-ui-active");$(".epm-ui-mode-status").text("Saved!").css("color","green");setTimeout(function() { location.reload(); }, 500);}else{$(".epm-ui-mode-status").text("Error: "+resp.data).css("color","red");}});});});</script>';
+        }
+        // Determine UI mode
+        $ui_mode = 'tabs';
+        if ($section === 'all') {
+            $ui_mode = $db->get_user_preference($display_client_id, 'ui_mode') ?: 'tabs';
+        }
+        // If section is 'all', show all sections as tabs or twisties
+        if ($section === 'all') {
+            if ($ui_mode === 'twisties') {
+                echo '<div class="epm-client-data-twisties-wrapper">';
+                foreach ($sections as $section_key => $section_config) {
+                    echo '<div class="epm-twisty-section">';
+                    echo '<div class="epm-twisty-header" style="cursor:pointer;background:#f9f9f9;padding:10px;border:1px solid #eee;margin-bottom:2px;">' . esc_html($section_config['title']) . ' <span class="epm-twisty-arrow">&#9654;</span></div>';
+                    echo '<div class="epm-twisty-content" style="display:none;padding:10px;border:1px solid #eee;border-top:none;">';
+                    $this->render_client_data($section_key, $display_client_id, $readonly);
+                    echo '</div>';
+                    echo '</div>';
+                }
+                echo '</div>';
+                echo '<script>jQuery(function($){$(".epm-twisty-header").on("click",function(){$(this).next(".epm-twisty-content").slideToggle(200);$(this).find(".epm-twisty-arrow").toggleClass("epm-twisty-open");});});</script>';
+                echo '<style>.epm-twisty-arrow{float:right;transition:transform 0.2s;}.epm-twisty-open{transform:rotate(90deg);}</style>';
+                return;
+            } else {
+                echo '<div class="epm-client-data-tabs-wrapper">';
+                echo '<ul class="epm-tabs-nav">';
+                $first = true;
+                foreach ($sections as $section_key => $section_config) {
+                    echo '<li class="epm-tab-nav-item' . ($first ? ' epm-tab-active' : '') . '" data-epm-tab="' . esc_attr($section_key) . '">' . esc_html($section_config['title']) . '</li>';
+                    $first = false;
+                }
+                echo '</ul>';
+                $first = true;
+                foreach ($sections as $section_key => $section_config) {
+                    echo '<div class="epm-tab-content' . ($first ? ' epm-tab-content-active' : '') . '" id="epm-tab-' . esc_attr($section_key) . '">';
+                    $this->render_client_data($section_key, $display_client_id, $readonly);
+                    echo '</div>';
+                    $first = false;
+                }
+                echo '</div>';
+                echo '<style>.epm-tabs-nav{display:flex;list-style:none;padding:0;margin:0 0 20px 0;border-bottom:2px solid #eee;}.epm-tab-nav-item{padding:10px 20px;cursor:pointer;border:1px solid #eee;border-bottom:none;background:#f9f9f9;margin-right:5px;border-radius:5px 5px 0 0;}.epm-tab-active{background:#fff;border-bottom:2px solid #fff;font-weight:bold;}.epm-tab-content{display:none;}.epm-tab-content-active{display:block;}</style>';
+                echo '<script>jQuery(function($){$(".epm-tab-nav-item").on("click",function(){var tab=$(this).data("epm-tab");$(".epm-tab-nav-item").removeClass("epm-tab-active");$(this).addClass("epm-tab-active");$(".epm-tab-content").removeClass("epm-tab-content-active");$("#epm-tab-"+tab).addClass("epm-tab-content-active");});});</script>';
+                return;
+            }
         }
         // Get data for this section
         $data = $this->get_client_data($section, $display_client_id);
@@ -390,28 +436,41 @@ class EPM_Shortcodes {
     /**
      * Get field value for user
      */
-    private function get_field_value($field_name, $user_id) {
-        // This would typically get data from the database
-        // For now, return empty string as placeholder
-        return get_user_meta($user_id, 'epm_' . $field_name, true);
+    private function get_field_value($field_name, $user_id, $section = null) {
+        // If section is not provided, try to guess from field name (legacy fallback)
+        if (!$section) {
+            $sections = $this->get_form_sections();
+            foreach ($sections as $section_key => $section_config) {
+                foreach ($section_config['fields'] as $field) {
+                    if ($field['name'] === $field_name) {
+                        $section = $section_key;
+                        break 2;
+                    }
+                }
+            }
+        }
+        if (!$section) return '';
+        $db = EPM_Database::instance();
+        $client_id = $db->get_client_id_by_user_id($user_id);
+        if (!$client_id) return '';
+        $records = $db->get_client_data($client_id, $section);
+        if (!empty($records)) {
+            $record = (array)$records[0];
+            return isset($record[$field_name]) ? $record[$field_name] : '';
+        }
+        return '';
     }
-    
+
     /**
      * Get client data for section
      */
     private function get_client_data($section, $client_id) {
-        // This would typically get data from the database
-        // For now, return sample data structure
-        $data = array();
-        $sections = $this->get_form_sections();
-        
-        if (isset($sections[$section])) {
-            foreach ($sections[$section]['fields'] as $field) {
-                $data[$field['name']] = get_user_meta($client_id, 'epm_' . $field['name'], true);
-            }
+        $db = EPM_Database::instance();
+        $records = $db->get_client_data($client_id, $section);
+        if (!empty($records)) {
+            return (array)$records[0];
         }
-        
-        return array_filter($data); // Remove empty values
+        return array();
     }
     
     /**
@@ -584,5 +643,59 @@ class EPM_Shortcodes {
                 ));
             }
         }
+    }
+
+    /**
+     * Render a form field
+     */
+    public function render_form_field($field, $user_id) {
+        $value = $this->get_field_value($field['name'], $user_id);
+        echo '<div class="epm-form-field">';
+        echo '<label for="' . esc_attr($field['name']) . '">' . esc_html($field['label']) . '</label>';
+        switch ($field['type']) {
+            case 'text':
+            case 'email':
+            case 'tel':
+            case 'date':
+                echo '<input type="' . esc_attr($field['type']) . '" ';
+                echo 'id="' . esc_attr($field['name']) . '" ';
+                echo 'name="' . esc_attr($field['name']) . '" ';
+                echo 'value="' . esc_attr($value) . '" ';
+                if (isset($field['required']) && $field['required']) {
+                    echo 'required ';
+                }
+                echo '/>';
+                break;
+            case 'textarea':
+                echo '<textarea ';
+                echo 'id="' . esc_attr($field['name']) . '" ';
+                echo 'name="' . esc_attr($field['name']) . '" ';
+                if (isset($field['required']) && $field['required']) {
+                    echo 'required ';
+                }
+                echo '>' . esc_textarea($value) . '</textarea>';
+                break;
+            case 'select':
+                echo '<select ';
+                echo 'id="' . esc_attr($field['name']) . '" ';
+                echo 'name="' . esc_attr($field['name']) . '" ';
+                if (isset($field['required']) && $field['required']) {
+                    echo 'required ';
+                }
+                echo '>';
+                echo '<option value="">Select...</option>';
+                if (isset($field['options'])) {
+                    foreach ($field['options'] as $option_value => $option_label) {
+                        echo '<option value="' . esc_attr($option_value) . '"';
+                        if ($value == $option_value) {
+                            echo ' selected';
+                        }
+                        echo '>' . esc_html($option_label) . '</option>';
+                    }
+                }
+                echo '</select>';
+                break;
+        }
+        echo '</div>';
     }
 }
