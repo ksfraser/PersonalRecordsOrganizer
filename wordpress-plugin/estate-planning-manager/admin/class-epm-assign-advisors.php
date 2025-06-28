@@ -70,7 +70,7 @@ class EPM_Assign_Advisors_Admin {
         echo '<button type="submit" class="button">Send Invite</button>';
         echo '<span class="epm-invite-status" style="margin-left:10px;"></span>';
         echo '</form>';
-        echo '<script>jQuery(function($){$("#epm-invite-client-form").on("submit",function(e){e.preventDefault();var form=$(this);var email=form.find("[name='invite_email']").val();var advisor=form.find("[name='advisor_id']").val();form.find(".epm-invite-status").text("Sending...");$.post(ajaxurl,{action:"epm_invite_client",invite_email:email,advisor_id:advisor,nonce:"' . wp_create_nonce('epm_invite_client') . '"},function(resp){if(resp.success){form.find(".epm-invite-status").text("Invite sent!").css("color","green");}else{form.find(".epm-invite-status").text("Error: "+resp.data).css("color","red");}});});});</script>';
+        echo '<script>jQuery(function($){$("#epm-invite-client-form").on("submit",function(e){e.preventDefault();var form=$(this);var email=form.find("[name="invite_email"]").val();var advisor=form.find("[name="advisor_id"]").val();form.find(".epm-invite-status").text("Sending...");$.post(ajaxurl,{action:"epm_invite_client",invite_email:email,advisor_id:advisor,nonce:"' . wp_create_nonce('epm_invite_client') . '"},function(resp){if(resp.success){form.find(".epm-invite-status").text("Invite sent!").css("color","green");}else{form.find(".epm-invite-status").text("Error: "+resp.data).css("color","red");}});});});</script>';
         echo '</div>';
         // Save assignments
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_admin_referer('epm_assign_advisors', 'epm_assign_advisors_nonce')) {
