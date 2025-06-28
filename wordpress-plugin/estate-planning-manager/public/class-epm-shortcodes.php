@@ -452,11 +452,33 @@ class EPM_Shortcodes {
         if (!$section) return '';
         $db = EPM_Database::instance();
         $client_id = $db->get_client_id_by_user_id($user_id);
-        if (!$client_id) return '';
-        $records = $db->get_client_data($client_id, $section);
-        if (!empty($records)) {
-            $record = (array)$records[0];
-            return isset($record[$field_name]) ? $record[$field_name] : '';
+        if ($client_id) {
+            $records = $db->get_client_data($client_id, $section);
+            if (!empty($records)) {
+                $record = (array)$records[0];
+                if (isset($record[$field_name]) && $record[$field_name] !== '') {
+                    return $record[$field_name];
+                }
+            }
+        }
+        // If no user/client value, try advisor default
+        $advisor_id = null;
+        if ($client_id) {
+            global $wpdb;
+            $advisor_id = $wpdb->get_var($wpdb->prepare("SELECT advisor_id FROM {$wpdb->prefix}epm_clients WHERE id = %d", $client_id));
+        }
+        if (!$advisor_id) {
+            // If user is an advisor, use their own ID
+            $user = get_user_by('ID', $user_id);
+            if ($user && in_array('financial_advisor', (array)$user->roles)) {
+                $advisor_id = $user_id;
+            }
+        }
+        if ($advisor_id) {
+            $default = $db->get_advisor_default($advisor_id, $field_name);
+            if ($default !== null && $default !== '') {
+                return $default;
+            }
         }
         return '';
     }

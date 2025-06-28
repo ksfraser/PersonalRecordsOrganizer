@@ -89,6 +89,7 @@ class EPM_Database {
         $this->create_selector_tables($charset_collate);
         $this->create_share_invites_table($charset_collate); // Add invites table
         $this->create_user_preferences_table($charset_collate); // Add user preferences table
+        $this->create_defaults_table($charset_collate); // Add advisor defaults table
     }
     
     /**
@@ -1152,6 +1153,25 @@ class EPM_Database {
     }
 
     /**
+     * Create advisor defaults table
+     */
+    private function create_defaults_table($charset_collate) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'epm_defaults';
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            advisor_user_id bigint(20) NOT NULL,
+            name varchar(191) NOT NULL,
+            value text DEFAULT NULL,
+            created datetime DEFAULT CURRENT_TIMESTAMP,
+            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY advisor_name (advisor_user_id, name)
+        ) $charset_collate;";
+        $this->execute_sql($sql);
+    }
+
+    /**
      * Populate default selector values
      */
     private function populate_default_selectors() {
@@ -1598,6 +1618,48 @@ class EPM_Database {
                     'user_id' => $user_id,
                     'preference_name' => $preference_name,
                     'preference_value' => $preference_value,
+                    'created' => current_time('mysql'),
+                    'lastupdated' => current_time('mysql')
+                )
+            );
+        }
+    }
+
+    /**
+     * Get an advisor default value
+     */
+    public function get_advisor_default($advisor_user_id, $name) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_defaults';
+        return $wpdb->get_var($wpdb->prepare(
+            "SELECT value FROM $table WHERE advisor_user_id = %d AND name = %s",
+            $advisor_user_id, $name
+        ));
+    }
+
+    /**
+     * Set an advisor default value
+     */
+    public function set_advisor_default($advisor_user_id, $name, $value) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_defaults';
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM $table WHERE advisor_user_id = %d AND name = %s",
+            $advisor_user_id, $name
+        ));
+        if ($exists) {
+            return $wpdb->update(
+                $table,
+                array('value' => $value, 'lastupdated' => current_time('mysql')),
+                array('advisor_user_id' => $advisor_user_id, 'name' => $name)
+            );
+        } else {
+            return $wpdb->insert(
+                $table,
+                array(
+                    'advisor_user_id' => $advisor_user_id,
+                    'name' => $name,
+                    'value' => $value,
                     'created' => current_time('mysql'),
                     'lastupdated' => current_time('mysql')
                 )

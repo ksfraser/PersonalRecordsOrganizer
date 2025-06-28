@@ -89,6 +89,8 @@ final class EstateplanningManager {
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-selectors.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-suggested-updates.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-defaults-admin.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-assign-advisors.php';
         }
         
         // Public classes
@@ -112,6 +114,8 @@ final class EstateplanningManager {
             EPM_Admin::instance()->init();
             EPM_Admin_Selectors::instance()->init();
             EPM_Admin_Suggested_Updates::instance()->init();
+            EPM_Defaults_Admin::instance()->init();
+            EPM_Assign_Advisors_Admin::instance()->init();
         }
         
         // Initialize frontend
@@ -152,6 +156,16 @@ final class EstateplanningManager {
         
         // Set default options
         $this->set_default_options();
+        
+        // Create main pages for shortcodes
+        if (class_exists('EPM_Shortcodes')) {
+            EPM_Shortcodes::create_pages_on_install();
+        } else {
+            require_once EPM_PLUGIN_DIR . 'public/class-epm-shortcodes.php';
+            if (class_exists('EPM_Shortcodes')) {
+                EPM_Shortcodes::create_pages_on_install();
+            }
+        }
         
         // Flush rewrite rules
         flush_rewrite_rules();
