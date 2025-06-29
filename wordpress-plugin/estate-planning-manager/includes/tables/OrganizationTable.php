@@ -18,8 +18,7 @@ class OrganizationTable implements TableInterface {
             created datetime DEFAULT CURRENT_TIMESTAMP,
             lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
-            KEY client_id (client_id),
-            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
+            KEY client_id (client_id)
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

@@ -24,8 +24,7 @@ class DigitalAssetsTable implements TableInterface {
             KEY client_id (client_id),
             KEY suitecrm_guid (suitecrm_guid),
             KEY wp_record_id (wp_record_id),
-            KEY asset_type (asset_type),
-            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
+            KEY asset_type (asset_type)
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
