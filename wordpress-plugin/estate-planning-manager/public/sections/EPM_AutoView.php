@@ -1,12 +1,18 @@
 <?php
 // View class for Autos section
-require_once dirname(__DIR__, 2) . '/includes/tables/AutoPropertyTable.php';
-require_once dirname(__DIR__, 2) . '/includes/tables/AutoModelTable.php';
-require_once dirname(__DIR__, 2) . '/includes/tables/PersonTable.php';
+if (!defined('ABSPATH')) exit;
+require_once __DIR__ . '/AbstractSectionView.php';
 
-class EPM_AutoView {
+class EPM_AutoView extends AbstractSectionView {
+    public static function get_section_key() {
+        return 'auto_property';
+    }
+    public static function get_fields() {
+        $shortcodes = EPM_Shortcodes::instance();
+        return $shortcodes->get_form_sections()['auto_property']['fields'];
+    }
+    // Retain custom render for table of multiple records
     public static function render($client_id, $readonly = false) {
-        // Fetch autos for this client
         global $wpdb;
         $table = $wpdb->prefix . 'epm_auto_property';
         $records = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $client_id));

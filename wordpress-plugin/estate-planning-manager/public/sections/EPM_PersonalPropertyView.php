@@ -1,9 +1,17 @@
 <?php
 // View class for Personal Property section
-require_once dirname(__DIR__, 2) . '/includes/tables/PersonalPropertyTable.php';
-require_once dirname(__DIR__, 2) . '/includes/tables/PersonTable.php';
+if (!defined('ABSPATH')) exit;
+require_once __DIR__ . '/AbstractSectionView.php';
 
-class EPM_PersonalPropertyView {
+class EPM_PersonalPropertyView extends AbstractSectionView {
+    public static function get_section_key() {
+        return 'personal_property';
+    }
+    public static function get_fields() {
+        $shortcodes = EPM_Shortcodes::instance();
+        return $shortcodes->get_form_sections()['personal_property']['fields'];
+    }
+    // Retain custom render for table of multiple records
     public static function render($client_id, $readonly = false) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_personal_property';
@@ -38,36 +46,5 @@ class EPM_PersonalPropertyView {
         $table = $wpdb->prefix . 'epm_persons';
         $row = $wpdb->get_row($wpdb->prepare("SELECT full_name FROM $table WHERE id = %d", $person_id));
         return $row ? $row->full_name : '';
-    }
-    public static function render_form($client_id) {
-        // Render the add/edit form for personal property
-        // This should match the fields in the normalized table and use dropdowns for owner and auto model
-        require_once dirname(__DIR__, 2) . '/includes/tables/AutoModelTable.php';
-        require_once dirname(__DIR__, 2) . '/includes/tables/PersonTable.php';
-        $auto_options = AutoModelTable::get_all_options();
-        $person_options = PersonTable::get_person_options($client_id);
-        echo '<form class="epm-personal-property-form" data-section="personal_property">';
-        echo '<label>Property Type:</label> <input type="text" name="property_type"><br>';
-        echo '<label>Item Type:</label> <input type="text" name="item_type"><br>';
-        echo '<label>Vehicle Model:</label> <select name="auto_model_id">';
-        echo '<option value="">Select...</option>';
-        foreach ($auto_options as $id => $label) {
-            echo '<option value="' . esc_attr($id) . '">' . esc_html($label) . '</option>';
-        }
-        echo '</select><br>';
-        echo '<label>Own/Lease:</label> <select name="own_or_lease"><option value="">Select...</option><option value="Own">Own</option><option value="Lease">Lease</option></select><br>';
-        echo '<label>Owner:</label> <select name="owner_person_id">';
-        echo '<option value="">Select...</option>';
-        foreach ($person_options as $id => $name) {
-            echo '<option value="' . esc_attr($id) . '">' . esc_html($name) . '</option>';
-        }
-        echo '</select><br>';
-        echo '<label>Registration Location:</label> <input type="text" name="registration_location"><br>';
-        echo '<label>Insurance Policy Location:</label> <input type="text" name="insurance_policy_location"><br>';
-        echo '<label>Bill of Sale Location:</label> <input type="text" name="bill_of_sale_location"><br>';
-        echo '<label>Keys Location:</label> <input type="text" name="keys_location"><br>';
-        echo '<label>Contents List Location:</label> <input type="text" name="contents_list_location"><br>';
-        echo '<button type="submit" class="epm-btn epm-btn-primary">Save</button>';
-        echo '</form>';
     }
 }

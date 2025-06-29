@@ -1,7 +1,18 @@
 <?php
 // EPM_BankingView: Dedicated view class for the Banking section
-class EPM_BankingView {
-    public static function render($client_id) {
+if (!defined('ABSPATH')) exit;
+require_once __DIR__ . '/AbstractSectionView.php';
+
+class EPM_BankingView extends AbstractSectionView {
+    public static function get_section_key() {
+        return 'banking';
+    }
+    public static function get_fields() {
+        $shortcodes = EPM_Shortcodes::instance();
+        return $shortcodes->get_form_sections()['banking']['fields'];
+    }
+    // Retain custom render for table of multiple records
+    public static function render($client_id, $readonly = false) {
         global $wpdb;
         require_once dirname(__DIR__, 2) . '/includes/tables/BankAccountsTable.php';
         require_once dirname(__DIR__, 2) . '/includes/tables/PersonTable.php';

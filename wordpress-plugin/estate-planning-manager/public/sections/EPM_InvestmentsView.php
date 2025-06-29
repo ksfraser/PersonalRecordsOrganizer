@@ -1,7 +1,18 @@
 <?php
 // EPM_InvestmentsView: Dedicated view class for the Investments section
-class EPM_InvestmentsView {
-    public static function render($client_id) {
+if (!defined('ABSPATH')) exit;
+require_once __DIR__ . '/AbstractSectionView.php';
+
+class EPM_InvestmentsView extends AbstractSectionView {
+    public static function get_section_key() {
+        return 'investments';
+    }
+    public static function get_fields() {
+        $shortcodes = EPM_Shortcodes::instance();
+        return $shortcodes->get_form_sections()['investments']['fields'];
+    }
+    // Retain custom render for table of multiple records
+    public static function render($client_id, $readonly = false) {
         global $wpdb;
         require_once dirname(__DIR__, 2) . '/includes/tables/InvestmentsTable.php';
         require_once dirname(__DIR__, 2) . '/includes/tables/PersonTable.php';
@@ -38,62 +49,5 @@ class EPM_InvestmentsView {
             echo '</table>';
         }
         echo '</div>';
-    }
-
-    public static function render_form($client_id) {
-        require_once dirname(__DIR__, 2) . '/includes/tables/PersonTable.php';
-        require_once dirname(__DIR__, 2) . '/includes/tables/OrganizationTable.php';
-        $person_options = PersonTable::get_person_options($client_id);
-        $org_options = OrganizationTable::get_org_options($client_id);
-        echo '<form class="epm-form" data-section="investments">';
-        echo '<label>Investment Type:</label><input type="text" name="investment_type"><br>';
-        echo '<label>Financial Company:</label><input type="text" name="financial_company"><br>';
-        echo '<label>Account Type:</label><input type="text" name="account_type"><br>';
-        echo '<label>Account Number:</label><input type="text" name="account_number"><br>';
-        echo '<label>Beneficiary:</label>';
-        echo '<select name="beneficiary_person_id" class="epm-person-select">';
-        echo '<option value="">Select...</option>';
-        foreach ($person_options as $id => $name) {
-            echo '<option value="' . esc_attr($id) . '">' . esc_html($name) . '</option>';
-        }
-        echo '</select><br>';
-        echo '<label>Advisor:</label>';
-        echo '<select name="advisor_person_id" class="epm-person-select">';
-        echo '<option value="">Select...</option>';
-        foreach ($person_options as $id => $name) {
-            echo '<option value="' . esc_attr($id) . '">' . esc_html($name) . '</option>';
-        }
-        echo '</select><br>';
-        // Lender type selector
-        echo '<label>Lender Type:</label>';
-        echo '<select name="lender_type" id="epm-lender-type-select">';
-        echo '<option value="">Select...</option>';
-        echo '<option value="person">Person</option>';
-        echo '<option value="organization">Organization</option>';
-        echo '</select><br>';
-        // Lender person dropdown
-        echo '<div id="epm-lender-person-row" style="display:none">';
-        echo '<label>Lender (Person):</label>';
-        echo '<select name="lender_person_id" class="epm-person-select">';
-        echo '<option value="">Select...</option>';
-        foreach ($person_options as $id => $name) {
-            echo '<option value="' . esc_attr($id) . '">' . esc_html($name) . '</option>';
-        }
-        echo '</select><br>';
-        echo '</div>';
-        // Lender org dropdown
-        echo '<div id="epm-lender-org-row" style="display:none">';
-        echo '<label>Lender (Organization):</label>';
-        echo '<select name="lender_org_id" class="epm-institute-select">';
-        echo '<option value="">Select...</option>';
-        foreach ($org_options as $id => $name) {
-            echo '<option value="' . esc_attr($id) . '">' . esc_html($name) . '</option>';
-        }
-        echo '</select><br>';
-        echo '</div>';
-        echo '<button type="submit" class="epm-btn epm-btn-primary">Save</button>';
-        echo '</form>';
-        // JS to toggle lender dropdowns
-        echo '<script>jQuery(function($){$("#epm-lender-type-select").on("change",function(){var v=$(this).val();$("#epm-lender-person-row,#epm-lender-org-row").hide();if(v==="person"){$("#epm-lender-person-row").show();}else if(v==="organization"){$("#epm-lender-org-row").show();}});});</script>';
     }
 }
