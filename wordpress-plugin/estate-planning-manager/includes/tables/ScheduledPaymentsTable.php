@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/TableInterface.php';
+require_once __DIR__ . '/OrganizationTable.php';
 
 class ScheduledPaymentsTable implements TableInterface {
     public function create($charset_collate) {
@@ -11,12 +12,8 @@ class ScheduledPaymentsTable implements TableInterface {
             suitecrm_guid varchar(36) DEFAULT NULL,
             wp_record_id bigint(20) DEFAULT NULL,
             payment_type varchar(100) DEFAULT NULL,
-            paid_to varchar(255) DEFAULT NULL,
+            paid_to_org_id bigint(20) DEFAULT NULL,
             is_automatic varchar(10) DEFAULT NULL,
-            address text DEFAULT NULL,
-            phone varchar(50) DEFAULT NULL,
-            email varchar(255) DEFAULT NULL,
-            account_number varchar(255) DEFAULT NULL,
             amount decimal(10,2) DEFAULT NULL,
             due_date varchar(100) DEFAULT NULL,
             created datetime DEFAULT CURRENT_TIMESTAMP,
@@ -26,7 +23,9 @@ class ScheduledPaymentsTable implements TableInterface {
             KEY suitecrm_guid (suitecrm_guid),
             KEY wp_record_id (wp_record_id),
             KEY payment_type (payment_type),
-            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
+            KEY paid_to_org_id (paid_to_org_id),
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
+            FOREIGN KEY (paid_to_org_id) REFERENCES {$wpdb->prefix}epm_organizations(id) ON DELETE SET NULL
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

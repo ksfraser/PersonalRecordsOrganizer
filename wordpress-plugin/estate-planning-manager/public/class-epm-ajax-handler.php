@@ -46,6 +46,8 @@ class EPM_Ajax_Handler {
         add_action('wp_ajax_nopriv_epm_load_client_data', array($this, 'load_client_data'));
         add_action('wp_ajax_epm_set_ui_mode', array($this, 'set_ui_mode'));
         add_action('wp_ajax_epm_generate_pdf_and_send', array($this, 'generate_pdf_and_send'));
+        add_action('wp_ajax_epm_add_person', array($this, 'add_person'));
+        add_action('wp_ajax_epm_add_institute', array($this, 'add_institute'));
     }
     
     /**
@@ -89,6 +91,20 @@ class EPM_Ajax_Handler {
                     $data[$field_name] = $sanitized_value;
                     break;
                 }
+            }
+        }
+
+        // Validate email and phone fields (server-side)
+        $email_fields = ['email', 'advisor_email', 'beneficiary_email', 'owner_email'];
+        $phone_fields = ['phone', 'advisor_phone', 'beneficiary_phone', 'owner_phone'];
+        foreach ($email_fields as $field) {
+            if (!empty($data[$field]) && !filter_var($data[$field], FILTER_VALIDATE_EMAIL)) {
+                wp_send_json_error('Invalid email address in ' . $field);
+            }
+        }
+        foreach ($phone_fields as $field) {
+            if (!empty($data[$field]) && !self::validate_phone($data[$field])) {
+                wp_send_json_error('Invalid phone number in ' . $field);
             }
         }
 
@@ -269,5 +285,72 @@ class EPM_Ajax_Handler {
         } else {
             wp_send_json_error('Failed to send email');
         }
+    }
+
+    /**
+     * AJAX: Add Person
+     */
+    public function add_person() {
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Not logged in');
+        }
+        $client_id = EPM_Database::instance()->get_client_id_by_user_id(get_current_user_id());
+        $full_name = sanitize_text_field($_POST['full_name'] ?? '');
+        $email = sanitize_email($_POST['email'] ?? '');
+        $phone = sanitize_text_field($_POST['phone'] ?? '');
+        $address = sanitize_text_field($_POST['address'] ?? '');
+        if (!$full_name) {
+            wp_send_json_error('Name required');
+        }
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_persons';
+        $wpdb->insert($table, [
+            'client_id' => $client_id,
+            'full_name' => $full_name,
+            'email' => $email,
+            'phone' => $phone,
+            'address' => $address
+        ]);
+        $id = $wpdb->insert_id;
+        wp_send_json_success(['id' => $id, 'name' => $full_name]);
+    }
+    /**
+     * AJAX: Add Institute/Organization
+     */
+    public function add_institute() {
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Not logged in');
+        }
+        $client_id = EPM_Database::instance()->get_client_id_by_user_id(get_current_user_id());
+        $name = sanitize_text_field($_POST['name'] ?? '');
+        $email = sanitize_email($_POST['email'] ?? '');
+        $phone = sanitize_text_field($_POST['phone'] ?? '');
+        $address = sanitize_text_field($_POST['address'] ?? '');
+        $account_number = sanitize_text_field($_POST['account_number'] ?? '');
+        $branch = sanitize_text_field($_POST['branch'] ?? '');
+        if (!$name) {
+            wp_send_json_error('Name required');
+        }
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_organizations';
+        $wpdb->insert($table, [
+            'client_id' => $client_id,
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'address' => $address,
+            'account_number' => $account_number,
+            'branch' => $branch
+        ]);
+        $id = $wpdb->insert_id;
+        wp_send_json_success(['id' => $id, 'name' => $name]);
+    }
+
+    /**
+     * Validate international phone numbers (E.164 and common formats)
+     */
+    public static function validate_phone($phone) {
+        // Accepts +countrycode, spaces, dashes, parentheses, min 7 digits
+        return preg_match('/^\+?[0-9 .\-()]{7,20}$/', $phone);
     }
 }

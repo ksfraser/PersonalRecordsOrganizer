@@ -105,35 +105,68 @@ class EPM_Shortcodes {
             echo '<div class="epm-error">Please log in to access this form.</div>';
             return;
         }
-        
         $current_user = wp_get_current_user();
         $sections = $this->get_form_sections();
-        
         if (!isset($sections[$section])) {
             echo '<div class="epm-error">Invalid section specified.</div>';
             return;
         }
-        
+        // Modular: delegate to section view class if available
+        switch ($section) {
+            case 'personal_property':
+                require_once __DIR__ . '/sections/EPM_PersonalPropertyView.php';
+                EPM_PersonalPropertyView::render_form($current_user->ID);
+                return;
+            case 'investments':
+                require_once __DIR__ . '/sections/EPM_InvestmentsView.php';
+                EPM_InvestmentsView::render_form($current_user->ID);
+                return;
+            // ...add other modularized sections here as needed...
+        }
         $section_config = $sections[$section];
-        
         echo '<div class="epm-client-form-wrapper">';
         echo '<h3>' . esc_html($section_config['title']) . '</h3>';
         echo '<form class="epm-client-form" data-section="' . esc_attr($section) . '">';
-        
         wp_nonce_field('epm_save_data', 'epm_nonce');
-        
         foreach ($section_config['fields'] as $field) {
             $this->render_form_field($field, $current_user->ID);
         }
-        
         echo '<div class="epm-form-actions">';
         echo '<button type="submit" class="epm-btn epm-btn-primary">Save Data</button>';
         echo '<button type="button" class="epm-btn epm-btn-secondary epm-generate-pdf">Generate PDF</button>';
+        if (in_array($section, array('scheduled_payments', 'insurance', 'banking', 'investments', 'real_estate'))) {
+            echo '<button type="button" class="epm-btn epm-btn-secondary epm-add-person-btn">Add Person</button>';
+            echo '<button type="button" class="epm-btn epm-btn-secondary epm-add-institute-btn">Add Institute</button>';
+        }
         echo '</div>';
-        
         echo '</form>';
         echo '</div>';
-        
+        // Add Person Modal
+        echo '<div id="epm-add-person-modal" class="epm-modal" style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;border-radius:5px;padding:30px;z-index:9999;max-width:400px;width:90%;">';
+        echo '<h3>Add Person</h3>';
+        echo '<form id="epm-add-person-form">';
+        echo '<label>Name:</label><input type="text" name="full_name" required><br>';
+        echo '<label>Email:</label><input type="email" name="email"><br>';
+        echo '<label>Phone:</label><input type="tel" name="phone"><br>';
+        echo '<label>Address:</label><input type="text" name="address"><br>';
+        echo '<button type="submit" class="epm-btn epm-btn-primary">Add</button>';
+        echo '<button type="button" class="epm-btn epm-btn-secondary epm-modal-cancel" style="margin-left:10px;">Cancel</button>';
+        echo '</form>';
+        echo '</div>';
+        // Add Institute Modal
+        echo '<div id="epm-add-institute-modal" class="epm-modal" style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;border-radius:5px;padding:30px;z-index:9999;max-width:400px;width:90%;">';
+        echo '<h3>Add Institute/Organization</h3>';
+        echo '<form id="epm-add-institute-form">';
+        echo '<label>Name:</label><input type="text" name="name" required><br>';
+        echo '<label>Email:</label><input type="email" name="email"><br>';
+        echo '<label>Phone:</label><input type="tel" name="phone"><br>';
+        echo '<label>Address:</label><input type="text" name="address"><br>';
+        echo '<label>Account Number:</label><input type="text" name="account_number"><br>';
+        echo '<label>Branch:</label><input type="text" name="branch"><br>';
+        echo '<button type="submit" class="epm-btn epm-btn-primary">Add</button>';
+        echo '<button type="button" class="epm-btn epm-btn-secondary epm-modal-cancel" style="margin-left:10px;">Cancel</button>';
+        echo '</form>';
+        echo '</div>';
         $this->enqueue_form_scripts();
     }
     
@@ -276,68 +309,45 @@ class EPM_Shortcodes {
                 return;
             }
         }
-        // Get data for this section
-        $data = $this->get_client_data($section, $display_client_id);
-        // If no data and owner, go straight to form
-        if ($is_owner && !$readonly && empty($data)) {
-            $this->render_client_form($section);
-            return;
+        // Modular section rendering
+        switch ($section) {
+            case 'banking':
+                require_once __DIR__ . '/sections/EPM_BankingView.php';
+                EPM_BankingView::render($display_client_id);
+                break;
+            case 'investments':
+                require_once __DIR__ . '/sections/EPM_InvestmentsView.php';
+                EPM_InvestmentsView::render($display_client_id);
+                break;
+            case 'insurance':
+                require_once __DIR__ . '/sections/EPM_InsuranceView.php';
+                EPM_InsuranceView::render($display_client_id);
+                break;
+            case 'real_estate':
+                require_once __DIR__ . '/sections/EPM_RealEstateView.php';
+                EPM_RealEstateView::render($display_client_id);
+                break;
+            case 'scheduled_payments':
+                require_once __DIR__ . '/sections/EPM_ScheduledPaymentsView.php';
+                EPM_ScheduledPaymentsView::render($display_client_id);
+                break;
+            case 'auto_property':
+                require_once __DIR__ . '/sections/EPM_AutoView.php';
+                EPM_AutoView::render($display_client_id, $readonly);
+                break;
+            case 'personal_property':
+                require_once __DIR__ . '/sections/EPM_PersonalPropertyView.php';
+                EPM_PersonalPropertyView::render($display_client_id, $readonly);
+                break;
+            case 'emergency_contacts':
+                require_once __DIR__ . '/sections/EPM_EmergencyContactsView.php';
+                EPM_EmergencyContactsView::render($display_client_id, $readonly);
+                break;
+            default:
+                // Fallback to legacy inline rendering for sections not yet modularized
+                $this->render_data_section($section, $sections[$section], $display_client_id, true, true);
+                break;
         }
-        // If edit mode and owner, show form
-        if ($is_owner && !$readonly && $edit_mode) {
-            $this->render_client_form($section);
-            return;
-        }
-        // Otherwise, show read-only data
-        echo '<div class="epm-client-data-wrapper">';
-        if ($is_owner && !$readonly && !empty($data)) {
-            // Show Edit button
-            $edit_url = add_query_arg(array_merge($_GET, ['edit' => 1]));
-            echo '<div style="text-align:right;"><a href="' . esc_url($edit_url) . '" class="epm-btn epm-btn-primary">Edit</a></div>';
-        }
-        // Share button and modal (only for owner)
-        if (!$readonly && $is_owner) {
-            echo '<button type="button" class="epm-btn epm-btn-secondary epm-share-btn">Share Data</button>';
-            echo '<div class="epm-share-modal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#fff; border:1px solid #ccc; border-radius:5px; padding:30px; z-index:9999; max-width:500px; width:90%;">';
-            echo '<h3>Share Your Data</h3>';
-            echo '<form class="epm-share-form">';
-            echo '<label>Email to share with:</label> <input type="email" name="share_email" required style="width:250px; margin-bottom:10px;">';
-            echo '<div style="margin:10px 0;"><strong>Select sections to share:</strong></div>';
-            foreach (
-                $sections as $section_key => $section_config) {
-                echo '<div><label><input type="checkbox" name="share_sections[]" value="' . esc_attr($section_key) . '"> ' . esc_html($section_config['title']) . '</label></div>';
-            }
-            echo '<div style="margin:10px 0;"><label>Permission: <select name="permission_level"><option value="view">View</option><option value="edit">Edit</option></select></label></div>';
-            // Password sharing options
-            echo '<div style="margin:10px 0;"><strong>Password Sharing Options:</strong></div>';
-            foreach ($sections as $section_key => $section_config) {
-                foreach ($section_config['fields'] as $field) {
-                    if (stripos($field['name'], 'password') !== false) {
-                        echo '<div style="margin-left:15px;">';
-                        echo '<label><input type="checkbox" name="show_password[' . esc_attr($section_key) . '][' . esc_attr($field['name']) . ']" value="1"> Show ' . esc_html($field['label']) . ' as plaintext</label>';
-                        echo '</div>';
-                    }
-                }
-            }
-            echo '<button type="submit" class="epm-btn epm-btn-primary">Share</button>';
-            echo '<button type="button" class="epm-btn epm-btn-secondary epm-share-cancel" style="margin-left:10px;">Cancel</button>';
-            echo '<span class="epm-share-status" style="margin-left:10px;"></span>';
-            echo '</form>';
-            echo '</div>';
-        }
-        // Show the data section in read-only mode
-        if (isset($sections[$section])) {
-            // Pass share masking info if available
-            $mask_passwords = true;
-            if (isset($_GET['share_id'])) {
-                // TODO: Load share preferences from DB for this share_id
-                // $mask_passwords = ...
-            }
-            $this->render_data_section($section, $sections[$section], $display_client_id, true, $mask_passwords);
-        } else {
-            echo '<div class="epm-error">Invalid section specified.</div>';
-        }
-        echo '</div>';
     }
     
     /**
@@ -456,6 +466,33 @@ class EPM_Shortcodes {
                     array('name' => 'email', 'label' => 'Email', 'type' => 'email'),
                     array('name' => 'address', 'label' => 'Address', 'type' => 'textarea'),
                 )
+            ),
+            'scheduled_payments' => array(
+                'title' => 'Scheduled Payments',
+                'fields' => array(
+                    array('name' => 'payment_type', 'label' => 'Payment Type', 'type' => 'text'),
+                    array('name' => 'paid_to_org_id', 'label' => 'Paid To (Institute/Organization)', 'type' => 'select', 'options' => $db->get_org_options($client_id), 'class' => 'epm-institute-select', 'required' => true),
+                    array('name' => 'is_automatic', 'label' => 'Is Automatic?', 'type' => 'select', 'options' => array('Yes' => 'Yes', 'No' => 'No')),
+                    array('name' => 'amount', 'label' => 'Amount', 'type' => 'text'),
+                    array('name' => 'due_date', 'label' => 'Due Date', 'type' => 'date'),
+                )
+            ),
+            'auto_property' => array(
+                'title' => 'Autos',
+                'fields' => array(
+                    array('name' => 'auto_model_id', 'label' => 'Vehicle (Make/Model/Year)', 'type' => 'select', 'options' => AutoModelTable::get_all_options(), 'class' => 'epm-auto-model-select', 'required' => true),
+                    array('name' => 'own_or_lease', 'label' => 'Own or Lease', 'type' => 'select', 'options' => array('Own' => 'Own', 'Lease' => 'Lease')),
+                    array('name' => 'legal_document', 'label' => 'Legal Document', 'type' => 'textarea'),
+                    array('name' => 'registration_location', 'label' => 'Registration Location', 'type' => 'text'),
+                    array('name' => 'insurance_policy_location', 'label' => 'Insurance Policy Location', 'type' => 'text'),
+                    array('name' => 'bill_of_sale_location', 'label' => 'Bill of Sale Location', 'type' => 'text'),
+                    array('name' => 'location', 'label' => 'Physical Location', 'type' => 'text'),
+                    array('name' => 'safe_deposit_box_location', 'label' => 'Safe Deposit Box Location', 'type' => 'text'),
+                    array('name' => 'box_access_names', 'label' => 'Box Access Names', 'type' => 'textarea'),
+                    array('name' => 'keys_location', 'label' => 'Keys Location', 'type' => 'text'),
+                    array('name' => 'contents_list_location', 'label' => 'Contents List Location', 'type' => 'text'),
+                    array('name' => 'owner_person_id', 'label' => 'Owner', 'type' => 'select', 'options' => PersonTable::get_person_options($client_id), 'class' => 'epm-person-select'),
+                )
             )
         );
     }
@@ -538,6 +575,7 @@ class EPM_Shortcodes {
         }
         
         // Check if user is an administrator
+        $user = get_user_by('ID', $user_id);
         if ($user && in_array('administrator', $user->roles)) {
             return true;
         }

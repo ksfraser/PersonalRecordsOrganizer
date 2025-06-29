@@ -25,13 +25,16 @@ class RealEstateTable implements TableInterface {
             tax_receipts text DEFAULT NULL,
             leases text DEFAULT NULL,
             accounting_docs text DEFAULT NULL,
+            lender_person_id bigint(20) DEFAULT NULL,
             created datetime DEFAULT CURRENT_TIMESTAMP,
             lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id),
             KEY suitecrm_guid (suitecrm_guid),
             KEY wp_record_id (wp_record_id),
-            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
+            KEY lender_person_id (lender_person_id),
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
+            FOREIGN KEY (lender_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

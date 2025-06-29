@@ -2,6 +2,16 @@
 
 A comprehensive WordPress plugin and SuiteCRM integration system for managing estate planning records with multi-user support, data sharing controls, and PDF generation capabilities.
 
+## Architecture Overview
+
+Estate Planning Manager uses a modular, extensible architecture for all database tables and cross-platform data sync. Key architectural features:
+
+- **Modular Table Classes:** All selector and user data tables are defined as individual classes implementing a common `TableInterface`. Each class contains its own schema and default data logic, making tables reusable and easy to maintain.
+- **TableFactory:** A central `TableFactory` returns all registered table classes. The main database installer (`EPM_Database::create_tables()`) uses this factory to create and populate all tables in a single pass.
+- **Cross-Platform Sync Fields:** All major user data tables include both a `suitecrm_guid` and a `wp_record_id` field, enabling two-way record matching and synchronization with SuiteCRM (and future platforms).
+- **Separation of Concerns:** Table creation and population logic is fully separated from business logic, UI, and API code. This makes the system more testable and extensible.
+- **Extensibility:** The architecture is designed to support additional platforms (e.g., FrontAccounting) by reusing the same table classes and adding new sync fields if needed.
+
 ## Overview
 
 This system transforms spreadsheet-based estate planning data into a secure, multi-user database application with the following key features:

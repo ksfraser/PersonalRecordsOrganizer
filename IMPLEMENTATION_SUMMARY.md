@@ -14,6 +14,9 @@ The plugin follows WordPress best practices with a modular, object-oriented arch
    - Handles all database operations
    - Creates and manages custom tables for different data sections
    - Provides secure data access methods
+   - Uses modular table classes, each implementing a common `TableInterface`.
+   - All table classes are registered in a central `TableFactory` for automatic creation and population.
+   - All user data tables include both `suitecrm_guid` and `wp_record_id` fields for cross-platform sync.
 
 2. **Security Layer** (`EPM_Security`)
    - Implements data encryption for sensitive information
@@ -24,6 +27,9 @@ The plugin follows WordPress best practices with a modular, object-oriented arch
    - Bidirectional data synchronization
    - Suggested updates management
    - Contact and record management
+   - Robust logging of all sync operations and errors
+   - Supports background and scheduled sync jobs for ongoing data consistency
+   - Extensible for future platforms (e.g., FrontAccounting) by adding new GUID fields and sync adapters
 
 4. **PDF Generation** (`EPM_PDF_Generator`)
    - Dynamic PDF creation from database records
@@ -34,6 +40,9 @@ The plugin follows WordPress best practices with a modular, object-oriented arch
    - Comprehensive activity tracking
    - Security event monitoring
    - Compliance reporting
+
+6. **Static Analysis Compatibility**
+   - Provides a `wp-stubs.php` file with stubs for all major WordPress functions and classes, including a comprehensive `wpdb` class, to silence static analysis errors (e.g., Intelephense).
 
 ## Database Schema
 
@@ -64,12 +73,17 @@ The plugin follows WordPress best practices with a modular, object-oriented arch
 - Converted spreadsheet tabs into database tables
 - Implemented user roles (Estate Client, Financial Advisor)
 - Secure multi-user access with proper permissions
+- Modular table classes and TableFactory for maintainability and extensibility
 
 ### 2. SuiteCRM Integration
 - **Bidirectional Sync**: Data flows both ways between WordPress and SuiteCRM
 - **Suggested Updates**: System compares data and suggests updates
 - **Contact Management**: Automatic contact creation and updates
 - **Custom Modules**: Bank accounts, investments, real estate, insurance
+- **Cross-system GUIDs**: All user data tables include both `suitecrm_guid` and `wp_record_id` fields
+- **Robust Logging**: All sync operations and errors are logged
+- **Background/Scheduled Sync**: Supports background and scheduled sync jobs
+- **Extensible**: Architecture supports future platforms (e.g., FrontAccounting)
 
 ### 3. PDF Generation System
 - **Dynamic Templates**: Generate PDFs from database records
@@ -88,6 +102,13 @@ The plugin follows WordPress best practices with a modular, object-oriented arch
 - **Access Controls**: Role-based permissions
 - **Audit Logging**: Complete activity tracking
 - **PIPEDA Compliance**: Privacy controls and data handling
+
+### 6. Static Analysis Compatibility
+- **wp-stubs.php**: Stubs for all major WordPress functions and classes, including `wpdb`, to silence static analysis errors
+
+### 7. Testing & Quality Assurance
+- **Unit and Integration Tests**: Comprehensive PHPUnit test suite for all modular table classes, sync logic, and user/admin features
+- **Test Coverage**: Table creation, default data population, sync logic, sharing/invite logic, and static analysis compatibility
 
 ## File Structure
 

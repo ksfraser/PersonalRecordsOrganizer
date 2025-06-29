@@ -20,6 +20,8 @@ require_once __DIR__ . '/DigitalAssetsTable.php';
 require_once __DIR__ . '/ScheduledPaymentsTable.php';
 require_once __DIR__ . '/DebtorsCreditorsTable.php';
 require_once __DIR__ . '/InsuranceTable.php';
+require_once __DIR__ . '/PersonTable.php';
+require_once __DIR__ . '/PersonXrefTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -45,6 +47,8 @@ class TableFactory {
             new ScheduledPaymentsTable(),
             new DebtorsCreditorsTable(),
             new InsuranceTable(),
+            new PersonTable(),
+            new PersonXrefTable(),
         ];
     }
 }

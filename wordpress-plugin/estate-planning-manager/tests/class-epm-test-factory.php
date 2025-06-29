@@ -191,4 +191,45 @@ class EPM_Test_Factory {
             array('test_data' => 'test_value')
         );
     }
+    
+    /**
+     * Create a test person and return the inserted ID
+     */
+    public static function create_person($client_id, $overrides = array()) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'epm_persons';
+        $defaults = array(
+            'client_id' => $client_id,
+            'full_name' => 'Test Person',
+            'email' => 'person@example.com',
+            'phone' => '+11234567890',
+            'address' => '123 Test St',
+            'relationship' => null,
+            'notes' => null
+        );
+        $data = array_merge($defaults, $overrides);
+        $wpdb->insert($table_name, $data);
+        return $wpdb->insert_id;
+    }
+    
+    /**
+     * Create a test organization and return the inserted ID
+     */
+    public static function create_organization($client_id, $overrides = array()) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'epm_organizations';
+        $defaults = array(
+            'client_id' => $client_id,
+            'name' => 'Test Organization',
+            'address' => '456 Org St',
+            'phone' => '+11234567891',
+            'email' => 'org@example.com',
+            'account_number' => 'ORG123',
+            'branch' => 'Main Branch',
+            'notes' => null
+        );
+        $data = array_merge($defaults, $overrides);
+        $wpdb->insert($table_name, $data);
+        return $wpdb->insert_id;
+    }
 }
