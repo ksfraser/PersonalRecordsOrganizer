@@ -5,7 +5,7 @@ class PersonXrefTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_person_xref';
-        $sql = "CREATE TABLE $table_name (
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             client_id bigint(20) NOT NULL,
             person_id bigint(20) NOT NULL,
