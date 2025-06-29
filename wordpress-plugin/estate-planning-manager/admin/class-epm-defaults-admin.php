@@ -3,6 +3,14 @@
 if (!defined('ABSPATH')) exit;
 
 class EPM_Defaults_Admin {
+    private static $instance = null;
+    public static function instance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
     public static function init() {
         add_action('admin_menu', [__CLASS__, 'add_menu']);
     }

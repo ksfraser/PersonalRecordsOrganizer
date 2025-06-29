@@ -43,8 +43,8 @@ class InvestmentsTable implements TableInterface {
             FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
             FOREIGN KEY (beneficiary_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
             FOREIGN KEY (advisor_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
-            FOREIGN KEY (lender_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
-            FOREIGN KEY (lender_org_id) REFERENCES {$wpdb->prefix}epm_organizations(id) ON DELETE SET NULL
+            --FOREIGN KEY (lender_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
+            --FOREIGN KEY (lender_org_id) REFERENCES {$wpdb->prefix}epm_organizations(id) ON DELETE SET NULL
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

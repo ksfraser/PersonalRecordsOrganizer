@@ -3,6 +3,23 @@
 if (!defined('ABSPATH')) exit;
 
 class EPM_Assign_Advisors_Admin {
+    /**
+     * Singleton instance
+     * @var self|null
+     */
+    private static $instance = null;
+
+    /**
+     * Get the singleton instance
+     * @return self
+     */
+    public static function instance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
     public static function init() {
         add_action('admin_menu', [__CLASS__, 'add_menu']);
         add_action('wp_ajax_epm_invite_client', [__CLASS__, 'ajax_invite_client']);
