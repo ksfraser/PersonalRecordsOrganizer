@@ -106,6 +106,14 @@ The plugin follows WordPress best practices with a modular, object-oriented arch
 ### 6. Static Analysis Compatibility
 - **wp-stubs.php**: Stubs for all major WordPress functions and classes, including `wpdb`, to silence static analysis errors
 
+### 7. Modular UI for All Sections (June 2025)
+- **Requirement:** Every major section (Personal, Banking, Investments, Insurance, Real Estate, Scheduled Payments, Autos, Personal Property, Emergency Contacts) must have its own dedicated view class for both form and data rendering. The main shortcode handler (`EPM_Shortcodes`) delegates all rendering to these classes. No legacy or inline rendering remains.
+- **Change Driver:** UI maintainability, testability, and future-proofing. (Chat, June 2025)
+
+### 8. Unit Tests for Modular UI
+- **Requirement:** Unit tests must cover that each section's view class is used for rendering, and that the main shortcode handler does not perform inline rendering for any section.
+- **Change Driver:** Refactor verification and test coverage. (Chat, June 2025)
+
 ### 7. Testing & Quality Assurance
 - **Unit and Integration Tests**: Comprehensive PHPUnit test suite for all modular table classes, sync logic, and user/admin features
 - **Test Coverage**: Table creation, default data population, sync logic, sharing/invite logic, and static analysis compatibility
@@ -324,6 +332,14 @@ Comprehensive PHPUnit test suite covering:
 #### 6. UI/UX Consistency and Validation
 - **Requirement:** The UI must ensure that only the relevant lender dropdown is enabled based on the selected type, and that AJAX logic is robust and consistent across all sections.
 - **Change Driver:** UI/UX review and normalization. (Chat, June 2025)
+
+#### 7. Modular UI for All Sections
+- **Requirement:** Every major section (Personal, Banking, Investments, Insurance, Real Estate, Scheduled Payments, Autos, Personal Property, Emergency Contacts) must have its own dedicated view class for both form and data rendering. The main shortcode handler (`EPM_Shortcodes`) delegates all rendering to these classes. No legacy or inline rendering remains.
+- **Change Driver:** UI maintainability, testability, and future-proofing. (Chat, June 2025)
+
+#### 8. Unit Tests for Modular UI
+- **Requirement:** Unit tests must cover that each section's view class is used for rendering, and that the main shortcode handler does not perform inline rendering for any section.
+- **Change Driver:** Refactor verification and test coverage. (Chat, June 2025)
 
 ### Notes
 - No requirements were deleted; all changes are additive or clarifications/updates to existing requirements.

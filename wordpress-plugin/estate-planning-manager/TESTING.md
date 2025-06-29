@@ -12,6 +12,7 @@ The Estate Planning Manager plugin includes a comprehensive test suite covering:
 - Audit logging and compliance
 - SuiteCRM API integration
 - User permissions and role management
+- Modular UI functionality
 
 ## Test Structure
 
@@ -22,6 +23,7 @@ The Estate Planning Manager plugin includes a comprehensive test suite covering:
 - `tests/test-epm-pdf-generator.php` - PDF generation, templates, security features
 - `tests/test-epm-audit-logger.php` - Audit logging, compliance tracking, data integrity
 - `tests/test-epm-suitecrm-api.php` - CRM integration, data synchronization, API handling
+- `tests/test-epm-modular-ui.php` - Modular UI functionality, view class rendering, AJAX integration
 
 ### Supporting Files
 
@@ -143,6 +145,15 @@ Key test methods:
 - `test_sync_client_data()` - Data synchronization
 - `test_error_handling()` - Error handling
 - `test_batch_operations()` - Bulk operations
+
+### Modular UI Tests (`test-epm-modular-ui.php`)
+
+Tests modular UI functionality including:
+
+- **View Class Rendering**: Each section (Personal, Banking, Investments, Insurance, Real Estate, Scheduled Payments, Autos, Personal Property, Emergency Contacts) is rendered only via its dedicated view class. The main shortcode handler (`EPM_Shortcodes`) does not perform inline rendering for any section.
+- **Error Handling**: If a section view class is missing, an error is shown and no fallback rendering occurs.
+- **AJAX and Frontend JS Integration**: All AJAX and frontend JS for section forms and modals are triggered via the modular view classes.
+- **Unit Tests for View Classes**: Unit tests verify that the correct view class is called for each section, and that legacy rendering code is not used.
 
 ## Test Data
 

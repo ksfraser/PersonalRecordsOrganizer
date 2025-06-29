@@ -77,4 +77,25 @@ class Test_EPM_Shortcodes extends EPM_Test_Case {
         $this->assertStringContainsString('form', $html);
         $this->assertStringNotContainsString('Edit', $html);
     }
+
+    /**
+     * Test that each section uses its dedicated view class for rendering (modular UI)
+     */
+    public function test_section_renders_use_view_class() {
+        $shortcodes = EPM_Shortcodes::instance();
+        $sections = $shortcodes->get_form_sections();
+        $user_id = $this->client_user_id;
+        foreach (array_keys($sections) as $section) {
+            // All section view classes must exist and be used
+            $view_class = (new \ReflectionMethod($shortcodes, 'get_section_view_class'))->invoke($shortcodes, $section);
+            $this->assertNotEmpty($view_class, "View class for section $section should exist");
+            $this->assertTrue(class_exists($view_class), "Class $view_class should exist for section $section");
+            // Simulate form rendering
+            ob_start();
+            $shortcodes->client_form_shortcode(['section' => $section]);
+            $html = ob_get_clean();
+            $this->assertStringNotContainsString('Invalid section specified', $html, "No legacy error for $section");
+            $this->assertStringNotContainsString('legacy', strtolower($html), "No legacy rendering for $section");
+        }
+    }
 }
