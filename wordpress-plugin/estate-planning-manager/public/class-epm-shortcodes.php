@@ -10,6 +10,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once dirname(__DIR__) . '/includes/class-epm-logger.php';
+
 class EPM_Shortcodes {
     
     /**
@@ -53,7 +55,10 @@ class EPM_Shortcodes {
         $atts = shortcode_atts(array(
             'section' => 'personal',
         ), $atts);
-        
+        // Log all shortcode GET requests if log level is DEBUG
+        if (function_exists('EPM_Logger::log') && EPM_Logger::get_log_level() >= 4) {
+            EPM_Logger::log('Shortcode GET: ' . print_r($_GET, true), EPM_Logger::DEBUG);
+        }
         ob_start();
         $this->render_client_form($atts['section']);
         return ob_start();
@@ -110,6 +115,12 @@ class EPM_Shortcodes {
         if (!isset($sections[$section])) {
             echo '<div class="epm-error">Invalid section specified.</div>';
             return;
+        }
+        // Log user data changes (form save)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['section']) && function_exists('EPM_Logger::log')) {
+            $user = wp_get_current_user();
+            $msg = 'USER ' . $user->user_login . ' changed section ' . sanitize_text_field($_POST['section']);
+            EPM_Logger::log($msg, EPM_Logger::INFO);
         }
         // Modular: delegate to section view class if available
         switch ($section) {
@@ -168,6 +179,13 @@ class EPM_Shortcodes {
         echo '</form>';
         echo '</div>';
         $this->enqueue_form_scripts();
+        // Show log level indicator for admins
+        if (current_user_can('manage_options')) {
+            $log_level = EPM_Logger::get_log_level();
+            $log_label = ['1'=>'Error','2'=>'Warning','3'=>'Info','4'=>'Debug'];
+            echo '<div style="float:right;margin-top:-40px;"><span style="background:#222;color:#fff;padding:2px 8px;border-radius:3px;font-size:12px;">Log Level: ' . esc_html($log_label[$log_level]) . '</span> ';
+            echo '<a href="' . admin_url('options-general.php?page=epm-log-viewer') . '" target="_blank" style="color:#0073aa;">View Log</a></div>';
+        }
     }
     
     /**
@@ -784,5 +802,28 @@ class EPM_Shortcodes {
                 break;
         }
         echo '</div>';
+    }
+
+    /**
+     * Add admin setting for log level
+     */
+    public static function add_log_level_setting() {
+        add_option('epm_log_level', 1); // Default to ERROR
+        add_settings_field('epm_log_level', 'EPM Log Level', [self::class, 'render_log_level_field'], 'general');
+        register_setting('general', 'epm_log_level', [
+            'type' => 'integer',
+            'sanitize_callback' => 'absint',
+            'default' => 1
+        ]);
+    }
+    public static function render_log_level_field() {
+        $level = get_option('epm_log_level', 1);
+        echo '<select name="epm_log_level" id="epm_log_level">';
+        echo '<option value="1"' . selected($level, 1, false) . '>Error</option>';
+        echo '<option value="2"' . selected($level, 2, false) . '>Warning</option>';
+        echo '<option value="3"' . selected($level, 3, false) . '>Info (User Changes)</option>';
+        echo '<option value="4"' . selected($level, 4, false) . '>Debug (All Queries)</option>';
+        echo '</select>';
+        echo '<p class="description">Controls what is logged to the plugin log file. Errors are always logged. Info logs user data changes. Debug logs all queries (POST/GET/AJAX).</p>';
     }
 }

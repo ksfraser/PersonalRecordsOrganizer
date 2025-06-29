@@ -297,6 +297,38 @@ Comprehensive PHPUnit test suite covering:
 - Backup verification
 - User training sessions
 
+## Requirements Updates (June 2025)
+
+### New and Updated Requirements
+
+#### 1. Modular UI for Investments Section
+- **Requirement:** The Investments section UI must be modularized into a dedicated view class (`EPM_InvestmentsView`), with all form and display logic separated from the main shortcode handler.
+- **Change Driver:** Refactoring for maintainability, testability, and to support normalized data structures. (Chat, June 2025)
+
+#### 2. Normalized, Modular Tables for Estate Entities
+- **Requirement:** All estate planning entities (people, organizations, vehicles, etc.) must use normalized, dedicated tables with foreign keys and static helper methods for dropdowns.
+- **Change Driver:** Data normalization and robust relationship management. (Chat, June 2025)
+
+#### 3. Dual-Reference Lender Logic in Investments
+- **Requirement:** The Investments table and UI must allow a lender to be either a person or an organization, using a `lender_type` selector and two fields (`lender_person_id`, `lender_org_id`). Only the relevant field is stored based on the selected type; the other is cleared.
+- **Change Driver:** User request for flexible lender reference and robust UI/DB logic. (Chat, June 2025)
+
+#### 4. AJAX-Powered Add/Select Modals and Dropdowns
+- **Requirement:** All person and organization dropdowns must support AJAX-powered add/select modals, with dynamic updates to dropdowns after new entries are added.
+- **Change Driver:** Improved user experience and data integrity. (Chat, June 2025)
+
+#### 5. Robust Unit Tests for Investments Logic
+- **Requirement:** Unit tests must cover the dual-reference lender logic, ensuring only the correct lender field is stored and the other is cleared, for all scenarios (person, organization, unset).
+- **Change Driver:** Test coverage for new Investments logic. (Chat, June 2025)
+
+#### 6. UI/UX Consistency and Validation
+- **Requirement:** The UI must ensure that only the relevant lender dropdown is enabled based on the selected type, and that AJAX logic is robust and consistent across all sections.
+- **Change Driver:** UI/UX review and normalization. (Chat, June 2025)
+
+### Notes
+- No requirements were deleted; all changes are additive or clarifications/updates to existing requirements.
+- Each change is annotated with the date and the chat that drove the update for traceability.
+
 ## Conclusion
 
 The Estate Planning Manager successfully transforms a spreadsheet-based system into a robust, multi-user database application with enterprise-grade features. The integration with SuiteCRM provides seamless data synchronization, while the PDF generation system ensures clients can easily share their information with relevant parties while maintaining privacy and security.
