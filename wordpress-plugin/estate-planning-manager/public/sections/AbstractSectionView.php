@@ -13,15 +13,17 @@ if (!defined('ABSPATH')) exit;
 
 interface SectionViewInterface
 {
-    public static function get_section_key(): string;
-    public static function get_fields(EPM_Shortcodes $shortcodes): array;
+    public static function get_section_key();
+    public static function get_fields(
+        /*EPM_Shortcodes*/ $shortcodes
+    );
 }
 
 abstract class AbstractSectionView implements SectionViewInterface
 {
-    protected static EPM_Shortcodes $shortcodes;
+    protected static /*EPM_Shortcodes*/ $shortcodes;
 
-    public static function setShortcodes(EPM_Shortcodes $shortcodes): void
+    public static function setShortcodes($shortcodes)
     {
         static::$shortcodes = $shortcodes;
     }
@@ -36,7 +38,7 @@ abstract class AbstractSectionView implements SectionViewInterface
      * Get the fields array for this section
      * @return array
      */
-    abstract public static function get_fields(EPM_Shortcodes $shortcodes): array;
+    abstract public static function get_fields($shortcodes);
 
     /**
      * Render the section data (read-only or editable)

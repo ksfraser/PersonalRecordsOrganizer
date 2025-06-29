@@ -350,19 +350,19 @@ class EPM_Shortcodes {
      */
     private function get_section_view_class($section) {
         $map = array(
-            'personal' => 'EPM_PersonalView',
-            'banking' => 'EPM_BankingView',
-            'investments' => 'EPM_InvestmentsView',
-            'insurance' => 'EPM_InsuranceView',
-            'real_estate' => 'EPM_RealEstateView',
-            'scheduled_payments' => 'EPM_ScheduledPaymentsView',
-            'auto_property' => 'EPM_AutoView',
-            'personal_property' => 'EPM_PersonalPropertyView',
-            'emergency_contacts' => 'EPM_EmergencyContactsView',
+            'personal' => 'EstatePlanningManager\\Sections\\EPM_PersonalView',
+            'banking' => 'EstatePlanningManager\\Sections\\EPM_BankingView',
+            'investments' => 'EstatePlanningManager\\Sections\\EPM_InvestmentsView',
+            'insurance' => 'EstatePlanningManager\\Sections\\EPM_InsuranceView',
+            'real_estate' => 'EstatePlanningManager\\Sections\\EPM_RealEstateView',
+            'scheduled_payments' => 'EstatePlanningManager\\Sections\\EPM_ScheduledPaymentsView',
+            'auto_property' => 'EstatePlanningManager\\Sections\\EPM_AutoView',
+            'personal_property' => 'EstatePlanningManager\\Sections\\EPM_PersonalPropertyView',
+            'emergency_contacts' => 'EstatePlanningManager\\Sections\\EPM_EmergencyContactsView',
         );
         if (isset($map[$section])) {
             $class = $map[$section];
-            $file = __DIR__ . '/sections/' . $class . '.php';
+            $file = __DIR__ . '/sections/' . substr($class, strrpos($class, '\\') + 1) . '.php';
             if (file_exists($file)) {
                 require_once $file;
                 return $class;
@@ -446,6 +446,45 @@ class EPM_Shortcodes {
         echo '<option value="4"' . selected($level, 4, false) . '>Debug (All Queries)</option>';
         echo '</select>';
         echo '<p class="description">Controls what is logged to the plugin log file. Errors are always logged. Info logs user data changes. Debug logs all queries (POST/GET/AJAX).</p>';
+    }
+
+    /**
+     * Create required pages on plugin activation
+     */
+    public static function create_pages_on_install() {
+        $pages = [
+            [
+                'title' => 'Estate Planning Manager',
+                'slug' => 'estate-planning-manager',
+                'shortcode' => '[epm_client_form]'
+            ],
+            [
+                'title' => 'My Estate Data',
+                'slug' => 'my-estate-data',
+                'shortcode' => '[epm_client_data]'
+            ],
+            [
+                'title' => 'Manage Shares',
+                'slug' => 'manage-shares',
+                'shortcode' => '[epm_manage_shares]'
+            ],
+            [
+                'title' => 'Shared With You',
+                'slug' => 'shared-with-you',
+                'shortcode' => '[epm_shared_with_you]'
+            ],
+        ];
+        foreach ($pages as $page) {
+            if (!get_page_by_path($page['slug'])) {
+                wp_insert_post([
+                    'post_title'   => $page['title'],
+                    'post_name'    => $page['slug'],
+                    'post_content' => $page['shortcode'],
+                    'post_status'  => 'publish',
+                    'post_type'    => 'page',
+                ]);
+            }
+        }
     }
 
     // --- BEGIN: Ensure all required methods exist and are public/protected as needed ---

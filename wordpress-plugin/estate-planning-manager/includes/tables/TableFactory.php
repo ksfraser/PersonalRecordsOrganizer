@@ -23,11 +23,13 @@ require_once __DIR__ . '/InsuranceTable.php';
 require_once __DIR__ . '/PersonTable.php';
 require_once __DIR__ . '/PersonXrefTable.php';
 require_once __DIR__ . '/ClientsTable.php';
+require_once __DIR__ . '/UserPreferencesTable.php';
 
 class TableFactory {
     public static function getTables() {
         return [
             new ClientsTable(),
+            new UserPreferencesTable(),
             new RelationshipTypesTable(),
             new AccountTypesTable(),
             new ContactTypesTable(),

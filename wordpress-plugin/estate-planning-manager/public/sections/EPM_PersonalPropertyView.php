@@ -10,14 +10,11 @@ require_once __DIR__ . '/AbstractSectionView.php';
 
 class EPM_PersonalPropertyView extends AbstractSectionView
 {
-    public static function get_section_key(): string
-    {
+    public static function get_section_key() {
         return 'personal_property';
     }
 
-    public static function get_fields(): array
-    {
-        $shortcodes = EPM_Shortcodes::instance();
+    public static function get_fields($shortcodes) {
         return $shortcodes->get_form_sections()['personal_property']['fields'];
     }
 
@@ -25,8 +22,7 @@ class EPM_PersonalPropertyView extends AbstractSectionView
      * Render the personal property section (data should be provided by controller)
      * @param array $records
      */
-    public static function render_view(array $records): void
-    {
+    public static function render_view($records) {
         echo '<div class="epm-data-section" data-section="personal_property">';
         echo '<h3>Personal Property</h3>';
         if (empty($records)) {

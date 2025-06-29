@@ -1,4 +1,5 @@
 <?php
+namespace EstatePlanningManager\Sections;
 /**
  * EPM_PersonalView
  * Handles rendering of the Personal Information section (form and data)
@@ -10,8 +11,7 @@ class EPM_PersonalView extends AbstractSectionView {
     public static function get_section_key() {
         return 'personal';
     }
-    public static function get_fields() {
-        $shortcodes = EPM_Shortcodes::instance();
+    public static function get_fields($shortcodes) {
         return $shortcodes->get_form_sections()['personal']['fields'];
     }
 }

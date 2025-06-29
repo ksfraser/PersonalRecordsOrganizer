@@ -10,14 +10,13 @@ require_once __DIR__ . '/AbstractSectionView.php';
 
 class EPM_AutoView extends AbstractSectionView
 {
-    public static function get_section_key(): string
+    public static function get_section_key()
     {
         return 'auto_property';
     }
 
-    public static function get_fields(): array
+    public static function get_fields($shortcodes)
     {
-        $shortcodes = EPM_Shortcodes::instance();
         return $shortcodes->get_form_sections()['auto_property']['fields'];
     }
 
@@ -25,7 +24,7 @@ class EPM_AutoView extends AbstractSectionView
      * Render the autos section (data should be provided by controller)
      * @param array $records
      */
-    public static function render_view(array $records): void
+    public static function render_view($records)
     {
         echo '<div class="epm-data-section" data-section="auto_property">';
         echo '<h3>Autos</h3>';

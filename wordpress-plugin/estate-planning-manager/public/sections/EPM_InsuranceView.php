@@ -10,12 +10,12 @@ require_once __DIR__ . '/AbstractSectionView.php';
 
 class EPM_InsuranceView extends AbstractSectionView
 {
-    public static function get_section_key(): string
+    public static function get_section_key()
     {
         return 'insurance';
     }
 
-    public static function get_fields(EPM_Shortcodes $shortcodes): array
+    public static function get_fields($shortcodes)
     {
         return $shortcodes->get_form_sections()['insurance']['fields'];
     }
@@ -24,7 +24,7 @@ class EPM_InsuranceView extends AbstractSectionView
      * Render the insurance section (data should be provided by controller)
      * @param array $records
      */
-    public static function render_view(array $records): void
+    public static function render_view($records)
     {
         echo '<div class="epm-data-section" data-section="insurance">';
         echo '<h3>Insurance Policies</h3>';
