@@ -21,10 +21,7 @@ class DigitalAssetsTable implements TableInterface {
             created datetime DEFAULT CURRENT_TIMESTAMP,
             lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
-            KEY client_id (client_id),
-            KEY suitecrm_guid (suitecrm_guid),
-            KEY wp_record_id (wp_record_id),
-            KEY asset_type (asset_type)
+            KEY client_id (client_id)
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

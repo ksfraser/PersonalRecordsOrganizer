@@ -5,7 +5,7 @@ class PersonalPropertyCategoriesTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_personal_property_categories';
-        $sql = "CREATE TABLE $table_name (
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             value varchar(100) NOT NULL,
             label varchar(255) NOT NULL,

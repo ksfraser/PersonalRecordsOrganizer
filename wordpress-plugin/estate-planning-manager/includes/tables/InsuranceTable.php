@@ -7,7 +7,7 @@ class InsuranceTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_insurance';
-        $sql = "CREATE TABLE $table_name (
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             client_id bigint(20) NOT NULL,
             suitecrm_guid varchar(36) DEFAULT NULL,
@@ -34,11 +34,7 @@ class InsuranceTable implements TableInterface {
             KEY insurance_type (insurance_type),
             KEY beneficiary_person_id (beneficiary_person_id),
             KEY advisor_person_id (advisor_person_id),
-            KEY owner_person_id (owner_person_id),
-            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
-            FOREIGN KEY (beneficiary_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
-            FOREIGN KEY (advisor_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
-            FOREIGN KEY (owner_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL
+            KEY owner_person_id (owner_person_id)
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
