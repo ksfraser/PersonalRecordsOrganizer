@@ -5,7 +5,6 @@ class DigitalAssetsTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_digital_assets';
-        $wpdb->query("DROP TABLE IF EXISTS $table_name");
         $sql = "CREATE TABLE $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             client_id bigint(20) NOT NULL,

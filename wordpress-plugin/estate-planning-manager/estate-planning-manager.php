@@ -148,6 +148,11 @@ final class EstateplanningManager {
      * Plugin activation
      */
     public function activate() {
+        // Drop all EPM tables for a clean install
+        require_once EPM_PLUGIN_DIR . 'includes/tables/TableFactory.php';
+        if (class_exists('TableFactory')) {
+            TableFactory::dropAllTables();
+        }
         // Create database tables
         EPM_Database::instance()->create_tables();
         

@@ -51,4 +51,24 @@ class TableFactory {
             new PersonXrefTable(),
         ];
     }
+
+    public static function dropAllTables() {
+        global $wpdb;
+        $tables = [
+            'epm_investments',
+            'epm_bank_accounts',
+            'epm_real_estate',
+            'epm_personal_property',
+            'epm_digital_assets',
+            'epm_debtors_creditors',
+            'epm_person_xref',
+            'epm_insurance',
+            'epm_persons',
+            'epm_organizations',
+            'epm_clients'
+        ];
+        foreach ($tables as $table) {
+            $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}$table");
+        }
+    }
 }
