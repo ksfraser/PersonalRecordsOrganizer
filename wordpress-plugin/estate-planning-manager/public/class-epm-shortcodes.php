@@ -310,7 +310,36 @@ class EPM_Shortcodes {
         // Modular section rendering for ALL sections
         $view_class = $this->get_section_view_class($section);
         if ($view_class && class_exists($view_class)) {
-            $view_class::render($display_client_id, $readonly);
+            // Use new MVC/PSR approach if available
+            $model_class = null;
+            switch ($section) {
+                case 'real_estate':
+                    $model_class = '\EstatePlanningManager\Models\RealEstateModel';
+                    break;
+                case 'banking':
+                    $model_class = '\EstatePlanningManager\Models\BankingModel';
+                    break;
+                case 'investments':
+                    $model_class = '\EstatePlanningManager\Models\InvestmentsModel';
+                    break;
+                case 'insurance':
+                    $model_class = '\EstatePlanningManager\Models\InsuranceModel';
+                    break;
+                case 'scheduled_payments':
+                    $model_class = '\EstatePlanningManager\Models\ScheduledPaymentsModel';
+                    break;
+                // Add other sections as needed
+            }
+            if ($model_class && class_exists($model_class) && method_exists($view_class, 'render_view')) {
+                $records = $model_class::getByClientId($display_client_id);
+                // Inject EPM_Shortcodes instance if needed
+                if (method_exists($view_class, 'setShortcodes')) {
+                    $view_class::setShortcodes($this);
+                }
+                $view_class::render_view($records);
+            } else {
+                $view_class::render($display_client_id, $readonly);
+            }
         } else {
             echo '<div class="epm-error">Section view class not found for: ' . esc_html($section) . '</div>';
         }

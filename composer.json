@@ -1,0 +1,12 @@
+{
+    "name": "estate-planning-manager/estate-planning-manager",
+    "description": "Estate Planning Manager WordPress Plugin",
+    "type": "project",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "EstatePlanningManager\\Models\\": "wordpress-plugin/estate-planning-manager/public/models/",
+            "EstatePlanningManager\\Sections\\": "wordpress-plugin/estate-planning-manager/public/sections/"
+        }
+    }
+}

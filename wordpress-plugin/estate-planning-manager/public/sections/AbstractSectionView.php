@@ -5,9 +5,27 @@
  * Provides generic render and render_form logic for EPM section views.
  */
 
+namespace EstatePlanningManager\Sections;
+
+use EPM_Shortcodes;
+
 if (!defined('ABSPATH')) exit;
 
-abstract class AbstractSectionView {
+interface SectionViewInterface
+{
+    public static function get_section_key(): string;
+    public static function get_fields(EPM_Shortcodes $shortcodes): array;
+}
+
+abstract class AbstractSectionView implements SectionViewInterface
+{
+    protected static EPM_Shortcodes $shortcodes;
+
+    public static function setShortcodes(EPM_Shortcodes $shortcodes): void
+    {
+        static::$shortcodes = $shortcodes;
+    }
+
     /**
      * Get the section key (e.g., 'personal', 'banking', etc.)
      * @return string
@@ -18,7 +36,7 @@ abstract class AbstractSectionView {
      * Get the fields array for this section
      * @return array
      */
-    abstract public static function get_fields();
+    abstract public static function get_fields(EPM_Shortcodes $shortcodes): array;
 
     /**
      * Render the section data (read-only or editable)
@@ -26,10 +44,9 @@ abstract class AbstractSectionView {
      * @param bool $readonly
      */
     public static function render($user_id, $readonly = false) {
-        $fields = static::get_fields();
+        $fields = static::get_fields(static::$shortcodes);
         $section = static::get_section_key();
-        $shortcodes = EPM_Shortcodes::instance();
-        $data = $shortcodes->get_client_data($section, $user_id);
+        $data = static::$shortcodes->get_client_data($section, $user_id);
         echo '<div class="epm-section-data">';
         echo '<table class="epm-section-table" style="width:100%;">';
         foreach ($fields as $field) {
@@ -46,13 +63,12 @@ abstract class AbstractSectionView {
      * @param int $user_id
      */
     public static function render_form($user_id) {
-        $fields = static::get_fields();
+        $fields = static::get_fields(static::$shortcodes);
         $section = static::get_section_key();
-        $shortcodes = EPM_Shortcodes::instance();
         echo '<form method="post" class="epm-section-form">';
         echo '<input type="hidden" name="section" value="' . esc_attr($section) . '">';
         foreach ($fields as $field) {
-            $shortcodes->render_form_field($field, $user_id);
+            static::$shortcodes->render_form_field($field, $user_id);
         }
         echo '<button type="submit" class="epm-btn epm-btn-primary">Save</button>';
         echo '</form>';
