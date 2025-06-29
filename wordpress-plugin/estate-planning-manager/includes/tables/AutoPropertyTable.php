@@ -31,9 +31,9 @@ class AutoPropertyTable implements TableInterface {
             KEY wp_record_id (wp_record_id),
             KEY auto_model_id (auto_model_id),
             KEY owner_person_id (owner_person_id),
-            --FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
-            --FOREIGN KEY (owner_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
-            --FOREIGN KEY (auto_model_id) REFERENCES {$wpdb->prefix}epm_auto_models(id) ON DELETE SET NULL
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
+            FOREIGN KEY (owner_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
+            FOREIGN KEY (auto_model_id) REFERENCES {$wpdb->prefix}epm_auto_models(id) ON DELETE SET NULL
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

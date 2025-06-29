@@ -6,6 +6,7 @@ class PersonalPropertyTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_personal_property';
+        $wpdb->query("DROP TABLE IF EXISTS $table_name");
         $sql = "CREATE TABLE $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             client_id bigint(20) NOT NULL,
@@ -35,9 +36,9 @@ class PersonalPropertyTable implements TableInterface {
             KEY property_type (property_type),
             KEY owner_person_id (owner_person_id),
             KEY auto_model_id (auto_model_id),
-            --FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
-            --FOREIGN KEY (owner_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
-            --FOREIGN KEY (auto_model_id) REFERENCES {$wpdb->prefix}epm_auto_models(id) ON DELETE SET NULL
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
+            FOREIGN KEY (owner_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL,
+            FOREIGN KEY (auto_model_id) REFERENCES {$wpdb->prefix}epm_auto_models(id) ON DELETE SET NULL
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

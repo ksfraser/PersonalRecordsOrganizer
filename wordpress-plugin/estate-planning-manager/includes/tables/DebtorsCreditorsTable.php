@@ -29,7 +29,7 @@ class DebtorsCreditorsTable implements TableInterface {
             KEY suitecrm_guid (suitecrm_guid),
             KEY wp_record_id (wp_record_id),
             KEY relationship_type (relationship_type),
-            --FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

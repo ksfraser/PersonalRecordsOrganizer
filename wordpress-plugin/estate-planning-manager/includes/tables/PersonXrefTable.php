@@ -19,8 +19,8 @@ class PersonXrefTable implements TableInterface {
             KEY person_id (person_id),
             KEY section (section),
             KEY record_id (record_id),
-            --FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
-            --FOREIGN KEY (person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE CASCADE
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
+            FOREIGN KEY (person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE CASCADE
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

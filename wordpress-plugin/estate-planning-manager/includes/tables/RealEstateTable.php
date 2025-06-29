@@ -5,6 +5,7 @@ class RealEstateTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_real_estate';
+        $wpdb->query("DROP TABLE IF EXISTS $table_name");
         $sql = "CREATE TABLE $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             client_id bigint(20) NOT NULL,
@@ -32,9 +33,10 @@ class RealEstateTable implements TableInterface {
             KEY client_id (client_id),
             KEY suitecrm_guid (suitecrm_guid),
             KEY wp_record_id (wp_record_id),
+            KEY property_type (property_type),
             KEY lender_person_id (lender_person_id),
-            --FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
-            --FOREIGN KEY (lender_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
+            FOREIGN KEY (lender_person_id) REFERENCES {$wpdb->prefix}epm_persons(id) ON DELETE SET NULL
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

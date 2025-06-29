@@ -24,8 +24,8 @@ class ScheduledPaymentsTable implements TableInterface {
             KEY wp_record_id (wp_record_id),
             KEY payment_type (payment_type),
             KEY paid_to_org_id (paid_to_org_id),
-            --FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
-            --FOREIGN KEY (paid_to_org_id) REFERENCES {$wpdb->prefix}epm_organizations(id) ON DELETE SET NULL
+            FOREIGN KEY (client_id) REFERENCES {$wpdb->prefix}epm_clients(id) ON DELETE CASCADE,
+            FOREIGN KEY (paid_to_org_id) REFERENCES {$wpdb->prefix}epm_organizations(id) ON DELETE SET NULL
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
