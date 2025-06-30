@@ -116,6 +116,29 @@ The plugin follows WordPress best practices with a modular, object-oriented arch
 - **Requirement:** Unit tests must cover that each section's view class is used for rendering, and that the main shortcode handler does not perform inline rendering for any section.
 - **Change Driver:** Refactor verification and test coverage. (Chat, June 2025)
 
+### 9. Recent Changes: Multi-Record Section UI (June 2025)
+
+#### Requirement (Old):
+- Each section displayed only a single record or a two-row table, with no clear support for multiple records or add/edit/delete per user.
+
+#### Requirement (New):
+- Each section now displays a summary table with multiple rows (one per record, if any), with human-readable column headers.
+- An "Add New" button is shown for owners, allowing new records to be added.
+- Edit/Delete actions are available for owners only.
+- When a section is shared, users with whom it is shared see a read-only view (no add/edit/delete buttons).
+- All section view classes now use a common `renderSectionView()` method from `AbstractSectionView` for consistent UI and logic.
+
+#### Justification:
+- Supports robust, multi-record, and shareable section logic as required.
+- Improves usability and clarity for both owners and shared users.
+- Ensures compliance with modularity, SOLID, and MVC principles.
+
+#### Test Coverage:
+- Added/updated unit tests in `tests/test-section-multirecord-ui.php` to verify:
+  - Table and add button appear for owners
+  - Add button does not appear for shared/read-only users
+  - Table headers are human-readable and match the data
+
 ### 7. Testing & Quality Assurance
 - **Unit and Integration Tests**: Comprehensive PHPUnit test suite for all modular table classes, sync logic, and user/admin features
 - **Test Coverage**: Table creation, default data population, sync logic, sharing/invite logic, and static analysis compatibility

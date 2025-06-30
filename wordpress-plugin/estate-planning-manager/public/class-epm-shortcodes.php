@@ -46,6 +46,7 @@ class EPM_Shortcodes {
         add_shortcode('epm_client_data', array($this, 'client_data_shortcode'));
         add_shortcode('epm_manage_shares', array($this, 'manage_shares_shortcode'));
         add_shortcode('epm_shared_with_you', array($this, 'shared_with_you_shortcode'));
+        add_shortcode('estate_planning_manager', array($this, 'estate_planning_manager_shortcode'));
     }
     
     /**
@@ -99,6 +100,15 @@ class EPM_Shortcodes {
         }
         ob_start();
         $this->render_shared_with_you();
+        return ob_get_clean();
+    }
+    
+    /**
+     * Main Estate Planning Manager Shortcode
+     */
+    public function estate_planning_manager_shortcode($atts) {
+        ob_start();
+        self::render_main_ui(get_current_user_id());
         return ob_get_clean();
     }
     
@@ -481,6 +491,27 @@ class EPM_Shortcodes {
         }
     }
 
+    /**
+     * Plugin activation: create required tables
+     */
+    public static function activate() {
+        global $wpdb;
+        $charset_collate = $wpdb->get_charset_collate();
+        $table_name = $wpdb->prefix . 'epm_section_shares';
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            owner_id BIGINT UNSIGNED NOT NULL,
+            shared_with_id BIGINT UNSIGNED NOT NULL,
+            section_key VARCHAR(64) NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            KEY idx_owner (owner_id),
+            KEY idx_shared_with (shared_with_id),
+            KEY idx_section (section_key)
+        ) ENGINE=InnoDB $charset_collate;";
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
     // --- BEGIN: Ensure all required methods exist and are public/protected as needed ---
 
     /**
@@ -685,6 +716,20 @@ class EPM_Shortcodes {
         $results = $wpdb->get_results($wpdb->prepare("SELECT section_key FROM $table WHERE owner_id = %d AND shared_with_id = %d", $owner_id, $viewer_id));
         if (!$results) return [];
         return array_map(function($row) { return $row->section_key; }, $results);
+    }
+
+    /**
+     * Render all sections for the given user (owner view)
+     */
+    public static function render_sections_for_user($user_id) {
+        $instance = self::instance();
+        $sections = $instance->get_form_sections();
+        foreach (array_keys($sections) as $section_key) {
+            $view_class = $instance->get_section_view_class($section_key);
+            if ($view_class && class_exists($view_class)) {
+                $view_class::render($user_id, false);
+            }
+        }
     }
     // --- END: Ensure all required methods exist and are public/protected as needed ---
 }

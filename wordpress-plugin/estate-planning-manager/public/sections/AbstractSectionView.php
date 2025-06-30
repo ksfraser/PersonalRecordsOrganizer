@@ -9,8 +9,6 @@ namespace EstatePlanningManager\Sections;
 
 use EPM_Shortcodes;
 
-if (!defined('ABSPATH')) exit;
-
 interface SectionViewInterface
 {
     public static function get_section_key();

@@ -1,9 +1,9 @@
 <?php
 namespace EstatePlanningManager\Sections;
 
+use EstatePlanningManager\Models\EmergencyContactsModel;
 use EPM_Shortcodes;
 
-require_once __DIR__ . '/AbstractSectionView.php';
 
 class EPM_EmergencyContactsView extends AbstractSectionView {
     public static function get_section_key() {
@@ -14,6 +14,10 @@ class EPM_EmergencyContactsView extends AbstractSectionView {
             $shortcodes = \EPM_Shortcodes::instance();
         }
         return $shortcodes->get_form_sections()['emergency_contacts']['fields'];
+    }
+    public static function render($user_id, $readonly = false) {
+        $instance = new self();
+        $instance->renderSectionView();
     }
     public function getModel() {
         return new \EstatePlanningManager\Models\EmergencyContactsModel();
