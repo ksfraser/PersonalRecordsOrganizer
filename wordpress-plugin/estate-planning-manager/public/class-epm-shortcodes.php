@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once dirname(__DIR__) . '/includes/class-epm-logger.php';
+use EstatePlanningManager\Sections\AbstractSectionView;
 
 class EPM_Shortcodes {
     
@@ -250,8 +250,10 @@ class EPM_Shortcodes {
             return;
         }
         $current_user = wp_get_current_user();
-        $display_client_id = $client_id ? $client_id : $current_user->ID;
-        $is_owner = ($display_client_id == $current_user->ID);
+        // Use client_id everywhere, fallback to current user's client_id if not provided
+        $db = EPM_Database::instance();
+        $display_client_id = $client_id ? $client_id : $db->get_client_id_by_user_id($current_user->ID);
+        $is_owner = ($display_client_id == $db->get_client_id_by_user_id($current_user->ID));
         $sections = $this->get_form_sections();
         $edit_mode = isset($_GET['edit']) && $_GET['edit'] == '1';
         if ($readonly) $edit_mode = false;
@@ -590,6 +592,8 @@ class EPM_Shortcodes {
             $('#epm-add-person-form, #epm-add-institute-form').on('submit',function(e){
                 e.preventDefault();
                 var form=$(this);
+                e.preventDefault();
+                var form=$(this);
                 var data=form.serialize();
                 var url=form.attr('action');
                 $.post(url,data,function(resp){
@@ -723,11 +727,13 @@ class EPM_Shortcodes {
      */
     public static function render_sections_for_user($user_id) {
         $instance = self::instance();
+        $db = EPM_Database::instance();
+        $client_id = $db->get_client_id_by_user_id($user_id);
         $sections = $instance->get_form_sections();
         foreach (array_keys($sections) as $section_key) {
             $view_class = $instance->get_section_view_class($section_key);
             if ($view_class && class_exists($view_class)) {
-                $view_class::render($user_id, false);
+                $view_class::render($client_id, false);
             }
         }
     }

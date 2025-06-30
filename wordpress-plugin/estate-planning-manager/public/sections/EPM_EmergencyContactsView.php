@@ -20,7 +20,7 @@ class EPM_EmergencyContactsView extends AbstractSectionView {
         $instance->renderSectionView();
     }
     public function getModel() {
-        return new \EstatePlanningManager\Models\EmergencyContactsModel();
+        return new EmergencyContactsModel();
     }
     public function getSection() {
         return 'emergency_contacts';

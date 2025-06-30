@@ -1,11 +1,13 @@
 <?php
 namespace EstatePlanningManager\Models;
 
+require_once __DIR__ . '/AbstractSectionModel.php';
+
 require_once __DIR__ . '/Sanitizer.php';
 
 if (!defined('ABSPATH')) exit;
 
-class PersonalPropertyModel {
+class PersonalPropertyModel extends AbstractSectionModel {
     public static function getByClientId($clientId) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_personal_property';
@@ -50,16 +52,10 @@ class PersonalPropertyModel {
         global $wpdb;
         return $wpdb->prefix . 'epm_personal_property';
     }
-    public function getAllRecordsForUser($user_id) {
-        global $wpdb;
-        $table = $this->getTableName();
-        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE user_id = %d", $user_id), ARRAY_A);
-        return $results ? $results : [];
-    }
-    public function getOwnerIdForSection($section, $user_id) {
-        return $user_id;
+    public function getOwnerIdForSection($section, $client_id) {
+        return $client_id;
     }
     public function getSummaryFields() {
-        return ['id', 'property_name'];
+        return ['id', 'property_description'];
     }
 }

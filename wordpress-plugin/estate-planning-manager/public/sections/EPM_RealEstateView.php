@@ -29,7 +29,7 @@ class EPM_RealEstateView extends AbstractSectionView
     }
 
     public function getModel() {
-        return new \EstatePlanningManager\Models\RealEstateModel();
+        return new RealEstateModel();
     }
     public function getSection() {
         return 'real_estate';

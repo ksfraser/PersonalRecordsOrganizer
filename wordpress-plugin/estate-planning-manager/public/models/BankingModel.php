@@ -2,10 +2,11 @@
 namespace EstatePlanningManager\Models;
 
 require_once __DIR__ . '/Sanitizer.php';
+require_once __DIR__ . '/AbstractSectionModel.php';
 
 if (!defined('ABSPATH')) exit;
 
-class BankingModel {
+class BankingModel extends AbstractSectionModel {
     public static function getByClientId($clientId) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_bank_accounts';
@@ -37,18 +38,11 @@ class BankingModel {
 
     public function getTableName() {
         global $wpdb;
-        return $wpdb->prefix . 'epm_banking';
+        return $wpdb->prefix . 'epm_bank_accounts';
     }
 
-    public function getAllRecordsForUser($user_id) {
-        global $wpdb;
-        $table = $this->getTableName();
-        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE user_id = %d", $user_id), ARRAY_A);
-        return $results ? $results : [];
-    }
-
-    public function getOwnerIdForSection($section, $user_id) {
-        return $user_id;
+    public function getOwnerIdForSection($section, $client_id) {
+        return $client_id;
     }
 
     public function getSummaryFields() {

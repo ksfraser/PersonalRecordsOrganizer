@@ -7,7 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInit4e370a174ffaf5e6afac581307d0f07f
 {
     public static $prefixLengthsPsr4 = array (
-        'E' => 
+        'E' =>
         array (
             'EstatePlanningManager\\Sections\\' => 31,
             'EstatePlanningManager\\Models\\' => 29,
@@ -15,11 +15,11 @@ class ComposerStaticInit4e370a174ffaf5e6afac581307d0f07f
     );
 
     public static $prefixDirsPsr4 = array (
-        'EstatePlanningManager\\Sections\\' => 
+        'EstatePlanningManager\\Sections\\' =>
         array (
             0 => __DIR__ . '/../..' . '/wordpress-plugin/estate-planning-manager/public/sections',
         ),
-        'EstatePlanningManager\\Models\\' => 
+        'EstatePlanningManager\\Models\\' =>
         array (
             0 => __DIR__ . '/../..' . '/wordpress-plugin/estate-planning-manager/public/models',
         ),

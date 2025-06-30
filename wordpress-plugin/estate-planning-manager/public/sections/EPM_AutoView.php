@@ -28,7 +28,7 @@ class EPM_AutoView extends AbstractSectionView
     }
 
     public function getModel() {
-        return new \EstatePlanningManager\Models\AutoModel();
+        return new AutoModel();
     }
     public function getSection() {
         return 'auto_property';

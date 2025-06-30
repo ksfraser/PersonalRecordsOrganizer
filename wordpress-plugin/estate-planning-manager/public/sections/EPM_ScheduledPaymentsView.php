@@ -28,7 +28,7 @@ class EPM_ScheduledPaymentsView extends AbstractSectionView
     }
 
     public function getModel() {
-        return new \EstatePlanningManager\Models\ScheduledPaymentsModel();
+        return new ScheduledPaymentsModel();
     }
     public function getSection() {
         return 'scheduled_payments';

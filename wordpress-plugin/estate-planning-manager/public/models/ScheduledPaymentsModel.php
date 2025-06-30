@@ -1,11 +1,13 @@
 <?php
 namespace EstatePlanningManager\Models;
 
+require_once __DIR__ . '/AbstractSectionModel.php';
+
 require_once __DIR__ . '/Sanitizer.php';
 
 if (!defined('ABSPATH')) exit;
 
-class ScheduledPaymentsModel {
+class ScheduledPaymentsModel extends AbstractSectionModel {
     public static function getByClientId($clientId) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_scheduled_payments';
@@ -38,18 +40,9 @@ class ScheduledPaymentsModel {
         global $wpdb;
         return $wpdb->prefix . 'epm_scheduled_payments';
     }
-
-    public function getAllRecordsForUser($user_id) {
-        global $wpdb;
-        $table = $this->getTableName();
-        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE user_id = %d", $user_id), ARRAY_A);
-        return $results ? $results : [];
+    public function getOwnerIdForSection($section, $client_id) {
+        return $client_id;
     }
-
-    public function getOwnerIdForSection($section, $user_id) {
-        return $user_id;
-    }
-
     public function getSummaryFields() {
         return ['id', 'payment_name'];
     }

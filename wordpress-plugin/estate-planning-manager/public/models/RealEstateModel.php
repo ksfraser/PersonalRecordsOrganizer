@@ -1,11 +1,13 @@
 <?php
 namespace EstatePlanningManager\Models;
 
-if (!defined('ABSPATH')) exit;
+require_once __DIR__ . '/AbstractSectionModel.php';
 
 require_once __DIR__ . '/Sanitizer.php';
 
-class RealEstateModel {
+if (!defined('ABSPATH')) exit;
+
+class RealEstateModel extends AbstractSectionModel {
     public static function getByClientId($clientId) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_real_estate';
@@ -50,17 +52,11 @@ class RealEstateModel {
         global $wpdb;
         return $wpdb->prefix . 'epm_real_estate';
     }
-    public function getAllRecordsForUser($user_id) {
-        global $wpdb;
-        $table = $this->getTableName();
-        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE user_id = %d", $user_id), ARRAY_A);
-        return $results ? $results : [];
-    }
-    public function getOwnerIdForSection($section, $user_id) {
+    public function getOwnerIdForSection($section, $client_id) {
         // TODO: Implement sharing logic
-        return $user_id;
+        return $client_id;
     }
     public function getSummaryFields() {
-        return ['id', 'name'];
+        return ['id', 'property_address'];
     }
 }

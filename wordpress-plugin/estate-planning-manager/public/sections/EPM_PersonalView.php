@@ -1,5 +1,7 @@
 <?php
 namespace EstatePlanningManager\Sections;
+
+use EstatePlanningManager\Models\PersonalModel;
 /**
  * EPM_PersonalView
  * Handles rendering of the Personal Information section (form and data)
@@ -20,7 +22,7 @@ class EPM_PersonalView extends AbstractSectionView {
         $instance->renderSectionView();
     }
     public function getModel() {
-        return new \EstatePlanningManager\Models\PersonalModel();
+        return new PersonalModel();
     }
     public function getSection() {
         return 'personal';

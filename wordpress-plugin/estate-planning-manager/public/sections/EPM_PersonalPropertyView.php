@@ -26,7 +26,7 @@ class EPM_PersonalPropertyView extends AbstractSectionView
     }
 
     public function getModel() {
-        return new \EstatePlanningManager\Models\PersonalPropertyModel();
+        return new PersonalPropertyModel();
     }
     public function getSection() {
         return 'personal_property';
