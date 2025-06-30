@@ -37,4 +37,11 @@ class EPM_PersonalView extends AbstractSectionView {
     public static function render_form($user_id) {
         parent::render_form($user_id);
     }
+    public function getModel() {
+        // Return the model instance for the Personal section
+        return new \EstatePlanningManager\Models\PersonalModel();
+    }
+    public function getSection() {
+        return 'personal';
+    }
 }

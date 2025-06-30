@@ -15,4 +15,10 @@ class EPM_EmergencyContactsView extends AbstractSectionView {
         }
         return $shortcodes->get_form_sections()['emergency_contacts']['fields'];
     }
+    public function getModel() {
+        return new \EstatePlanningManager\Models\EmergencyContactsModel();
+    }
+    public function getSection() {
+        return 'emergency_contacts';
+    }
 }

@@ -50,4 +50,10 @@ class EPM_PersonalPropertyView extends AbstractSectionView
         }
         echo '</div>';
     }
+    public function getModel() {
+        return new \EstatePlanningManager\Models\PersonalPropertyModel();
+    }
+    public function getSection() {
+        return 'personal_property';
+    }
 }

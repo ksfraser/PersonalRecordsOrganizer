@@ -51,4 +51,10 @@ class EPM_InsuranceView extends AbstractSectionView
         }
         echo '</div>';
     }
+    public function getModel() {
+        return new \EstatePlanningManager\Models\InsuranceModel();
+    }
+    public function getSection() {
+        return 'insurance';
+    }
 }

@@ -50,4 +50,10 @@ class EPM_BankingView extends AbstractSectionView
         }
         echo '</div>';
     }
+    public function getModel() {
+        return new \EstatePlanningManager\Models\BankingModel();
+    }
+    public function getSection() {
+        return 'banking';
+    }
 }

@@ -47,4 +47,11 @@ class EPM_InvestmentsView extends AbstractSectionView
         }
         echo '</div>';
     }
+
+    public function getModel() {
+        return new \EstatePlanningManager\Models\InvestmentsModel();
+    }
+    public function getSection() {
+        return 'investments';
+    }
 }

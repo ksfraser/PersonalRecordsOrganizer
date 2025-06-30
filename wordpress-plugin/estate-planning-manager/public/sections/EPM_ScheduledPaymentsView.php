@@ -49,4 +49,10 @@ class EPM_ScheduledPaymentsView extends AbstractSectionView
         }
         echo '</div>';
     }
+    public function getModel() {
+        return new \EstatePlanningManager\Models\ScheduledPaymentsModel();
+    }
+    public function getSection() {
+        return 'scheduled_payments';
+    }
 }
