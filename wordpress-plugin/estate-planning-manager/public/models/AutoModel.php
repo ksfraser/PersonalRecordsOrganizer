@@ -53,4 +53,13 @@ class AutoModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'auto_name'];
     }
+
+    public function getFormFields() {
+        return [
+            ['name' => 'vehicle', 'label' => 'Vehicle'],
+            ['name' => 'own_or_lease', 'label' => 'Own or Lease'],
+            ['name' => 'owner', 'label' => 'Owner'],
+            ['name' => 'registration_location', 'label' => 'Registration Location'],
+        ];
+    }
 }

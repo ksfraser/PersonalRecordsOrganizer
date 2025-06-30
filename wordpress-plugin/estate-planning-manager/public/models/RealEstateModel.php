@@ -59,4 +59,23 @@ class RealEstateModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'property_address'];
     }
+    public function getFormFields() {
+        return [
+            ['name' => 'property_type', 'label' => 'Property Type'],
+            ['name' => 'title_held_by', 'label' => 'Title Held By'],
+            ['name' => 'address', 'label' => 'Address'],
+            ['name' => 'has_mortgage', 'label' => 'Has Mortgage'],
+            ['name' => 'mortgage_held_by', 'label' => 'Mortgage Held By'],
+            ['name' => 'lender_address', 'label' => 'Lender Address'],
+            ['name' => 'lender_phone', 'label' => 'Lender Phone'],
+            ['name' => 'lender_email', 'label' => 'Lender Email'],
+            ['name' => 'mortgage_location', 'label' => 'Mortgage Location'],
+            ['name' => 'deed_location', 'label' => 'Deed Location'],
+            ['name' => 'property_insurance_docs', 'label' => 'Property Insurance Docs'],
+            ['name' => 'land_surveys', 'label' => 'Land Surveys'],
+            ['name' => 'tax_receipts', 'label' => 'Tax Receipts'],
+            ['name' => 'leases', 'label' => 'Leases'],
+            ['name' => 'accounting_docs', 'label' => 'Accounting Docs'],
+        ];
+    }
 }

@@ -47,4 +47,14 @@ class InvestmentsModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'investment_name'];
     }
+    public function getFormFields() {
+        return [
+            ['name' => 'investment_type', 'label' => 'Investment Type'],
+            ['name' => 'financial_company', 'label' => 'Financial Company'],
+            ['name' => 'account_number', 'label' => 'Account Number'],
+            ['name' => 'beneficiary', 'label' => 'Beneficiary'],
+            ['name' => 'advisor', 'label' => 'Advisor'],
+            ['name' => 'lender', 'label' => 'Lender'],
+        ];
+    }
 }

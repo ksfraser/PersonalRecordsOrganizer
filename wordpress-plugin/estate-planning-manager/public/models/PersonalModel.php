@@ -14,4 +14,13 @@ class PersonalModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'name'];
     }
+    public function getFormFields() {
+        return [
+            ['name' => 'name', 'label' => 'Full Name'],
+            ['name' => 'dob', 'label' => 'Date of Birth'],
+            ['name' => 'email', 'label' => 'Email'],
+            ['name' => 'phone', 'label' => 'Phone'],
+            // Add more fields as needed
+        ];
+    }
 }

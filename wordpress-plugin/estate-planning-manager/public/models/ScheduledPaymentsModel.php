@@ -46,4 +46,13 @@ class ScheduledPaymentsModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'payment_name'];
     }
+    public function getFormFields() {
+        return [
+            ['name' => 'payment_type', 'label' => 'Payment Type'],
+            ['name' => 'paid_to', 'label' => 'Paid To'],
+            ['name' => 'is_automatic', 'label' => 'Is Automatic'],
+            ['name' => 'amount', 'label' => 'Amount'],
+            ['name' => 'due_date', 'label' => 'Due Date'],
+        ];
+    }
 }

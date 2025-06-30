@@ -1,4 +1,24 @@
-# Section Sharing Requirements (Updated)
+# Section Sharing & Model Requirements (Updated)
+
+## Section Model Requirements
+- Each section model **must implement** a `getFormFields()` method.
+    - This method returns an array of all user-facing fields (excluding `id` and `client_id`) for summary tables and forms.
+    - Example:
+      ```php
+      public function getFormFields() {
+          return [
+              ['name' => 'contact_name', 'label' => 'Contact Name'],
+              ['name' => 'relationship', 'label' => 'Relationship'],
+              // ...
+          ];
+      }
+      ```
+- All summary tables and forms in the UI are generated from `getFormFields()`.
+- All models must keep `getFormFields()` in sync with the actual table schema and validation logic.
+- Unit tests (PHPUnit) must verify:
+    - Each model implements `getFormFields()`.
+    - The returned fields match the expected schema for each section.
+    - All fields are present in both the summary table and the add/edit form.
 
 ## Old Behavior
 - Users could only see their own data in each section.

@@ -58,4 +58,21 @@ class PersonalPropertyModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'property_description'];
     }
+    public function getFormFields() {
+        return [
+            ['name' => 'property_type', 'label' => 'Property Type'],
+            ['name' => 'item_type', 'label' => 'Item Type'],
+            ['name' => 'vehicle_model', 'label' => 'Vehicle Model'],
+            ['name' => 'own_or_lease', 'label' => 'Own or Lease'],
+            ['name' => 'legal_document', 'label' => 'Legal Document'],
+            ['name' => 'registration_location', 'label' => 'Registration Location'],
+            ['name' => 'insurance_policy_location', 'label' => 'Insurance Policy Location'],
+            ['name' => 'bill_of_sale_location', 'label' => 'Bill of Sale Location'],
+            ['name' => 'location', 'label' => 'Location'],
+            ['name' => 'safe_deposit_box_location', 'label' => 'Safe Deposit Box Location'],
+            ['name' => 'box_access_names', 'label' => 'Box Access Names'],
+            ['name' => 'keys_location', 'label' => 'Keys Location'],
+            ['name' => 'contents_list_location', 'label' => 'Contents List Location'],
+        ];
+    }
 }

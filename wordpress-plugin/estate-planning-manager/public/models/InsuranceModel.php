@@ -48,4 +48,15 @@ class InsuranceModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'policy_number'];
     }
+    public function getFormFields() {
+        return [
+            ['name' => 'insurance_category', 'label' => 'Insurance Category'],
+            ['name' => 'insurance_type', 'label' => 'Insurance Type'],
+            ['name' => 'insurance_company', 'label' => 'Insurance Company'],
+            ['name' => 'policy_number', 'label' => 'Policy Number'],
+            ['name' => 'beneficiary', 'label' => 'Beneficiary'],
+            ['name' => 'advisor', 'label' => 'Advisor'],
+            ['name' => 'owner', 'label' => 'Owner'],
+        ];
+    }
 }

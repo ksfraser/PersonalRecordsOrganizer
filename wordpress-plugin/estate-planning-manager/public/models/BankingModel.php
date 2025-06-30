@@ -48,4 +48,15 @@ class BankingModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'account_name']; // Example, override as needed
     }
+
+    public function getFormFields() {
+        return [
+            ['name' => 'bank', 'label' => 'Bank'],
+            ['name' => 'account_type', 'label' => 'Account Type'],
+            ['name' => 'account_number', 'label' => 'Account Number'],
+            ['name' => 'branch', 'label' => 'Branch'],
+            ['name' => 'owner', 'label' => 'Owner'],
+            ['name' => 'advisor', 'label' => 'Advisor'],
+        ];
+    }
 }

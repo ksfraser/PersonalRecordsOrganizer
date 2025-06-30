@@ -124,14 +124,14 @@ abstract class AbstractSectionView implements SectionViewInterface
         }
     }
     protected function renderSummaryTable($records, $is_owner, $model) {
-        // Determine columns: use all keys from the first record, or model's getFormFields()
+        // Always use getFormFields() for columns if available
         $columns = [];
-        if (!empty($records)) {
-            $columns = array_keys($records[0]);
-        } elseif (method_exists($model, 'getFormFields')) {
+        if (method_exists($model, 'getFormFields')) {
             foreach ($model->getFormFields() as $field) {
                 $columns[] = $field['name'];
             }
+        } elseif (!empty($records)) {
+            $columns = array_keys($records[0]);
         }
         // Exclude 'id' and 'client_id' fields
         $exclude = ['id', 'client_id'];
@@ -144,18 +144,22 @@ abstract class AbstractSectionView implements SectionViewInterface
             echo '<th>Actions</th>';
         }
         echo '</tr></thead><tbody>';
-        foreach ($records as $record) {
-            echo '<tr>';
-            foreach ($columns as $field) {
-                echo '<td>' . esc_html(isset($record[$field]) ? $record[$field] : '') . '</td>';
+        if (empty($records)) {
+            echo '<tr><td colspan="' . (count($columns) + ($is_owner ? 1 : 0)) . '" style="text-align:center;">No data available.</td></tr>';
+        } else {
+            foreach ($records as $record) {
+                echo '<tr>';
+                foreach ($columns as $field) {
+                    echo '<td>' . esc_html(isset($record[$field]) ? $record[$field] : '') . '</td>';
+                }
+                if ($is_owner) {
+                    echo '<td>';
+                    echo '<a href="#" class="epm-edit-record" data-id="' . esc_attr($record['id']) . '">Edit</a> | ';
+                    echo '<a href="#" class="epm-delete-record" data-id="' . esc_attr($record['id']) . '">Delete</a>';
+                    echo '</td>';
+                }
+                echo '</tr>';
             }
-            if ($is_owner) {
-                echo '<td>';
-                echo '<a href="#" class="epm-edit-record" data-id="' . esc_attr($record['id']) . '">Edit</a> | ';
-                echo '<a href="#" class="epm-delete-record" data-id="' . esc_attr($record['id']) . '">Delete</a>';
-                echo '</td>';
-            }
-            echo '</tr>';
         }
         echo '</tbody></table>';
     }

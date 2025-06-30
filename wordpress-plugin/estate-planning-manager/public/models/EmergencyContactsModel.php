@@ -22,4 +22,12 @@ class EmergencyContactsModel extends AbstractSectionModel {
     public function getSummaryFields() {
         return ['id', 'contact_name'];
     }
+    public function getFormFields() {
+        return [
+            ['name' => 'contact_name', 'label' => 'Contact Name'],
+            ['name' => 'relationship', 'label' => 'Relationship'],
+            ['name' => 'phone', 'label' => 'Phone'],
+            ['name' => 'email', 'label' => 'Email'],
+        ];
+    }
 }
