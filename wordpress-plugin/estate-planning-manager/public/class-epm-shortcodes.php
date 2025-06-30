@@ -159,13 +159,7 @@ class EPM_Shortcodes {
             echo '</div>';
         }
         $this->enqueue_form_scripts();
-        // Show log level indicator for admins
-        if (current_user_can('manage_options')) {
-            $log_level = EPM_Logger::get_log_level();
-            $log_label = ['1'=>'Error','2'=>'Warning','3'=>'Info','4'=>'Debug'];
-            echo '<div style="float:right;margin-top:-40px;"><span style="background:#222;color:#fff;padding:2px 8px;border-radius:3px;font-size:12px;">Log Level: ' . esc_html($log_label[$log_level]) . '</span> ';
-            echo '<a href="' . admin_url('options-general.php?page=epm-log-viewer') . '" target="_blank" style="color:#0073aa;">View Log</a></div>';
-        }
+        // (Log level indicator and View Log link moved to admin UI)
     }
     
     /**

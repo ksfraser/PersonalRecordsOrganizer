@@ -66,6 +66,16 @@ class EPM_Admin {
         echo '<div class="wrap">';
         echo '<h1>' . __('Estate Planning Manager', 'estate-planning-manager') . '</h1>';
         echo '<p>' . __('Estate Planning Manager is active and ready to use.', 'estate-planning-manager') . '</p>';
+        
+        // Show log level indicator and View Log link for admins
+        $log_level = class_exists('EPM_Logger') ? \EPM_Logger::get_log_level() : 1;
+        $log_label = ['1'=>'Error','2'=>'Warning','3'=>'Info','4'=>'Debug'];
+        echo '<div style="float:right;margin-top:-40px;">'
+            . '<span style="background:#222;color:#fff;padding:2px 8px;border-radius:3px;font-size:12px;">Log Level: ' . esc_html($log_label[$log_level]) . '</span> '
+            . '<a href="' . admin_url('options-general.php?page=epm-log-viewer') . '" target="_blank" style="color:#0073aa;margin-left:10px;">View Log</a>'
+            . '<a href="' . admin_url('options-general.php#epm_log_level') . '" style="color:#0073aa;margin-left:10px;">Change Log Level</a>'
+            . '</div>';
+        
         echo '</div>';
     }
     

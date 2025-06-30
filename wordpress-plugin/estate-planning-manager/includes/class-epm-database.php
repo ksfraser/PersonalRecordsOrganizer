@@ -329,4 +329,19 @@ class EPM_Database {
             );
         }
     }
+
+    /**
+     * Get user meta value (wrapper for get_user_meta, for testability and abstraction)
+     * @param int $user_id
+     * @param string $key
+     * @return mixed
+     */
+    public function get_user_meta($user_id, $key) {
+        // Use WordPress core get_user_meta, but allow for easier mocking/testing
+        if (function_exists('get_user_meta')) {
+            $value = get_user_meta($user_id, $key, true);
+            return $value !== '' ? $value : null;
+        }
+        return null;
+    }
 }
