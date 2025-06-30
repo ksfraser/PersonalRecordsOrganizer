@@ -6,7 +6,7 @@ require_once __DIR__ . '/AbstractSectionModel.php';
 class PersonalModel extends AbstractSectionModel {
     public function getTableName() {
         global $wpdb;
-        return $wpdb->prefix . 'epm_personal';
+        return $wpdb->prefix . 'epm_personal_property';
     }
     public function getOwnerIdForSection($section, $client_id) {
         return $client_id;

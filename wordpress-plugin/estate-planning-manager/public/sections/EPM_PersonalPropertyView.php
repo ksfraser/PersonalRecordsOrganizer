@@ -1,6 +1,7 @@
 <?php
 namespace EstatePlanningManager\Sections;
 
+require_once __DIR__ . '/../models/PersonalPropertyModel.php';
 use EstatePlanningManager\Models\PersonalPropertyModel;
 use EPM_Shortcodes;
 

@@ -1,6 +1,7 @@
 <?php
 namespace EstatePlanningManager\Sections;
 
+require_once __DIR__ . '/../models/AutoModel.php';
 use EstatePlanningManager\Models\AutoModel;
 use EPM_Shortcodes;
 
@@ -21,10 +22,10 @@ class EPM_AutoView extends AbstractSectionView
         return $shortcodes->get_form_sections()['auto_property']['fields'];
     }
 
-    public static function render($user_id, $readonly = false)
+    public static function render($client_id, $readonly = false)
     {
         $instance = new self();
-        $instance->renderSectionView();
+        $instance->renderSectionView($client_id, $readonly);
     }
 
     public function getModel() {
