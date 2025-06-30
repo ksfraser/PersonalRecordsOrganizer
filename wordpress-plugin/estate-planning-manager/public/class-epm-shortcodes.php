@@ -622,5 +622,69 @@ class EPM_Shortcodes {
         $user_client_id = $db->get_client_id_by_user_id($user_id);
         return ($user_client_id == $client_id);
     }
+
+    /**
+     * Render main UI selector for 'My Data' vs 'Shared With Me'
+     */
+    public static function render_main_ui($user_id) {
+        $view_mode = isset($_GET['epm_view_mode']) && $_GET['epm_view_mode'] === 'shared' ? 'shared' : 'own';
+        echo '<div class="epm-view-mode-selector">';
+        echo '<form method="get">';
+        echo '<label for="epm_view_mode">View: </label>';
+        echo '<select name="epm_view_mode" id="epm_view_mode" onchange="this.form.submit()">';
+        echo '<option value="own"' . ($view_mode === 'own' ? ' selected' : '') . '>My Data</option>';
+        echo '<option value="shared"' . ($view_mode === 'shared' ? ' selected' : '') . '>Shared With Me</option>';
+        echo '</select>';
+        // Preserve other query params
+        foreach ($_GET as $k => $v) {
+            if ($k !== 'epm_view_mode' && $k !== 'epm_shared_user') {
+                echo '<input type="hidden" name="' . esc_attr($k) . '" value="' . esc_attr($v) . '">';
+            }
+        }
+        if ($view_mode === 'shared') {
+            $shared_users = self::get_users_who_shared_with($user_id);
+            echo '<label for="epm_shared_user"> Select User: </label>';
+            echo '<select name="epm_shared_user" id="epm_shared_user" onchange="this.form.submit()">';
+            echo '<option value="">-- Select --</option>';
+            foreach ($shared_users as $shared_user) {
+                $selected = (isset($_GET['epm_shared_user']) && $_GET['epm_shared_user'] == $shared_user['ID']) ? ' selected' : '';
+                echo '<option value="' . esc_attr($shared_user['ID']) . '"' . $selected . '>' . esc_html($shared_user['display_name']) . '</option>';
+            }
+            echo '</select>';
+        }
+        echo '</form>';
+        echo '</div>';
+        if ($view_mode === 'own') {
+            self::render_sections_for_user($user_id);
+        } else {
+            $shared_user_id = isset($_GET['epm_shared_user']) ? intval($_GET['epm_shared_user']) : 0;
+            if ($shared_user_id) {
+                self::render_sections_shared_with_user($shared_user_id, $user_id);
+            } else {
+                echo '<div class="epm-shared-select-notice">Please select a user to view shared data.</div>';
+            }
+        }
+    }
+    public static function get_users_who_shared_with($user_id) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_section_shares';
+        $results = $wpdb->get_results($wpdb->prepare("SELECT DISTINCT owner_id FROM $table WHERE shared_with_id = %d", $user_id));
+        if (!$results) return [];
+        $user_ids = array_map(function($row) { return $row->owner_id; }, $results);
+        if (empty($user_ids)) return [];
+        $placeholders = implode(',', array_fill(0, count($user_ids), '%d'));
+        $users = $wpdb->get_results($wpdb->prepare(
+            "SELECT ID, display_name FROM {$wpdb->users} WHERE ID IN ($placeholders)",
+            ...$user_ids
+        ), ARRAY_A);
+        return $users ? $users : [];
+    }
+    public static function get_sections_shared_with_user($owner_id, $viewer_id) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_section_shares';
+        $results = $wpdb->get_results($wpdb->prepare("SELECT section_key FROM $table WHERE owner_id = %d AND shared_with_id = %d", $owner_id, $viewer_id));
+        if (!$results) return [];
+        return array_map(function($row) { return $row->section_key; }, $results);
+    }
     // --- END: Ensure all required methods exist and are public/protected as needed ---
 }

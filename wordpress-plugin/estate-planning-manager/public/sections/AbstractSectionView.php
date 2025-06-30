@@ -84,4 +84,60 @@ abstract class AbstractSectionView implements SectionViewInterface
         echo '<button type="submit" class="epm-btn epm-btn-primary">Save</button>';
         echo '</form>';
     }
+
+    /**
+     * Child classes must provide the model instance.
+     */
+    abstract protected function getModel();
+    /**
+     * Child classes must provide the section name/slug.
+     */
+    abstract protected function getSection();
+    /**
+     * Render the section view: summary table, add/edit/delete for owner, read-only for shared users.
+     */
+    public function renderSectionView() {
+        $model = $this->getModel();
+        $section = $this->getSection();
+        $current_user_id = get_current_user_id();
+        $owner_id = $model->getOwnerIdForSection($section, $current_user_id);
+        $is_owner = ($current_user_id === $owner_id);
+        $records = $model->getAllRecordsForUser($owner_id);
+        // Display summary table
+        $this->renderSummaryTable($records, $is_owner, $model);
+        // Only owner can add/edit/delete
+        if ($is_owner) {
+            $this->renderAddEditDeleteUI($records, $model);
+        } else {
+            echo '<div class="epm-readonly-notice">This section is shared with you. You have read-only access.</div>';
+        }
+    }
+    protected function renderSummaryTable($records, $is_owner, $model) {
+        echo '<table class="epm-summary-table"><thead><tr>';
+        foreach ($model->getSummaryFields() as $field) {
+            echo '<th>' . esc_html($field) . '</th>';
+        }
+        if ($is_owner) {
+            echo '<th>Actions</th>';
+        }
+        echo '</tr></thead><tbody>';
+        foreach ($records as $record) {
+            echo '<tr>';
+            foreach ($model->getSummaryFields() as $field) {
+                echo '<td>' . esc_html($record[$field]) . '</td>';
+            }
+            if ($is_owner) {
+                echo '<td>';
+                echo '<a href="#" class="epm-edit-record" data-id="' . esc_attr($record['id']) . '">Edit</a> | ';
+                echo '<a href="#" class="epm-delete-record" data-id="' . esc_attr($record['id']) . '">Delete</a>';
+                echo '</td>';
+            }
+            echo '</tr>';
+        }
+        echo '</tbody></table>';
+    }
+    protected function renderAddEditDeleteUI($records, $model) {
+        echo '<button class="epm-add-new">Add New</button>';
+        // ...modal/form rendering code...
+    }
 }
