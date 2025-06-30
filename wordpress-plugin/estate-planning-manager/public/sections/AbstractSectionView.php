@@ -21,7 +21,10 @@ interface SectionViewInterface
 
 abstract class AbstractSectionView implements SectionViewInterface
 {
-    protected static /*EPM_Shortcodes*/ $shortcodes;
+    /**
+     * @var EPM_Shortcodes|null
+     */
+    protected static $shortcodes;
 
     public static function setShortcodes($shortcodes)
     {
@@ -46,6 +49,9 @@ abstract class AbstractSectionView implements SectionViewInterface
      * @param bool $readonly
      */
     public static function render($user_id, $readonly = false) {
+        if (!static::$shortcodes) {
+            static::$shortcodes = \EPM_Shortcodes::instance();
+        }
         $fields = static::get_fields(static::$shortcodes);
         $section = static::get_section_key();
         $data = static::$shortcodes->get_client_data($section, $user_id);
@@ -65,6 +71,9 @@ abstract class AbstractSectionView implements SectionViewInterface
      * @param int $user_id
      */
     public static function render_form($user_id) {
+        if (!static::$shortcodes) {
+            static::$shortcodes = \EPM_Shortcodes::instance();
+        }
         $fields = static::get_fields(static::$shortcodes);
         $section = static::get_section_key();
         echo '<form method="post" class="epm-section-form">';

@@ -38,6 +38,7 @@ class RealEstateTable implements TableInterface {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
     }
+
     public function populate($charset_collate) {
         // No default data for user data tables
     }

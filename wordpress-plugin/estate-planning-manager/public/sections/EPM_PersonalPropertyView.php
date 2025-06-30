@@ -15,6 +15,9 @@ class EPM_PersonalPropertyView extends AbstractSectionView
     }
 
     public static function get_fields($shortcodes) {
+        if ($shortcodes === null) {
+            $shortcodes = \EPM_Shortcodes::instance();
+        }
         return $shortcodes->get_form_sections()['personal_property']['fields'];
     }
 
