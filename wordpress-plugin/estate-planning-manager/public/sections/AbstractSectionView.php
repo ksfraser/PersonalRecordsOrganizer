@@ -93,18 +93,17 @@ abstract class AbstractSectionView implements SectionViewInterface
     abstract protected function getSection();
     /**
      * Render the section view: summary table, add/edit/delete for owner, read-only for shared users.
+     * @param int $client_id
+     * @param bool $readonly
      */
-    public function renderSectionView() {
+    public function renderSectionView($client_id, $readonly = false) {
         $model = $this->getModel();
         $section = $this->getSection();
-        $current_user_id = get_current_user_id();
-        $owner_id = $model->getOwnerIdForSection($section, $current_user_id);
-        $is_owner = ($current_user_id === $owner_id);
-        $records = $model->getAllRecordsForUser($owner_id);
+        $records = $model->getAllRecordsForClient($client_id);
         // Display summary table
-        $this->renderSummaryTable($records, $is_owner, $model);
-        // Only owner can add/edit/delete
-        if ($is_owner) {
+        $this->renderSummaryTable($records, !$readonly, $model);
+        // Only allow add/edit/delete if not readonly
+        if (!$readonly) {
             $this->renderAddEditDeleteUI($records, $model);
         } else {
             echo '<div class="epm-readonly-notice">This section is shared with you. You have read-only access.</div>';

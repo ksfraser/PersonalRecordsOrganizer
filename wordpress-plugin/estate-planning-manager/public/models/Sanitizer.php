@@ -23,6 +23,9 @@ class Sanitizer {
      * Sanitize an email field
      */
     public static function email($value) {
+        // Remove any HTML tags and their content
+        $value = preg_replace('/<[^>]*>.*?<\/[^>]*>/i', '', $value); // Remove tags and their content
+        $value = strip_tags($value); // Remove any remaining tags
         return sanitize_email($value);
     }
     /**

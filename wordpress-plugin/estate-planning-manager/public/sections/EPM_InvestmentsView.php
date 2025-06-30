@@ -1,6 +1,9 @@
 <?php
 namespace EstatePlanningManager\Sections;
 
+require_once __DIR__ . '/AbstractSectionView.php';
+require_once __DIR__ . '/../models/InvestmentsModel.php';
+
 use EstatePlanningManager\Models\InvestmentsModel;
 use EPM_Shortcodes;
 
@@ -19,10 +22,10 @@ class EPM_InvestmentsView extends AbstractSectionView
         return $shortcodes->get_form_sections()['investments']['fields'];
     }
 
-    public static function render($user_id, $readonly = false)
+    public static function render($client_id, $readonly = false)
     {
         $instance = new self();
-        $instance->renderSectionView();
+        $instance->renderSectionView($client_id, $readonly);
     }
 
     public function getModel() {

@@ -46,29 +46,35 @@ if (!function_exists('sanitize_text_field')) {
 
 if (!function_exists('sanitize_email')) {
     function sanitize_email($email) {
-        return filter_var($email, FILTER_SANITIZE_EMAIL);
+        // Remove anything after a space or <, and strip tags
+        $email = preg_replace('/[\s<].*$/', '', $email);
+        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+        return $email;
     }
 }
 
 if (!function_exists('get_option')) {
     function get_option($option, $default = false) {
-        static $options = array();
-        return isset($options[$option]) ? $options[$option] : $default;
+        global $epm_test_options;
+        if (!isset($epm_test_options)) $epm_test_options = array();
+        return isset($epm_test_options[$option]) ? $epm_test_options[$option] : $default;
     }
 }
 
 if (!function_exists('update_option')) {
     function update_option($option, $value) {
-        static $options = array();
-        $options[$option] = $value;
+        global $epm_test_options;
+        if (!isset($epm_test_options)) $epm_test_options = array();
+        $epm_test_options[$option] = $value;
         return true;
     }
 }
 
 if (!function_exists('delete_option')) {
     function delete_option($option) {
-        static $options = array();
-        unset($options[$option]);
+        global $epm_test_options;
+        if (!isset($epm_test_options)) $epm_test_options = array();
+        unset($epm_test_options[$option]);
         return true;
     }
 }

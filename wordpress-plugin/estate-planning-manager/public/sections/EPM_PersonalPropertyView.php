@@ -19,10 +19,10 @@ class EPM_PersonalPropertyView extends AbstractSectionView
         return $shortcodes->get_form_sections()['personal_property']['fields'];
     }
 
-    public static function render($user_id, $readonly = false)
+    public static function render($client_id, $readonly = false)
     {
         $instance = new self();
-        $instance->renderSectionView();
+        $instance->renderSectionView($client_id, $readonly);
     }
 
     public function getModel() {

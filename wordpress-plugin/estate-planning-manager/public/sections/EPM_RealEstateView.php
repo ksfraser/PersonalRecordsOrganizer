@@ -1,6 +1,9 @@
 <?php
 namespace EstatePlanningManager\Sections;
 
+require_once __DIR__ . '/AbstractSectionView.php';
+require_once __DIR__ . '/../models/RealEstateModel.php';
+
 use EstatePlanningManager\Models\RealEstateModel;
 use EPM_Shortcodes;
 
@@ -22,10 +25,10 @@ class EPM_RealEstateView extends AbstractSectionView
     }
 
     // Use the new multi-record summary table logic
-    public static function render($user_id, $readonly = false)
+    public static function render($client_id, $readonly = false)
     {
         $instance = new self();
-        $instance->renderSectionView();
+        $instance->renderSectionView($client_id, $readonly);
     }
 
     public function getModel() {

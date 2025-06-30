@@ -1,0 +1,21 @@
+# Ignore Composer dependencies
+/vendor/
+
+# Ignore WordPress plugin dependencies
+wordpress-plugin/estate-planning-manager/vendor/
+
+# Ignore build artifacts
+dist/
+*.zip
+
+# Ignore logs and temp files
+*.log
+*.tmp
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE/project files
+.vscode/
+.idea/

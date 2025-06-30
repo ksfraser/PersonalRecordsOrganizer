@@ -1,11 +1,12 @@
 <?php
 namespace EstatePlanningManager\Models;
 
+require_once __DIR__ . '/AbstractSectionModel.php';
 require_once __DIR__ . '/Sanitizer.php';
 
 if (!defined('ABSPATH')) exit;
 
-class AutoModel {
+class AutoModel extends AbstractSectionModel {
     public static function getByClientId($clientId) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_auto_property';
@@ -38,15 +39,15 @@ class AutoModel {
         return $wpdb->prefix . 'epm_auto';
     }
 
-    public function getAllRecordsForUser($user_id) {
+    public function getAllRecordsForClient($client_id) {
         global $wpdb;
         $table = $this->getTableName();
-        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE user_id = %d", $user_id), ARRAY_A);
+        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $client_id), \ARRAY_A);
         return $results ? $results : [];
     }
 
-    public function getOwnerIdForSection($section, $user_id) {
-        return $user_id;
+    public function getOwnerIdForSection($section, $client_id) {
+        return $client_id;
     }
 
     public function getSummaryFields() {
