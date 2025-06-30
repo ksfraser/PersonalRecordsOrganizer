@@ -59,6 +59,8 @@ The plugin follows WordPress best practices with a modular, object-oriented arch
 9. **epm_suggested_updates** - SuiteCRM sync suggestions
 10. **epm_sync_log** - Synchronization history
 11. **epm_audit_log** - Activity audit trail
+12. **epm_key_contacts** - Key contact information
+13. **epm_family_contacts** - Family contact information
 
 ### Security Features
 
@@ -340,6 +342,26 @@ Comprehensive PHPUnit test suite covering:
 #### 8. Unit Tests for Modular UI
 - **Requirement:** Unit tests must cover that each section's view class is used for rendering, and that the main shortcode handler does not perform inline rendering for any section.
 - **Change Driver:** Refactor verification and test coverage. (Chat, June 2025)
+
+### Requirement Update: Key Contacts Table
+- **Old Requirement:** No explicit requirement for a key contacts table.
+- **New Requirement:** The system must include an `epm_key_contacts` table with fields: `id`, `client_id`, `name`, `relationship`, `phone`, `email`, `contact_type`, `created`, `lastupdated`. The `contact_type` field must support predefined values (lawyer, accountant, financial_advisor, doctor, dentist, insurance_agent, real_estate_agent, other).
+- **Reason for Update:** Error encountered due to missing table/column; required for admin selectors and robust contact management. (Chat, June 2025)
+
+### Requirement Update: Family Contacts Table
+- **Old Requirement:** No explicit requirement for a family contacts table.
+- **New Requirement:** The system must include an `epm_family_contacts` table with fields: `id`, `client_id`, `name`, `relationship`, `phone`, `email`, `created`, `lastupdated`.
+- **Reason for Update:** Error encountered due to missing table; required for emergency/family contact management. (Chat, June 2025)
+
+### Requirement Update: Suggested Updates Table
+- **Old Requirement:** No explicit requirement for a suggested updates table.
+- **New Requirement:** The system must include an `epm_suggested_updates` table with fields: `id`, `client_id`, `field`, `old_value`, `new_value`, `notes`, `status`, `created_at`, `updated_at`.
+- **Reason for Update:** Error encountered due to missing table; required for SuiteCRM sync and admin review of suggested updates. (Chat, June 2025)
+
+### Requirement Clarification: Table Schema Evolution
+- **Old Requirement:** All table definitions must be robust and compatible with MariaDB/MySQL.
+- **New Requirement:** All table definitions must be robust, compatible with MariaDB/MySQL, and support schema evolution via `dbDelta` (e.g., adding new columns like `contact_type` without data loss).
+- **Reason for Update:** To ensure future-proofing and smooth upgrades as new fields are added. (Chat, June 2025)
 
 ### Notes
 - No requirements were deleted; all changes are additive or clarifications/updates to existing requirements.

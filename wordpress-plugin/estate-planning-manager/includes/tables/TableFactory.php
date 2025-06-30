@@ -28,6 +28,7 @@ require_once __DIR__ . '/FamilyContactsTable.php';
 require_once __DIR__ . '/KeyContactsTable.php';
 require_once __DIR__ . '/FamilyContactsTable.php';
 require_once __DIR__ . '/KeyContactsTable.php';
+require_once __DIR__ . '/SuggestedUpdatesTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -59,6 +60,7 @@ class TableFactory {
             new PersonXrefTable(),
             new FamilyContactsTable(),
             new KeyContactsTable(),
+            new SuggestedUpdatesTable(),
         ];
     }
 
