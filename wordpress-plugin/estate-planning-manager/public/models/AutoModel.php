@@ -36,7 +36,7 @@ class AutoModel extends AbstractSectionModel {
 
     public function getTableName() {
         global $wpdb;
-        return $wpdb->prefix . 'epm_auto';
+        return $wpdb->prefix . 'epm_auto_property';
     }
 
     public function getAllRecordsForClient($client_id) {

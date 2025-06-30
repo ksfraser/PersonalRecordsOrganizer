@@ -99,6 +99,20 @@ abstract class AbstractSectionView implements SectionViewInterface
     public function renderSectionView($client_id, $readonly = false) {
         $model = $this->getModel();
         $section = $this->getSection();
+        // Add H3 header for each section
+        $section_titles = [
+            'personal' => 'Personal Information',
+            'banking' => 'Bank Accounts',
+            'investments' => 'Investments',
+            'real_estate' => 'Real Estate',
+            'insurance' => 'Insurance Policies',
+            'scheduled_payments' => 'Scheduled Payments',
+            'personal_property' => 'Personal Property',
+            'auto_property' => 'Automobiles',
+            'emergency_contacts' => 'Emergency Contacts',
+        ];
+        $title = isset($section_titles[$section]) ? $section_titles[$section] : ucfirst(str_replace('_', ' ', $section));
+        echo '<h3 class="epm-section-title">' . esc_html($title) . '</h3>';
         $records = $model->getAllRecordsForClient($client_id);
         // Display summary table
         $this->renderSummaryTable($records, !$readonly, $model);
@@ -110,9 +124,21 @@ abstract class AbstractSectionView implements SectionViewInterface
         }
     }
     protected function renderSummaryTable($records, $is_owner, $model) {
+        // Determine columns: use all keys from the first record, or model's getFormFields()
+        $columns = [];
+        if (!empty($records)) {
+            $columns = array_keys($records[0]);
+        } elseif (method_exists($model, 'getFormFields')) {
+            foreach ($model->getFormFields() as $field) {
+                $columns[] = $field['name'];
+            }
+        }
+        // Exclude 'id' and 'client_id' fields
+        $exclude = ['id', 'client_id'];
+        $columns = array_filter($columns, function($col) use ($exclude) { return !in_array($col, $exclude); });
         echo '<table class="epm-summary-table"><thead><tr>';
-        foreach ($model->getSummaryFields() as $field) {
-            echo '<th>' . esc_html($field) . '</th>';
+        foreach ($columns as $field) {
+            echo '<th>' . esc_html(ucwords(str_replace('_', ' ', $field))) . '</th>';
         }
         if ($is_owner) {
             echo '<th>Actions</th>';
@@ -120,8 +146,8 @@ abstract class AbstractSectionView implements SectionViewInterface
         echo '</tr></thead><tbody>';
         foreach ($records as $record) {
             echo '<tr>';
-            foreach ($model->getSummaryFields() as $field) {
-                echo '<td>' . esc_html($record[$field]) . '</td>';
+            foreach ($columns as $field) {
+                echo '<td>' . esc_html(isset($record[$field]) ? $record[$field] : '') . '</td>';
             }
             if ($is_owner) {
                 echo '<td>';
@@ -135,6 +161,34 @@ abstract class AbstractSectionView implements SectionViewInterface
     }
     protected function renderAddEditDeleteUI($records, $model) {
         echo '<button class="epm-add-new">Add New</button>';
-        // ...modal/form rendering code...
+        // Modal for Add/Edit form
+        echo '<div id="epm-modal" class="epm-modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);">';
+        echo '<div class="epm-modal-content" style="background:#fff;margin:5% auto;padding:20px;max-width:500px;position:relative;">';
+        echo '<span class="epm-modal-close" style="position:absolute;top:10px;right:15px;font-size:24px;cursor:pointer;">&times;</span>';
+        echo '<h4>Add New Record</h4>';
+        // Render the form fields (empty for new record)
+        echo '<form class="epm-modal-form">';
+        foreach ($model->getFormFields() as $field) {
+            echo '<div class="epm-form-group">';
+            echo '<label>' . esc_html($field['label']) . '</label>';
+            echo '<input type="text" name="' . esc_attr($field['name']) . '" value="" class="epm-form-control">';
+            echo '</div>';
+        }
+        echo '<button type="submit" class="epm-btn epm-btn-primary">Save</button>';
+        echo '</form>';
+        echo '</div></div>';
+        // Inline JS for modal logic
+        echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var modal = document.getElementById("epm-modal");
+            var btn = document.querySelector(".epm-add-new");
+            var close = document.querySelector(".epm-modal-close");
+            if(btn && modal && close) {
+                btn.onclick = function() { modal.style.display = "block"; };
+                close.onclick = function() { modal.style.display = "none"; };
+                window.onclick = function(event) { if(event.target == modal) { modal.style.display = "none"; } };
+            }
+        });
+        </script>';
     }
 }

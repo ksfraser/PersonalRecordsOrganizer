@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) exit;
 class EmergencyContactsModel extends AbstractSectionModel {
     public function getTableName() {
         global $wpdb;
-        return $wpdb->prefix . 'epm_emergency_contacts';
+        return $wpdb->prefix . 'epm_contacts';
     }
     public function getAllRecordsForClient($client_id) {
         global $wpdb;
