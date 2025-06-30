@@ -12,6 +12,7 @@ class KeyContactsTable implements TableInterface {
             relationship varchar(100) DEFAULT NULL,
             phone varchar(50) DEFAULT NULL,
             email varchar(100) DEFAULT NULL,
+            contact_type varchar(100) DEFAULT NULL,
             created datetime DEFAULT CURRENT_TIMESTAMP,
             lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
