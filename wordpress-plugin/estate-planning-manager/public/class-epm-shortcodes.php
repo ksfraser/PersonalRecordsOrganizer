@@ -42,8 +42,8 @@ class EPM_Shortcodes {
      * Initialize shortcodes
      */
     public function init() {
-        add_shortcode('epm_client_form', array($this, 'client_form_shortcode'));
-        add_shortcode('epm_client_data', array($this, 'client_data_shortcode'));
+        // add_shortcode('epm_client_form', array($this, 'client_form_shortcode'));
+        // add_shortcode('epm_client_data', array($this, 'client_data_shortcode'));
         add_shortcode('epm_manage_shares', array($this, 'manage_shares_shortcode'));
         add_shortcode('epm_shared_with_you', array($this, 'shared_with_you_shortcode'));
         add_shortcode('estate_planning_manager', array($this, 'estate_planning_manager_shortcode'));

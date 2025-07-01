@@ -164,33 +164,41 @@ abstract class AbstractSectionView implements SectionViewInterface
         echo '</tbody></table>';
     }
     protected function renderAddEditDeleteUI($records, $model) {
-        echo '<button class="epm-add-new">Add New</button>';
+        $section = method_exists($model, 'get_section_key') ? $model::get_section_key() : '';
+        $modal_id = 'epm-modal-' . htmlspecialchars($section, ENT_QUOTES);
+        $button_id = 'epm-add-new-' . htmlspecialchars($section, ENT_QUOTES);
+        echo '<button class="epm-add-new" id="' . $button_id . '">Add New</button>';
         // Modal for Add/Edit form
-        echo '<div id="epm-modal" class="epm-modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);">';
+        echo '<div id="' . $modal_id . '" class="epm-modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);">';
         echo '<div class="epm-modal-content" style="background:#fff;margin:5% auto;padding:20px;max-width:500px;position:relative;">';
         echo '<span class="epm-modal-close" style="position:absolute;top:10px;right:15px;font-size:24px;cursor:pointer;">&times;</span>';
         echo '<h4>Add New Record</h4>';
-        // Render the form fields (empty for new record)
-        echo '<form class="epm-modal-form">';
+        $nonce = 'static-nonce';
+        // Use standard POST to the canonical permalink for the current page
+        $action_url = esc_url(get_permalink(get_queried_object_id()));
+        error_log('EPM DEBUG: Rendering modal form for section: ' . $section . ', action_url: ' . $action_url);
+        echo '<form class="epm-modal-form" method="post" action="' . $action_url . '">';
+        echo '<input type="hidden" name="section" value="' . htmlspecialchars($section, ENT_QUOTES) . '">';
+        echo '<input type="hidden" name="nonce" value="' . htmlspecialchars($nonce, ENT_QUOTES) . '">';
         foreach ($model->getFormFields() as $field) {
             echo '<div class="epm-form-group">';
-            echo '<label>' . esc_html($field['label']) . '</label>';
-            echo '<input type="text" name="' . esc_attr($field['name']) . '" value="" class="epm-form-control">';
+            echo '<label>' . htmlspecialchars($field['label'], ENT_QUOTES) . '</label>';
+            echo '<input type="text" name="' . htmlspecialchars($field['name'], ENT_QUOTES) . '" value="" class="epm-form-control">';
             echo '</div>';
         }
         echo '<button type="submit" class="epm-btn epm-btn-primary">Save</button>';
         echo '</form>';
         echo '</div></div>';
-        // Inline JS for modal logic
+        // Inline JS for modal open/close only (no AJAX), unique per section
         echo '<script>
         document.addEventListener("DOMContentLoaded", function() {
-            var modal = document.getElementById("epm-modal");
-            var btn = document.querySelector(".epm-add-new");
-            var close = document.querySelector(".epm-modal-close");
+            var modal = document.getElementById("' . $modal_id . '");
+            var btn = document.getElementById("' . $button_id . '");
+            var close = modal ? modal.querySelector(".epm-modal-close") : null;
             if(btn && modal && close) {
                 btn.onclick = function() { modal.style.display = "block"; };
                 close.onclick = function() { modal.style.display = "none"; };
-                window.onclick = function(event) { if(event.target == modal) { modal.style.display = "none"; } };
+                window.addEventListener("click", function(event) { if(event.target == modal) { modal.style.display = "none"; } });
             }
         });
         </script>';

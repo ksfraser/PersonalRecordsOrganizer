@@ -59,4 +59,7 @@ class InsuranceModel extends AbstractSectionModel {
             ['name' => 'owner', 'label' => 'Owner'],
         ];
     }
+    public static function get_section_key() {
+        return 'insurance';
+    }
 }

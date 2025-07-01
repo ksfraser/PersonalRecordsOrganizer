@@ -78,4 +78,7 @@ class RealEstateModel extends AbstractSectionModel {
             ['name' => 'accounting_docs', 'label' => 'Accounting Docs'],
         ];
     }
+    public static function get_section_key() {
+        return 'real_estate';
+    }
 }

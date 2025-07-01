@@ -57,4 +57,7 @@ class InvestmentsModel extends AbstractSectionModel {
             ['name' => 'lender', 'label' => 'Lender'],
         ];
     }
+    public static function get_section_key() {
+        return 'investments';
+    }
 }

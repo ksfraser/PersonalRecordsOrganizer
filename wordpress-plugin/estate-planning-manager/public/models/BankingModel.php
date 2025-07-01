@@ -59,4 +59,8 @@ class BankingModel extends AbstractSectionModel {
             ['name' => 'advisor', 'label' => 'Advisor'],
         ];
     }
+
+    public static function get_section_key() {
+        return 'banking';
+    }
 }

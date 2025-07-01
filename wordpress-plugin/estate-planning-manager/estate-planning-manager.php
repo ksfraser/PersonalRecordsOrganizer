@@ -21,6 +21,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// GLOBAL POST debug: log every POST before WordPress loads
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log('EPM DEBUG: GLOBAL POST handler reached. URI=' . $_SERVER['REQUEST_URI']);
+}
+
 // Define plugin constants
 define('EPM_VERSION', '1.0.0');
 define('EPM_PLUGIN_FILE', __FILE__);
@@ -66,6 +71,7 @@ final class EstateplanningManager {
     private function init_hooks() {
         add_action('init', array($this, 'init'), 0);
         add_action('plugins_loaded', array($this, 'load_textdomain'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         
         // Activation and deactivation hooks
         register_activation_hook(__FILE__, array($this, 'activate'));
@@ -144,6 +150,23 @@ final class EstateplanningManager {
         );
     }
     
+    /**
+     * Enqueue frontend scripts for modal AJAX
+     */
+    public function enqueue_scripts() {
+        wp_enqueue_script(
+            'epm-section-modal',
+            EPM_PLUGIN_URL . 'assets/js/epm-section-modal.js',
+            array('jquery'),
+            EPM_VERSION,
+            true
+        );
+        wp_localize_script('epm-section-modal', 'epmSectionModal', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('epm_save_data'),
+        ));
+    }
+
     /**
      * Plugin activation
      */
@@ -243,6 +266,112 @@ final class EstateplanningManager {
     }
 }
 
+// === EPM Modal POST Handler (shared for all sections) ===
+add_action('init', function() {
+    error_log('[EPM] DEBUG: POST handler triggered. $_POST=' . print_r($_POST, true));
+    $epm_section_models = [
+        'personal' => '\EstatePlanningManager\Models\PersonalModel',
+        'banking' => '\EstatePlanningManager\Models\BankingModel',
+        'investments' => '\EstatePlanningManager\Models\InvestmentsModel',
+        'real_estate' => '\EstatePlanningManager\Models\RealEstateModel',
+        'insurance' => '\EstatePlanningManager\Models\InsuranceModel',
+        'scheduled_payments' => '\EstatePlanningManager\Models\ScheduledPaymentsModel',
+        'personal_property' => '\EstatePlanningManager\Models\PersonalPropertyModel',
+        'auto_property' => '\EstatePlanningManager\Models\AutoModel',
+        'emergency_contacts' => '\EstatePlanningManager\Models\EmergencyContactsModel',
+    ];
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['section'], $_POST['nonce'])) {
+        $section = sanitize_text_field($_POST['section']);
+        $nonce = sanitize_text_field($_POST['nonce']);
+        // Log every section/action call
+        error_log('[EPM] Section POST: ' . $section);
+        // Optionally validate nonce here
+        if (isset($epm_section_models[$section])) {
+            $model_class = $epm_section_models[$section];
+            if (class_exists($model_class)) {
+                $model = new $model_class();
+                $data = $_POST;
+                unset($data['section'], $data['nonce']);
+                if (is_user_logged_in()) {
+                    $current_user_id = get_current_user_id();
+                    $data['client_id'] = $current_user_id;
+                }
+                $result = $model->saveRecord($data);
+                if ($result) {
+                    // === SuiteCRM sync stub ===
+                    // TODO: Implement SuiteCRM sync for $section and $result
+                    // =========================
+                    wp_redirect($_SERVER['REQUEST_URI']);
+                    exit;
+                } else {
+                    error_log('[EPM] Save failed for section: ' . $section);
+                    add_action('admin_notices', function() {
+                        echo '<div class="notice notice-error"><p>Failed to save record.</p></div>';
+                    });
+                }
+            } else {
+                error_log('[EPM] Model class does not exist for section: ' . $section . ' (Class: ' . $model_class . ')');
+            }
+        } else {
+            error_log('[EPM] Invalid section: ' . $section . ' (Available: ' . implode(', ', array_keys($epm_section_models)) . ')');
+            add_action('admin_notices', function() use ($section, $epm_section_models) {
+                echo '<div class="notice notice-error"><p>Invalid section: ' . esc_html($section) . '. Available: ' . esc_html(implode(', ', array_keys($epm_section_models))) . '</p></div>';
+            });
+        }
+    }
+});
+
+
+// === EPM Log Level Setting and Log Viewer Page ===
+add_action('admin_init', function() {
+    register_setting('general', 'epm_log_level', [
+        'type' => 'string',
+        'sanitize_callback' => 'sanitize_text_field',
+        'default' => 'info'
+    ]);
+    add_settings_field(
+        'epm_log_level',
+        'EPM Log Level',
+        function() {
+            $value = get_option('epm_log_level', 'info');
+            echo '<select id="epm_log_level" name="epm_log_level">'
+                . '<option value="debug"' . selected($value, 'debug', false) . '>Debug</option>'
+                . '<option value="info"' . selected($value, 'info', false) . '>Info</option>'
+                . '<option value="warning"' . selected($value, 'warning', false) . '>Warning</option>'
+                . '<option value="error"' . selected($value, 'error', false) . '>Error</option>'
+                . '</select>';
+        },
+        'general'
+    );
+});
+
+// Add EPM Log Viewer page to admin menu
+add_action('admin_menu', function() {
+    add_menu_page(
+        'EPM Log Viewer',
+        'EPM Log',
+        'manage_options',
+        'epm-log-viewer',
+        'epm_render_log_viewer',
+        'dashicons-media-text',
+        80
+    );
+});
+
+// Render the EPM Log Viewer page
+function epm_render_log_viewer() {
+    $log_file = WP_CONTENT_DIR . '/uploads/epm-log.txt';
+    echo '<div class="wrap"><h1>EPM Log Viewer</h1>';
+    if (file_exists($log_file) && is_readable($log_file)) {
+        echo '<pre style="background:#fff;max-height:600px;overflow:auto;border:1px solid #ccc;padding:10px;">';
+        echo esc_html(file_get_contents($log_file));
+        echo '</pre>';
+    } else {
+        echo '<p>Log file not found or not readable: ' . esc_html($log_file) . '</p>';
+    }
+    echo '</div>';
+}
+
 /**
  * Initialize the plugin
  */
@@ -252,3 +381,14 @@ function epm_init() {
 
 // Start the plugin
 epm_init();
+
+// Ensure EPM log file exists and is writable on plugin init
+add_action('init', function() {
+    $upload_dir = wp_upload_dir();
+    $log_file = $upload_dir['basedir'] . '/epm-log.txt';
+    if (!file_exists($log_file)) {
+        // Try to create the file
+        @file_put_contents($log_file, "EPM Log initialized on " . date('Y-m-d H:i:s') . "\n");
+        @chmod($log_file, 0664);
+    }
+});

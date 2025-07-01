@@ -62,4 +62,8 @@ class AutoModel extends AbstractSectionModel {
             ['name' => 'registration_location', 'label' => 'Registration Location'],
         ];
     }
+
+    public static function get_section_key() {
+        return 'auto_property';
+    }
 }

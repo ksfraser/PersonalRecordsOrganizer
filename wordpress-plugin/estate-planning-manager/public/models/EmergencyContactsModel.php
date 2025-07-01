@@ -30,4 +30,7 @@ class EmergencyContactsModel extends AbstractSectionModel {
             ['name' => 'email', 'label' => 'Email'],
         ];
     }
+    public static function get_section_key() {
+        return 'emergency_contacts';
+    }
 }

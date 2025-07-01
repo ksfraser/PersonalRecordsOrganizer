@@ -55,4 +55,7 @@ class ScheduledPaymentsModel extends AbstractSectionModel {
             ['name' => 'due_date', 'label' => 'Due Date'],
         ];
     }
+    public static function get_section_key() {
+        return 'scheduled_payments';
+    }
 }

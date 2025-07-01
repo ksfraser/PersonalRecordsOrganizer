@@ -130,7 +130,7 @@ class EPM_PDF_Generator {
         
         // Save PDF to uploads directory
         $upload_dir = wp_upload_dir();
-        $pdf_dir = $upload_dir['basedir'] . '/estate-planning-pdfs/';
+        $pdf_dir = $upload_dir['basedir'] . '/estate-planning-manager-pdfs/';
         
         if (!file_exists($pdf_dir)) {
             wp_mkdir_p($pdf_dir);
@@ -153,7 +153,7 @@ class EPM_PDF_Generator {
         );
         
         return array(
-            'url' => $upload_dir['baseurl'] . '/estate-planning-pdfs/' . $filename,
+            'url' => $upload_dir['baseurl'] . '/estate-planning-manager-pdfs/' . $filename,
             'path' => $file_path,
             'filename' => $filename
         );
@@ -366,7 +366,7 @@ class EPM_PDF_Generator {
      */
     public function clean_old_pdfs($days = 30) {
         $upload_dir = wp_upload_dir();
-        $pdf_dir = $upload_dir['basedir'] . '/estate-planning-pdfs/';
+        $pdf_dir = $upload_dir['basedir'] . '/estate-planning-manager-pdfs/';
         
         if (!file_exists($pdf_dir)) {
             return;

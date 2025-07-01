@@ -75,4 +75,7 @@ class PersonalPropertyModel extends AbstractSectionModel {
             ['name' => 'contents_list_location', 'label' => 'Contents List Location'],
         ];
     }
+    public static function get_section_key() {
+        return 'personal_property';
+    }
 }

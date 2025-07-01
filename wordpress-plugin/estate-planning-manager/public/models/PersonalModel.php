@@ -23,4 +23,7 @@ class PersonalModel extends AbstractSectionModel {
             // Add more fields as needed
         ];
     }
+    public static function get_section_key() {
+        return 'personal';
+    }
 }
