@@ -62,4 +62,26 @@ class InsuranceModel extends AbstractSectionModel {
     public static function get_section_key() {
         return 'insurance';
     }
+    public static function getFieldDefinitions() {
+        return [
+            'insurance_company' => [
+                'label' => 'Insurance Company',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'policy_number' => [
+                'label' => 'Policy Number',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'coverage_amount' => [
+                'label' => 'Coverage Amount',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+        ];
+    }
 }

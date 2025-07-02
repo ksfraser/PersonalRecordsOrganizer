@@ -63,4 +63,27 @@ class BankingModel extends AbstractSectionModel {
     public static function get_section_key() {
         return 'banking';
     }
+
+    public static function getFieldDefinitions() {
+        return [
+            'bank_name' => [
+                'label' => 'Bank Name',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'account_number' => [
+                'label' => 'Account Number',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'routing_number' => [
+                'label' => 'Routing Number',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+        ];
+    }
 }

@@ -66,4 +66,27 @@ class AutoModel extends AbstractSectionModel {
     public static function get_section_key() {
         return 'auto_property';
     }
+
+    public static function getFieldDefinitions() {
+        return [
+            'vehicle_make' => [
+                'label' => 'Vehicle Make',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'vehicle_model' => [
+                'label' => 'Vehicle Model',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'vehicle_year' => [
+                'label' => 'Vehicle Year',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+        ];
+    }
 }

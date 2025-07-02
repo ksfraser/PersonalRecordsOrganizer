@@ -521,53 +521,69 @@ class EPM_Shortcodes {
      * @return array Form sections configuration
      */
     public function get_form_sections() {
-        // This should be implemented as before, or moved to a config file if needed.
-        // For brevity, you may want to keep the previous implementation here.
+        // Require all model files so static methods are available
+        require_once __DIR__ . '/models/PersonalModel.php';
+        require_once __DIR__ . '/models/BankingModel.php';
+        require_once __DIR__ . '/models/InvestmentsModel.php';
+        require_once __DIR__ . '/models/InsuranceModel.php';
+        require_once __DIR__ . '/models/RealEstateModel.php';
+        require_once __DIR__ . '/models/ScheduledPaymentsModel.php';
+        require_once __DIR__ . '/models/AutoModel.php';
+        require_once __DIR__ . '/models/PersonalPropertyModel.php';
+        require_once __DIR__ . '/models/EmergencyContactsModel.php';
+
         $sections = array(
-            'personal' => array('title' => 'Personal Information', 'fields' => array(
-                array('name' => 'full_name', 'label' => 'Full Name', 'type' => 'text', 'required' => true),
-                array('name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true),
-                array('name' => 'phone', 'label' => 'Phone', 'type' => 'tel'),
-                array('name' => 'address', 'label' => 'Address', 'type' => 'text'),
-            )),
-            'banking' => array('title' => 'Banking Information', 'fields' => array(
-                array('name' => 'bank_name', 'label' => 'Bank Name', 'type' => 'text', 'required' => true),
-                array('name' => 'account_number', 'label' => 'Account Number', 'type' => 'text', 'required' => true),
-                array('name' => 'routing_number', 'label' => 'Routing Number', 'type' => 'text', 'required' => true),
-            )),
-            'investments' => array('title' => 'Investment Information', 'fields' => array(
-                array('name' => 'investment_type', 'label' => 'Type of Investment', 'type' => 'text', 'required' => true),
-                array('name' => 'investment_value', 'label' => 'Value of Investment', 'type' => 'text', 'required' => true),
-            )),
-            'insurance' => array('title' => 'Insurance Information', 'fields' => array(
-                array('name' => 'insurance_company', 'label' => 'Insurance Company', 'type' => 'text', 'required' => true),
-                array('name' => 'policy_number', 'label' => 'Policy Number', 'type' => 'text', 'required' => true),
-                array('name' => 'coverage_amount', 'label' => 'Coverage Amount', 'type' => 'text', 'required' => true),
-            )),
-            'real_estate' => array('title' => 'Real Estate Information', 'fields' => array(
-                array('name' => 'property_address', 'label' => 'Property Address', 'type' => 'text', 'required' => true),
-                array('name' => 'property_value', 'label' => 'Property Value', 'type' => 'text', 'required' => true),
-            )),
-            'scheduled_payments' => array('title' => 'Scheduled Payments', 'fields' => array(
-                array('name' => 'payment_amount', 'label' => 'Payment Amount', 'type' => 'text', 'required' => true),
-                array('name' => 'payment_date', 'label' => 'Payment Date', 'type' => 'date', 'required' => true),
-            )),
-            'auto_property' => array('title' => 'Automobile Property', 'fields' => array(
-                array('name' => 'vehicle_make', 'label' => 'Vehicle Make', 'type' => 'text', 'required' => true),
-                array('name' => 'vehicle_model', 'label' => 'Vehicle Model', 'type' => 'text', 'required' => true),
-                array('name' => 'vehicle_year', 'label' => 'Vehicle Year', 'type' => 'text', 'required' => true),
-            )),
-            'personal_property' => array('title' => 'Personal Property', 'fields' => array(
-                array('name' => 'property_description', 'label' => 'Property Description', 'type' => 'text', 'required' => true),
-                array('name' => 'property_value', 'label' => 'Property Value', 'type' => 'text', 'required' => true),
-            )),
-            'emergency_contacts' => array('title' => 'Emergency Contacts', 'fields' => array(
-                array('name' => 'contact_name', 'label' => 'Contact Name', 'type' => 'text', 'required' => true),
-                array('name' => 'relationship', 'label' => 'Relationship', 'type' => 'text', 'required' => true),
-                array('name' => 'contact_phone', 'label' => 'Contact Phone', 'type' => 'tel', 'required' => true),
-            )),
+            'personal' => array(
+                'title' => 'Personal Information',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\PersonalModel::getFieldDefinitions())
+            ),
+            'banking' => array(
+                'title' => 'Banking Information',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\BankingModel::getFieldDefinitions())
+            ),
+            'investments' => array(
+                'title' => 'Investment Information',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\InvestmentsModel::getFieldDefinitions())
+            ),
+            'insurance' => array(
+                'title' => 'Insurance Information',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\InsuranceModel::getFieldDefinitions())
+            ),
+            'real_estate' => array(
+                'title' => 'Real Estate Information',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\RealEstateModel::getFieldDefinitions())
+            ),
+            'scheduled_payments' => array(
+                'title' => 'Scheduled Payments',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\ScheduledPaymentsModel::getFieldDefinitions())
+            ),
+            'auto_property' => array(
+                'title' => 'Automobile Property',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\AutoModel::getFieldDefinitions())
+            ),
+            'personal_property' => array(
+                'title' => 'Personal Property',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\PersonalPropertyModel::getFieldDefinitions())
+            ),
+            'emergency_contacts' => array(
+                'title' => 'Emergency Contacts',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\EmergencyContactsModel::getFieldDefinitions())
+            ),
         );
         return apply_filters('epm_form_sections', $sections);
+    }
+
+    /**
+     * Normalize field definitions to ensure each field is an array with a 'name' key
+     * @param array $fields
+     * @return array
+     */
+    private function normalize_fields($fields) {
+        $out = [];
+        foreach ($fields as $name => $def) {
+            $out[] = array_merge(['name' => $name], $def);
+        }
+        return $out;
     }
 
     /**

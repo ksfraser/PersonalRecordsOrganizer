@@ -19,7 +19,7 @@ class EPM_ScheduledPaymentsView extends AbstractSectionView
     public static function get_fields($shortcodes)
     {
         if ($shortcodes === null) {
-            $shortcodes = \EPM_Shortcodes::instance();
+            $shortcodes = EPM_Shortcodes::instance();
         }
         return $shortcodes->get_form_sections()['scheduled_payments']['fields'];
     }

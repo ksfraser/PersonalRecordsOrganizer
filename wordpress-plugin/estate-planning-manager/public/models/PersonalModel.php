@@ -26,4 +26,32 @@ class PersonalModel extends AbstractSectionModel {
     public static function get_section_key() {
         return 'personal';
     }
+    public static function getFieldDefinitions() {
+        return [
+            'full_name' => [
+                'label' => 'Full Name',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'email' => [
+                'label' => 'Email',
+                'type' => 'email',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'phone' => [
+                'label' => 'Phone',
+                'type' => 'tel',
+                'required' => false,
+                'db_type' => 'VARCHAR(50)'
+            ],
+            'address' => [
+                'label' => 'Address',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(255)'
+            ],
+        ];
+    }
 }

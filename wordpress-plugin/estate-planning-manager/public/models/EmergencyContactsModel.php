@@ -33,4 +33,26 @@ class EmergencyContactsModel extends AbstractSectionModel {
     public static function get_section_key() {
         return 'emergency_contacts';
     }
+    public static function getFieldDefinitions() {
+        return [
+            'contact_name' => [
+                'label' => 'Contact Name',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'relationship' => [
+                'label' => 'Relationship',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'contact_phone' => [
+                'label' => 'Contact Phone',
+                'type' => 'tel',
+                'required' => true,
+                'db_type' => 'VARCHAR(50)'
+            ],
+        ];
+    }
 }

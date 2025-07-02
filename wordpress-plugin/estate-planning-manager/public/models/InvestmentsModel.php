@@ -60,4 +60,20 @@ class InvestmentsModel extends AbstractSectionModel {
     public static function get_section_key() {
         return 'investments';
     }
+    public static function getFieldDefinitions() {
+        return [
+            'investment_type' => [
+                'label' => 'Type of Investment',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'investment_value' => [
+                'label' => 'Value of Investment',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+        ];
+    }
 }

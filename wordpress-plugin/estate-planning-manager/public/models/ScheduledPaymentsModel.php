@@ -58,4 +58,20 @@ class ScheduledPaymentsModel extends AbstractSectionModel {
     public static function get_section_key() {
         return 'scheduled_payments';
     }
+    public static function getFieldDefinitions() {
+        return [
+            'payment_amount' => [
+                'label' => 'Payment Amount',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'payment_date' => [
+                'label' => 'Payment Date',
+                'type' => 'date',
+                'required' => true,
+                'db_type' => 'DATE'
+            ],
+        ];
+    }
 }

@@ -77,6 +77,12 @@
 - All organization data is validated (email with DNS check, international phone support) both frontend and backend.
 - Privacy is enforced: users cannot access or select organizations from other users.
 
+### 2.9. DRY Field Definitions (Single Source of Truth)
+- All field definitions for each section (Personal, Banking, Investments, Insurance, Real Estate, Scheduled Payments, Auto, Personal Property, Emergency Contacts) must be centralized in the corresponding model class via a static `getFieldDefinitions()` method.
+- All other code (views, shortcodes, DB table creation scripts, etc.) must reference this single source of truth for field definitions, never duplicating or hardcoding field arrays elsewhere.
+- Automated tests must verify that the model, view, and DB schema are consistent for all field definitions in every section.
+- Documentation and developer onboarding must emphasize this DRY approach for maintainability and future extensibility.
+
 ---
 
 ## 3. Unit and Integration Test Requirements

@@ -78,4 +78,20 @@ class PersonalPropertyModel extends AbstractSectionModel {
     public static function get_section_key() {
         return 'personal_property';
     }
+    public static function getFieldDefinitions() {
+        return [
+            'property_description' => [
+                'label' => 'Property Description',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'property_value' => [
+                'label' => 'Property Value',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+        ];
+    }
 }

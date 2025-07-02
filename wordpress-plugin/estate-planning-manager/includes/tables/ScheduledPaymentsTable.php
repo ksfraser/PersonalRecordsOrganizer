@@ -1,30 +1,35 @@
 <?php
 require_once __DIR__ . '/TableInterface.php';
-require_once __DIR__ . '/OrganizationTable.php';
+require_once __DIR__ . '/../public/models/ScheduledPaymentsModel.php';
+use EstatePlanningManager\Models\ScheduledPaymentsModel;
 
 class ScheduledPaymentsTable implements TableInterface {
+    private function getSqlColumnsFromFieldDefinitions($fields) {
+        $columns = [];
+        foreach ($fields as $name => $def) {
+            $dbType = isset($def['db_type']) ? $def['db_type'] : 'VARCHAR(255)';
+            $columns[] = "$name $dbType DEFAULT NULL";
+        }
+        return $columns;
+    }
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_scheduled_payments';
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            id bigint(20) NOT NULL AUTO_INCREMENT,
-            client_id bigint(20) NOT NULL,
-            suitecrm_guid varchar(36) DEFAULT NULL,
-            wp_record_id bigint(20) DEFAULT NULL,
-            payment_type varchar(100) DEFAULT NULL,
-            paid_to_org_id bigint(20) DEFAULT NULL,
-            is_automatic varchar(10) DEFAULT NULL,
-            amount decimal(10,2) DEFAULT NULL,
-            due_date varchar(100) DEFAULT NULL,
-            created datetime DEFAULT CURRENT_TIMESTAMP,
-            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY client_id (client_id),
-            KEY suitecrm_guid (suitecrm_guid),
-            KEY wp_record_id (wp_record_id),
-            KEY payment_type (payment_type),
-            KEY paid_to_org_id (paid_to_org_id)
-        ) $charset_collate;";
+        $modelFields = ScheduledPaymentsModel::getFieldDefinitions();
+        $modelColumns = $this->getSqlColumnsFromFieldDefinitions($modelFields);
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (\n"
+            . "id bigint(20) NOT NULL AUTO_INCREMENT,\n"
+            . "client_id bigint(20) NOT NULL,\n"
+            . "suitecrm_guid varchar(36) DEFAULT NULL,\n"
+            . "wp_record_id bigint(20) DEFAULT NULL,\n"
+            . implode(",\n", $modelColumns) . ",\n"
+            . "created datetime DEFAULT CURRENT_TIMESTAMP,\n"
+            . "lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n"
+            . "PRIMARY KEY (id),\n"
+            . "KEY client_id (client_id),\n"
+            . "KEY suitecrm_guid (suitecrm_guid),\n"
+            . "KEY wp_record_id (wp_record_id)\n"
+            . ") $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
     }
