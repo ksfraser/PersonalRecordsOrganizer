@@ -144,7 +144,9 @@ class EPM_Shortcodes {
             // Add Person Modal
             echo '<div id="epm-add-person-modal" class="epm-modal" style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;border-radius:5px;padding:30px;z-index:9999;max-width:400px;width:90%;">';
             echo '<h3>Add Person</h3>';
-            echo '<form id="epm-add-person-form">';
+            echo '<form id="epm-add-person-form" method="post" action="' . admin_url('admin-post.php') . '">';
+            echo '<input type="hidden" name="action" value="epm_add_person">';
+            wp_nonce_field('epm_add_person', 'epm_add_person_nonce');
             echo '<label>Name:</label><input type="text" name="full_name" required><br>';
             echo '<label>Email:</label><input type="email" name="email"><br>';
             echo '<label>Phone:</label><input type="tel" name="phone"><br>';
@@ -156,7 +158,9 @@ class EPM_Shortcodes {
             // Add Institute Modal
             echo '<div id="epm-add-institute-modal" class="epm-modal" style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;border-radius:5px;padding:30px;z-index:9999;max-width:400px;width:90%;">';
             echo '<h3>Add Institute/Organization</h3>';
-            echo '<form id="epm-add-institute-form">';
+            echo '<form id="epm-add-institute-form" method="post" action="' . admin_url('admin-post.php') . '">';
+            echo '<input type="hidden" name="action" value="epm_add_institute">';
+            wp_nonce_field('epm_add_institute', 'epm_add_institute_nonce');
             echo '<label>Name:</label><input type="text" name="name" required><br>';
             echo '<label>Email:</label><input type="email" name="email"><br>';
             echo '<label>Phone:</label><input type="tel" name="phone"><br>';
@@ -329,10 +333,6 @@ class EPM_Shortcodes {
                     $model_class = '\EstatePlanningManager\Models\InvestmentsModel';
                     break;
                 case 'insurance':
-                    $model_class = '\EstatePlanningManager\Models\InsuranceModel';
-                    break;
-                case 'scheduled_payments':
-                    $model_class = '\EstatePlanningManager\Models\ScheduledPaymentsModel';
                     break;
                 // Add other sections as needed
             }

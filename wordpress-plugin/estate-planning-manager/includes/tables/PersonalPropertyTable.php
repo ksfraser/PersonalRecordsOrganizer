@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/TableInterface.php';
-require_once __DIR__ . '/../public/models/PersonalPropertyModel.php';
+require_once __DIR__ . '/../../public/models/PersonalPropertyModel.php';
 use EstatePlanningManager\Models\PersonalPropertyModel;
 
 class PersonalPropertyTable implements TableInterface {

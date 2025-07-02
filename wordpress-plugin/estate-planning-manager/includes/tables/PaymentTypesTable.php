@@ -1,21 +1,30 @@
 <?php
 require_once __DIR__ . '/TableInterface.php';
+require_once __DIR__ . '/../../public/models/PaymentTypesModel.php';
+use EstatePlanningManager\Models\PaymentTypesModel;
 
 class PaymentTypesTable implements TableInterface {
+    private function getSqlColumnsFromFieldDefinitions($fields) {
+        $columns = [];
+        foreach ($fields as $name => $def) {
+            $dbType = isset($def['db_type']) ? $def['db_type'] : 'VARCHAR(255)';
+            $columns[] = "$name $dbType";
+        }
+        return $columns;
+    }
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_payment_types';
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            id bigint(20) NOT NULL AUTO_INCREMENT,
-            value varchar(100) NOT NULL,
-            label varchar(255) NOT NULL,
-            is_active tinyint(1) DEFAULT 1,
-            sort_order int(11) DEFAULT 0,
-            created datetime DEFAULT CURRENT_TIMESTAMP,
-            lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            UNIQUE KEY value (value)
-        ) $charset_collate;";
+        $modelFields = PaymentTypesModel::getFieldDefinitions();
+        $modelColumns = $this->getSqlColumnsFromFieldDefinitions($modelFields);
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (\n"
+            . "id bigint(20) NOT NULL AUTO_INCREMENT,\n"
+            . implode(",\n", $modelColumns) . ",\n"
+            . "created datetime DEFAULT CURRENT_TIMESTAMP,\n"
+            . "lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n"
+            . "PRIMARY KEY (id),\n"
+            . "UNIQUE KEY value (value)\n"
+            . ") $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
     }
