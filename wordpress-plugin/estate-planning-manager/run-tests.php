@@ -91,6 +91,39 @@ if (!function_exists('plugin_dir_url')) {
     }
 }
 
+if (!function_exists('add_action')) {
+    function add_action($hook, $callback) {
+        // No-op for test runner
+    }
+}
+if (!function_exists('current_user_can')) {
+    function current_user_can($cap) {
+        return true;
+    }
+}
+if (!function_exists('wp_die')) {
+    function wp_die($msg, $code = 500) {
+        echo "WP_DIE: $msg ($code)\n";
+        exit($code);
+    }
+}
+if (!function_exists('wp_get_referer')) {
+    function wp_get_referer() {
+        return '/';
+    }
+}
+if (!function_exists('home_url')) {
+    function home_url() {
+        return '/';
+    }
+}
+if (!function_exists('wp_redirect')) {
+    function wp_redirect($url) {
+        echo "Redirect to: $url\n";
+        exit;
+    }
+}
+
 // Mock WordPress database
 if (!isset($wpdb)) {
     $wpdb = new stdClass();

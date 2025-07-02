@@ -392,3 +392,53 @@ add_action('init', function() {
         @chmod($log_file, 0664);
     }
 });
+
+// === EPM Modal POST Handlers for admin-post.php ===
+add_action('admin_post_epm_add_person', function() {
+    if (!current_user_can('read')) {
+        wp_die('Unauthorized', 403);
+    }
+    if (!isset($_POST['epm_add_person_nonce']) || !wp_verify_nonce($_POST['epm_add_person_nonce'], 'epm_add_person')) {
+        wp_die('Invalid nonce', 400);
+    }
+    $data = [
+        'full_name' => sanitize_text_field($_POST['full_name'] ?? ''),
+        'email' => sanitize_email($_POST['email'] ?? ''),
+        'phone' => sanitize_text_field($_POST['phone'] ?? ''),
+        'address' => sanitize_text_field($_POST['address'] ?? ''),
+        'user_id' => get_current_user_id(),
+    ];
+    // TODO: Save $data to the appropriate model/table
+    // For now, just redirect back
+    wp_redirect(wp_get_referer() ?: home_url());
+    exit;
+});
+
+add_action('admin_post_epm_add_institute', function() {
+    if (!current_user_can('read')) {
+        wp_die('Unauthorized', 403);
+    }
+    if (!isset($_POST['epm_add_institute_nonce']) || !wp_verify_nonce($_POST['epm_add_institute_nonce'], 'epm_add_institute')) {
+        wp_die('Invalid nonce', 400);
+    }
+    $data = [
+        'name' => sanitize_text_field($_POST['name'] ?? ''),
+        'email' => sanitize_email($_POST['email'] ?? ''),
+        'phone' => sanitize_text_field($_POST['phone'] ?? ''),
+        'address' => sanitize_text_field($_POST['address'] ?? ''),
+        'account_number' => sanitize_text_field($_POST['account_number'] ?? ''),
+        'branch' => sanitize_text_field($_POST['branch'] ?? ''),
+        'user_id' => get_current_user_id(),
+    ];
+    // TODO: Save $data to the appropriate model/table
+    // For now, just redirect back
+    wp_redirect(wp_get_referer() ?: home_url());
+    exit;
+});
+
+add_action('admin_post_nopriv_epm_add_person', function() {
+    wp_die('You must be logged in to add a person.', 403);
+});
+add_action('admin_post_nopriv_epm_add_institute', function() {
+    wp_die('You must be logged in to add an institute.', 403);
+});

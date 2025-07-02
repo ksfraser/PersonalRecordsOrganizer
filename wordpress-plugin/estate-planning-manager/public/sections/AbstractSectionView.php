@@ -128,7 +128,9 @@ abstract class AbstractSectionView implements SectionViewInterface
         $columns = [];
         if (method_exists($model, 'getFormFields')) {
             foreach ($model->getFormFields() as $field) {
-                $columns[] = $field['name'];
+                if (isset($field['name'])) { // Defensive: only add if 'name' exists
+                    $columns[] = $field['name'];
+                }
             }
         } elseif (!empty($records)) {
             $columns = array_keys($records[0]);
@@ -150,7 +152,8 @@ abstract class AbstractSectionView implements SectionViewInterface
             foreach ($records as $record) {
                 echo '<tr>';
                 foreach ($columns as $field) {
-                    echo '<td>' . esc_html(isset($record[$field]) ? $record[$field] : '') . '</td>';
+                    // Defensive: only display if key exists in record
+                    echo '<td>' . esc_html(array_key_exists($field, $record) ? $record[$field] : '') . '</td>';
                 }
                 if ($is_owner) {
                     echo '<td>';

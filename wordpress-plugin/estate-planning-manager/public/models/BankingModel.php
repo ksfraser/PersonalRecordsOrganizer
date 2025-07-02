@@ -3,6 +3,7 @@ namespace EstatePlanningManager\Models;
 
 require_once __DIR__ . '/Sanitizer.php';
 require_once __DIR__ . '/AbstractSectionModel.php';
+require_once __DIR__ . '/AccountTypesModel.php';
 
 if (!defined('ABSPATH')) exit;
 
@@ -46,18 +47,11 @@ class BankingModel extends AbstractSectionModel {
     }
 
     public function getSummaryFields() {
-        return ['id', 'account_name']; // Example, override as needed
+        return ['id', 'bank', 'account_type', 'account_number'];
     }
 
     public function getFormFields() {
-        return [
-            ['name' => 'bank', 'label' => 'Bank'],
-            ['name' => 'account_type', 'label' => 'Account Type'],
-            ['name' => 'account_number', 'label' => 'Account Number'],
-            ['name' => 'branch', 'label' => 'Branch'],
-            ['name' => 'owner', 'label' => 'Owner'],
-            ['name' => 'advisor', 'label' => 'Advisor'],
-        ];
+        return array_values(self::getFieldDefinitions());
     }
 
     public static function get_section_key() {
@@ -65,12 +59,26 @@ class BankingModel extends AbstractSectionModel {
     }
 
     public static function getFieldDefinitions() {
+        // Get account type options from AccountTypesModel
+        $accountTypeOptions = [];
+        if (class_exists('EstatePlanningManager\\Models\\AccountTypesModel')) {
+            foreach (\EstatePlanningManager\Models\AccountTypesModel::getDefaultRows() as $row) {
+                $accountTypeOptions[$row['value']] = $row['label'];
+            }
+        }
         return [
-            'bank_name' => [
-                'label' => 'Bank Name',
+            'bank' => [
+                'label' => 'Bank',
                 'type' => 'text',
                 'required' => true,
                 'db_type' => 'VARCHAR(255)'
+            ],
+            'account_type' => [
+                'label' => 'Account Type',
+                'type' => 'select',
+                'options' => $accountTypeOptions,
+                'required' => true,
+                'db_type' => 'VARCHAR(100)'
             ],
             'account_number' => [
                 'label' => 'Account Number',
@@ -78,10 +86,22 @@ class BankingModel extends AbstractSectionModel {
                 'required' => true,
                 'db_type' => 'VARCHAR(255)'
             ],
-            'routing_number' => [
-                'label' => 'Routing Number',
+            'branch' => [
+                'label' => 'Branch',
                 'type' => 'text',
-                'required' => true,
+                'required' => false,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'owner' => [
+                'label' => 'Owner',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'advisor' => [
+                'label' => 'Advisor',
+                'type' => 'text',
+                'required' => false,
                 'db_type' => 'VARCHAR(255)'
             ],
         ];

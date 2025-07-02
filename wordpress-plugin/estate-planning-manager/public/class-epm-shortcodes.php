@@ -333,6 +333,10 @@ class EPM_Shortcodes {
                     $model_class = '\EstatePlanningManager\Models\InvestmentsModel';
                     break;
                 case 'insurance':
+                    $model_class = '\EstatePlanningManager\Models\InsuranceModel';
+                    break;
+                case 'scheduled_payments':
+                    $model_class = '\EstatePlanningManager\Models\ScheduledPaymentsModel';
                     break;
                 // Add other sections as needed
             }
@@ -573,6 +577,7 @@ class EPM_Shortcodes {
         return apply_filters('epm_form_sections', $sections);
     }
 
+    private static $normalize_field_warnings = [];
     /**
      * Normalize field definitions to ensure each field is an array with a 'name' key
      * @param array $fields
@@ -581,6 +586,19 @@ class EPM_Shortcodes {
     private function normalize_fields($fields) {
         $out = [];
         foreach ($fields as $name => $def) {
+            if (!is_string($name) || $name === '' || !is_array($def)) {
+                // Admin warning if field skipped
+                if (is_admin() && current_user_can('manage_options')) {
+                    $msg = "EPM Warning: Skipped invalid field definition in section. Field key: '" . print_r($name, true) . "'";
+                    if (!in_array($msg, self::$normalize_field_warnings)) {
+                        self::$normalize_field_warnings[] = $msg;
+                        add_action('admin_notices', function() use ($msg) {
+                            echo '<div class="notice notice-warning"><p>' . esc_html($msg) . '</p></div>';
+                        });
+                    }
+                }
+                continue;
+            }
             $out[] = array_merge(['name' => $name], $def);
         }
         return $out;

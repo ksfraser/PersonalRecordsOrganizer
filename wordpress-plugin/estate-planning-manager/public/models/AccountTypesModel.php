@@ -13,4 +13,15 @@ class AccountTypesModel {
                 'label' => 'Sort Order', 'type' => 'number', 'required' => false, 'db_type' => 'INT(11) DEFAULT 0'],
         ];
     }
+    public static function getDefaultRows() {
+        return [
+            ['value' => 'checking', 'label' => 'Checking', 'is_active' => 1],
+            ['value' => 'savings', 'label' => 'Savings', 'is_active' => 1],
+            ['value' => 'money_market', 'label' => 'Money Market', 'is_active' => 1],
+            ['value' => 'cd', 'label' => 'Certificate of Deposit', 'is_active' => 1],
+            ['value' => 'brokerage', 'label' => 'Brokerage', 'is_active' => 1],
+            ['value' => 'retirement', 'label' => 'Retirement', 'is_active' => 1],
+            ['value' => 'other', 'label' => 'Other', 'is_active' => 1],
+        ];
+    }
 }
