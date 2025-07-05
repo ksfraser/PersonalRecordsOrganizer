@@ -47,8 +47,9 @@ class PropertyTypesTable implements TableInterface {
                 'value' => $row[0],
                 'label' => $row[1],
                 'is_active' => 1,
-                'sort_order' => $sort_order++
+                'sort_order' => $sort_order
             ], ['%s', '%s', '%d', '%d']);
+            $sort_order += 10;
         }
     }
 }

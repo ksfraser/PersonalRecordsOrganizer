@@ -48,8 +48,9 @@ class InsuranceTypesTable implements TableInterface {
                 'label' => $row[1],
                 'category' => $row[2],
                 'is_active' => 1,
-                'sort_order' => $sort_order++
+                'sort_order' => $sort_order
             ], ['%s', '%s', '%s', '%d', '%d']);
+            $sort_order += 10;
         }
     }
 }
