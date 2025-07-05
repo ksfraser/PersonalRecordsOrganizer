@@ -29,6 +29,11 @@ require_once __DIR__ . '/KeyContactsTable.php';
 require_once __DIR__ . '/FamilyContactsTable.php';
 require_once __DIR__ . '/KeyContactsTable.php';
 require_once __DIR__ . '/SuggestedUpdatesTable.php';
+require_once __DIR__ . '/BankNamesTable.php';
+require_once __DIR__ . '/BankLocationTypesTable.php';
+require_once __DIR__ . '/EmergencyContactsTable.php';
+require_once __DIR__ . '/AutoPropertyTable.php';
+require_once __DIR__ . '/ContactsTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -61,6 +66,11 @@ class TableFactory {
             new FamilyContactsTable(),
             new KeyContactsTable(),
             new SuggestedUpdatesTable(),
+            new BankNamesTable(),
+            new BankLocationTypesTable(),
+            new EmergencyContactsTable(),
+            new AutoPropertyTable(),
+            new ContactsTable(),
         ];
     }
 

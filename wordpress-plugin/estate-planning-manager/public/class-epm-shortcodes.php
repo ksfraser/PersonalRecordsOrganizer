@@ -62,7 +62,7 @@ class EPM_Shortcodes {
         }
         ob_start();
         $this->render_client_form($atts['section']);
-        return ob_start();
+        return ob_get_clean();
     }
     
     /**

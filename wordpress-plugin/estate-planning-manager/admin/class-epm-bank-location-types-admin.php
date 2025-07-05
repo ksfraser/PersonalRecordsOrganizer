@@ -3,19 +3,7 @@
  * Admin page for managing bank location types (regions).
  */
 class EPM_BankLocationTypesAdmin {
-    public static function register() {
-        add_action('admin_menu', [__CLASS__, 'add_admin_menu']);
-    }
-    public static function add_admin_menu() {
-        add_submenu_page(
-            'estate-planning-manager',
-            'Bank Locations',
-            'Bank Locations',
-            'manage_options',
-            'epm-bank-locations',
-            [__CLASS__, 'render_admin_page']
-        );
-    }
+    // Menu registration is now handled in EPM_AdminMenuHandler
     public static function render_admin_page() {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_bank_location_types';
@@ -49,7 +37,7 @@ class EPM_BankLocationTypesAdmin {
         echo '<input type="text" name="location_value" value="' . esc_attr($edit_loc ? $edit_loc->value : '') . '" placeholder="Value (e.g. canada)" required> ';
         echo '<label><input type="checkbox" name="is_active" value="1"' . ($edit_loc && $edit_loc->is_active ? ' checked' : '') . '> Active</label> ';
         echo '<button type="submit" class="button button-primary">' . ($edit_loc ? 'Update' : 'Add') . ' Location</button>';
-        if ($edit_loc) echo ' <a href="' . admin_url('admin.php?page=epm-bank-locations') . '" class="button">Cancel</a>';
+        if ($edit_loc) echo ' <a href="' . admin_url('admin.php?page=' . EPM_BANK_SELECTORS_SLUG . '&tab=' . EPM_BANK_LOCATIONS_TAB) . '" class="button">Cancel</a>';
         echo '</form>';
         // List locations
         $locs = $wpdb->get_results("SELECT * FROM $table ORDER BY sort_order ASC");
@@ -59,11 +47,10 @@ class EPM_BankLocationTypesAdmin {
             echo '<td>' . esc_html($loc->label) . '</td>';
             echo '<td>' . esc_html($loc->value) . '</td>';
             echo '<td>' . ($loc->is_active ? 'Yes' : 'No') . '</td>';
-            echo '<td><a href="' . admin_url('admin.php?page=epm-bank-locations&edit_id=' . $loc->id) . '" class="button">Edit</a></td>';
+            echo '<td><a href="' . admin_url('admin.php?page=' . EPM_BANK_SELECTORS_SLUG . '&tab=' . EPM_BANK_LOCATIONS_TAB . '&edit_id=' . $loc->id) . '" class="button">Edit</a></td>';
             echo '</tr>';
         }
         echo '</tbody></table>';
         echo '</div>';
     }
 }
-EPM_BankLocationTypesAdmin::register();

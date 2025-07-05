@@ -35,6 +35,7 @@ class BankNamesTable implements TableInterface {
             ['canada', 'Desjardins Group'],
             ['canada', 'ATB Financial'],
             ['canada', 'Vancity Credit Union'],
+            ['canada', 'Bow Valley Credit Union'],
             ['canada', 'Meridian Credit Union'],
             ['canada', 'Other'],
             // USA

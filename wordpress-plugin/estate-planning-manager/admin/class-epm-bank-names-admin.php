@@ -2,20 +2,10 @@
 /**
  * Admin page for managing bank names and regions.
  */
+require_once dirname(__DIR__) . '/includes/epm-slugs.php';
+
 class EPM_BankNamesAdmin {
-    public static function register() {
-        add_action('admin_menu', [__CLASS__, 'add_admin_menu']);
-    }
-    public static function add_admin_menu() {
-        add_submenu_page(
-            'estate-planning-manager',
-            'Manage Banks',
-            'Manage Banks',
-            'manage_options',
-            'epm-manage-banks',
-            [__CLASS__, 'render_admin_page']
-        );
-    }
+    // Menu registration is now handled in EPM_BankSelectorsAdmin
     public static function render_admin_page() {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_bank_names';
@@ -41,7 +31,7 @@ class EPM_BankNamesAdmin {
             $edit_bank = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", intval($_GET['edit_id'])));
         }
         echo '<div class="wrap"><h1>Manage Banks</h1>';
-        echo '<form method="get"><input type="hidden" name="page" value="epm-manage-banks">';
+        echo '<form method="get"><input type="hidden" name="page" value="' . EPM_BANK_SELECTORS_SLUG . '"><input type="hidden" name="tab" value="' . EPM_BANK_NAMES_TAB . '">';
         echo '<select name="region" onchange="this.form.submit()">';
         foreach ($regions as $key => $label) {
             echo '<option value="' . esc_attr($key) . '"' . ($region === $key ? ' selected' : '') . '>' . esc_html($label) . '</option>';
@@ -55,7 +45,7 @@ class EPM_BankNamesAdmin {
         echo '<input type="text" name="bank_name" value="' . esc_attr($edit_bank ? $edit_bank->name : '') . '" placeholder="Bank Name" required> ';
         echo '<label><input type="checkbox" name="is_active" value="1"' . ($edit_bank && $edit_bank->is_active ? ' checked' : '') . '> Active</label> ';
         echo '<button type="submit" class="button button-primary">' . ($edit_bank ? 'Update' : 'Add') . ' Bank</button>';
-        if ($edit_bank) echo ' <a href="' . admin_url('admin.php?page=epm-manage-banks&region=' . $region) . '" class="button">Cancel</a>';
+        if ($edit_bank) echo ' <a href="' . admin_url('admin.php?page=' . EPM_BANK_SELECTORS_SLUG . '&tab=' . EPM_BANK_NAMES_TAB . '&region=' . $region) . '" class="button">Cancel</a>';
         echo '</form>';
         // List banks
         $banks = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE region = %s ORDER BY sort_order ASC", $region));
@@ -64,11 +54,10 @@ class EPM_BankNamesAdmin {
             echo '<tr>';
             echo '<td>' . esc_html($bank->name) . '</td>';
             echo '<td>' . ($bank->is_active ? 'Yes' : 'No') . '</td>';
-            echo '<td><a href="' . admin_url('admin.php?page=epm-manage-banks&region=' . $region . '&edit_id=' . $bank->id) . '" class="button">Edit</a></td>';
+            echo '<td><a href="' . admin_url('admin.php?page=' . EPM_BANK_SELECTORS_SLUG . '&tab=' . EPM_BANK_NAMES_TAB . '&region=' . $region . '&edit_id=' . $bank->id) . '" class="button">Edit</a></td>';
             echo '</tr>';
         }
         echo '</tbody></table>';
         echo '</div>';
     }
 }
-EPM_BankNamesAdmin::register();

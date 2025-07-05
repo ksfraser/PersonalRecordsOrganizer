@@ -35,7 +35,7 @@ class EmergencyContactsModel extends AbstractSectionModel {
     }
     public static function getFieldDefinitions() {
         return [
-            'contact_name' => [
+            'name' => [
                 'label' => 'Contact Name',
                 'type' => 'text',
                 'required' => true,
@@ -44,14 +44,32 @@ class EmergencyContactsModel extends AbstractSectionModel {
             'relationship' => [
                 'label' => 'Relationship',
                 'type' => 'text',
-                'required' => true,
+                'required' => false,
+                'db_type' => 'VARCHAR(100)'
+            ],
+            'phone' => [
+                'label' => 'Phone',
+                'type' => 'tel',
+                'required' => false,
+                'db_type' => 'VARCHAR(50)'
+            ],
+            'email' => [
+                'label' => 'Email',
+                'type' => 'email',
+                'required' => false,
+                'db_type' => 'VARCHAR(100)'
+            ],
+            'address' => [
+                'label' => 'Address',
+                'type' => 'text',
+                'required' => false,
                 'db_type' => 'VARCHAR(255)'
             ],
-            'contact_phone' => [
-                'label' => 'Contact Phone',
-                'type' => 'tel',
-                'required' => true,
-                'db_type' => 'VARCHAR(50)'
+            'notes' => [
+                'label' => 'Notes',
+                'type' => 'textarea',
+                'required' => false,
+                'db_type' => 'TEXT'
             ],
         ];
     }
