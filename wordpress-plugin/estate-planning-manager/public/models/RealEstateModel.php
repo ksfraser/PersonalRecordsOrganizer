@@ -95,6 +95,13 @@ class RealEstateModel extends AbstractSectionModel {
                 'required' => true,
                 'db_type' => 'VARCHAR(255)'
             ],
+            'lender_person_id' => [
+                'label' => 'Lender',
+                'type' => 'select',
+                'options' => PeopleModel::getDropdownOptions(),
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED'
+            ],
         ];
     }
 }

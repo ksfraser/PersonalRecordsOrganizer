@@ -79,6 +79,12 @@ class PersonalPropertyModel extends AbstractSectionModel {
         return 'personal_property';
     }
     public static function getFieldDefinitions() {
+        $peopleOptions = [];
+        if (class_exists('EstatePlanningManager\\Models\\PeopleModel')) {
+            foreach (\EstatePlanningManager\Models\PeopleModel::getAllForDropdown() as $person) {
+                $peopleOptions[$person['id']] = $person['full_name'];
+            }
+        }
         return [
             'property_description' => [
                 'label' => 'Property Description',
@@ -91,6 +97,13 @@ class PersonalPropertyModel extends AbstractSectionModel {
                 'type' => 'text',
                 'required' => true,
                 'db_type' => 'VARCHAR(255)'
+            ],
+            'owner_person_id' => [
+                'label' => 'Owner',
+                'type' => 'select',
+                'options' => $peopleOptions,
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED'
             ],
         ];
     }

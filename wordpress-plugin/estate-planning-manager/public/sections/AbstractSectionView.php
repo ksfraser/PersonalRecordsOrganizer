@@ -152,8 +152,17 @@ abstract class AbstractSectionView implements SectionViewInterface
             foreach ($records as $record) {
                 echo '<tr>';
                 foreach ($columns as $field) {
-                    // Defensive: only display if key exists in record
-                    echo '<td>' . esc_html(array_key_exists($field, $record) ? $record[$field] : '') . '</td>';
+                    $value = array_key_exists($field, $record) ? $record[$field] : '';
+                    // Show person name for owner_person_id/advisor_person_id
+                    if (in_array($field, ['owner_person_id', 'advisor_person_id']) && !empty($value) && class_exists('EstatePlanningManager\\Models\\PeopleModel')) {
+                        foreach (\EstatePlanningManager\Models\PeopleModel::getAllForDropdown() as $person) {
+                            if ($person['id'] == $value) {
+                                $value = $person['full_name'];
+                                break;
+                            }
+                        }
+                    }
+                    echo '<td>' . esc_html($value) . '</td>';
                 }
                 if ($is_owner) {
                     echo '<td>';
@@ -177,16 +186,28 @@ abstract class AbstractSectionView implements SectionViewInterface
         echo '<span class="epm-modal-close" style="position:absolute;top:10px;right:15px;font-size:24px;cursor:pointer;">&times;</span>';
         echo '<h4>Add New Record</h4>';
         $nonce = 'static-nonce';
-        // Use standard POST to the canonical permalink for the current page
-        $action_url = esc_url(get_permalink(get_queried_object_id()));
+        // Use admin-post.php for reliable POST handling
+        $action_url = esc_url(admin_url('admin-post.php'));
+        $redirect_url = esc_url_raw((is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
         error_log('EPM DEBUG: Rendering modal form for section: ' . $section . ', action_url: ' . $action_url);
         echo '<form class="epm-modal-form" method="post" action="' . $action_url . '">';
+        echo '<input type="hidden" name="action" value="epm_save_section">';
         echo '<input type="hidden" name="section" value="' . htmlspecialchars($section, ENT_QUOTES) . '">';
-        echo '<input type="hidden" name="nonce" value="' . htmlspecialchars($nonce, ENT_QUOTES) . '">';
+        echo '<input type="hidden" name="redirect_to" value="' . $redirect_url . '">';
+        wp_nonce_field('epm_save_section_' . $section, 'epm_save_section_nonce');
         foreach ($model->getFormFields() as $field) {
             echo '<div class="epm-form-group">';
             echo '<label>' . htmlspecialchars($field['label'], ENT_QUOTES) . '</label>';
-            echo '<input type="text" name="' . htmlspecialchars($field['name'], ENT_QUOTES) . '" value="" class="epm-form-control">';
+            if (isset($field['type']) && $field['type'] === 'select' && isset($field['options']) && is_array($field['options'])) {
+                echo '<select name="' . htmlspecialchars($field['name'], ENT_QUOTES) . '" class="epm-form-control">';
+                echo '<option value="">Select...</option>';
+                foreach ($field['options'] as $option_value => $option_label) {
+                    echo '<option value="' . htmlspecialchars($option_value, ENT_QUOTES) . '">' . htmlspecialchars($option_label, ENT_QUOTES) . '</option>';
+                }
+                echo '</select>';
+            } else {
+                echo '<input type="' . (isset($field['type']) ? htmlspecialchars($field['type'], ENT_QUOTES) : 'text') . '" name="' . htmlspecialchars($field['name'], ENT_QUOTES) . '" value="" class="epm-form-control">';
+            }
             echo '</div>';
         }
         echo '<button type="submit" class="epm-btn epm-btn-primary">Save</button>';

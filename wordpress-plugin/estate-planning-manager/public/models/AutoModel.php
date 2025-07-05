@@ -26,11 +26,15 @@ class AutoModel extends AbstractSectionModel {
         } else {
             $sanitized['client_id'] = Sanitizer::int($data['client_id']);
         }
+        $sanitized['type'] = isset($data['type']) ? Sanitizer::text($data['type']) : null;
         $sanitized['vehicle'] = isset($data['vehicle']) ? Sanitizer::text($data['vehicle']) : null;
+        $sanitized['model'] = isset($data['model']) ? Sanitizer::text($data['model']) : null;
         $sanitized['own_or_lease'] = isset($data['own_or_lease']) ? Sanitizer::text($data['own_or_lease']) : null;
-        $sanitized['owner'] = isset($data['owner']) ? Sanitizer::text($data['owner']) : null;
-        $sanitized['registration_location'] = isset($data['registration_location']) ? Sanitizer::textarea($data['registration_location']) : null;
-        // Add more fields as needed
+        $sanitized['legal_document_location'] = isset($data['legal_document_location']) ? Sanitizer::text($data['legal_document_location']) : null;
+        $sanitized['registration_location'] = isset($data['registration_location']) ? Sanitizer::text($data['registration_location']) : null;
+        $sanitized['insurance_policy_location'] = isset($data['insurance_policy_location']) ? Sanitizer::text($data['insurance_policy_location']) : null;
+        $sanitized['bill_of_sale_location'] = isset($data['bill_of_sale_location']) ? Sanitizer::text($data['bill_of_sale_location']) : null;
+        $sanitized['owner_person_id'] = isset($data['owner_person_id']) ? Sanitizer::int($data['owner_person_id']) : null;
         return [empty($errors), $errors, $sanitized];
     }
 
@@ -56,10 +60,15 @@ class AutoModel extends AbstractSectionModel {
 
     public function getFormFields() {
         return [
+            ['name' => 'type', 'label' => 'Type'],
             ['name' => 'vehicle', 'label' => 'Vehicle'],
+            ['name' => 'model', 'label' => 'Model'],
             ['name' => 'own_or_lease', 'label' => 'Own or Lease'],
-            ['name' => 'owner', 'label' => 'Owner'],
+            ['name' => 'legal_document_location', 'label' => 'Legal Document Location'],
             ['name' => 'registration_location', 'label' => 'Registration Location'],
+            ['name' => 'insurance_policy_location', 'label' => 'Insurance Policy Location'],
+            ['name' => 'bill_of_sale_location', 'label' => 'Bill of Sale Location'],
+            ['name' => 'owner_person_id', 'label' => 'Owner'],
         ];
     }
 
@@ -69,23 +78,60 @@ class AutoModel extends AbstractSectionModel {
 
     public static function getFieldDefinitions() {
         return [
-            'vehicle_make' => [
-                'label' => 'Vehicle Make',
+            'type' => [
+                'label' => 'Type',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(100)'
+            ],
+            'vehicle' => [
+                'label' => 'Vehicle',
                 'type' => 'text',
                 'required' => true,
                 'db_type' => 'VARCHAR(255)'
             ],
-            'vehicle_model' => [
-                'label' => 'Vehicle Model',
+            'model' => [
+                'label' => 'Model',
                 'type' => 'text',
-                'required' => true,
+                'required' => false,
+                'db_type' => 'VARCHAR(100)'
+            ],
+            'own_or_lease' => [
+                'label' => 'Own or Lease',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(100)'
+            ],
+            'legal_document_location' => [
+                'label' => 'Legal Document Location',
+                'type' => 'text',
+                'required' => false,
                 'db_type' => 'VARCHAR(255)'
             ],
-            'vehicle_year' => [
-                'label' => 'Vehicle Year',
+            'registration_location' => [
+                'label' => 'Registration Location',
                 'type' => 'text',
-                'required' => true,
+                'required' => false,
                 'db_type' => 'VARCHAR(255)'
+            ],
+            'insurance_policy_location' => [
+                'label' => 'Insurance Policy Location',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'bill_of_sale_location' => [
+                'label' => 'Bill of Sale Location',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'owner_person_id' => [
+                'label' => 'Owner',
+                'type' => 'select',
+                'options' => \EstatePlanningManager\Models\PeopleModel::getDropdownOptions(),
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED'
             ],
         ];
     }

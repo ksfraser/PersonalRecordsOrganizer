@@ -423,13 +423,43 @@ class EPM_Shortcodes {
                 if (isset($field['options'])) {
                     foreach ($field['options'] as $option_value => $option_label) {
                         echo '<option value="' . esc_attr($option_value) . '"';
-                        if ($value == $option_value) {
+                        if ($value == $option_value || (empty($value) && isset($field['default']) && $field['default'] == $option_value)) {
                             echo ' selected';
                         }
                         echo '>' . esc_html($option_label) . '</option>';
                     }
                 }
                 echo '</select>';
+                // Add New Advisor button for advisor_person_id
+                if ($field['name'] === 'advisor_person_id') {
+                    echo ' <button type="button" class="epm-btn epm-btn-secondary" id="epm-add-advisor-btn" style="margin-left:8px;">Add New Advisor</button>';
+                    // Modal for Add Advisor
+                    echo '<div id="epm-add-advisor-modal" class="epm-modal" style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;border-radius:5px;padding:30px;z-index:9999;max-width:400px;width:90%;">';
+                    echo '<h3>Add New Advisor</h3>';
+                    echo '<form id="epm-add-advisor-form" method="post" action="#">';
+                    echo '<label>Name:</label><input type="text" name="full_name" required><br>';
+                    echo '<label>Email:</label><input type="email" name="email"><br>';
+                    echo '<label>Phone:</label><input type="tel" name="phone"><br>';
+                    echo '<button type="submit" class="epm-btn epm-btn-primary">Add Advisor</button>';
+                    echo '<button type="button" class="epm-btn epm-btn-secondary epm-modal-cancel" style="margin-left:10px;">Cancel</button>';
+                    echo '</form>';
+                    echo '</div>';
+                    // JS to open/close modal and add advisor (stub: just closes modal)
+                    echo '<script>jQuery(function($){
+                        $("#epm-add-advisor-btn").on("click",function(){
+                            $("#epm-add-advisor-modal").fadeIn(200);
+                        });
+                        $("#epm-add-advisor-modal .epm-modal-cancel").on("click",function(){
+                            $("#epm-add-advisor-modal").fadeOut(200);
+                        });
+                        $("#epm-add-advisor-form").on("submit",function(e){
+                            e.preventDefault();
+                            // In production, AJAX to server to add advisor and refresh dropdown
+                            alert("Advisor added (stub, refresh page to see in dropdown)");
+                            $("#epm-add-advisor-modal").fadeOut(200);
+                        });
+                    });</script>';
+                }
                 break;
         }
         echo '</div>';
@@ -667,8 +697,16 @@ class EPM_Shortcodes {
         // For certain fields, get value from client data if not set in user meta
         if (empty($value) && $section) {
             $client_data = $this->get_client_data($section, $user_id);
-            if ($client_data) {
+            if ($client_data && isset($client_data->$field_name)) {
                 $value = $client_data->$field_name;
+            }
+        }
+        // Special: for owner_person_id/advisor_person_id, return name if possible
+        if (in_array($field_name, ['owner_person_id', 'advisor_person_id']) && !empty($value)) {
+            if (class_exists('EstatePlanningManager\\Models\\PeopleModel')) {
+                foreach (\EstatePlanningManager\Models\PeopleModel::getAllForDropdown() as $person) {
+                    if ($person['id'] == $value) return $person['full_name'];
+                }
             }
         }
         return $value;

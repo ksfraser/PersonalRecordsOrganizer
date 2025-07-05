@@ -28,7 +28,7 @@ class ScheduledPaymentsModel extends AbstractSectionModel {
             $sanitized['client_id'] = Sanitizer::int($data['client_id']);
         }
         $sanitized['payment_type'] = isset($data['payment_type']) ? Sanitizer::text($data['payment_type']) : null;
-        $sanitized['paid_to'] = isset($data['paid_to']) ? Sanitizer::text($data['paid_to']) : null;
+        $sanitized['paid_to_person_id'] = isset($data['paid_to_person_id']) ? Sanitizer::int($data['paid_to_person_id']) : null;
         $sanitized['is_automatic'] = isset($data['is_automatic']) ? Sanitizer::text($data['is_automatic']) : null;
         $sanitized['amount'] = isset($data['amount']) ? Sanitizer::text($data['amount']) : null;
         $sanitized['due_date'] = isset($data['due_date']) ? Sanitizer::text($data['due_date']) : null;
@@ -59,18 +59,43 @@ class ScheduledPaymentsModel extends AbstractSectionModel {
         return 'scheduled_payments';
     }
     public static function getFieldDefinitions() {
+        $peopleOptions = [];
+        if (class_exists('EstatePlanningManager\\Models\\PeopleModel')) {
+            foreach (\EstatePlanningManager\Models\PeopleModel::getAllForDropdown() as $person) {
+                $peopleOptions[$person['id']] = $person['full_name'];
+            }
+        }
         return [
-            'payment_amount' => [
-                'label' => 'Payment Amount',
+            'payment_type' => [
+                'label' => 'Payment Type',
                 'type' => 'text',
                 'required' => true,
-                'db_type' => 'VARCHAR(255)'
+                'db_type' => 'VARCHAR(100)'
             ],
-            'payment_date' => [
-                'label' => 'Payment Date',
-                'type' => 'date',
-                'required' => true,
-                'db_type' => 'DATE'
+            'paid_to_person_id' => [
+                'label' => 'Paid To',
+                'type' => 'select',
+                'options' => $peopleOptions,
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED'
+            ],
+            'is_automatic' => [
+                'label' => 'Is Automatic',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(10)'
+            ],
+            'amount' => [
+                'label' => 'Amount',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(100)'
+            ],
+            'due_date' => [
+                'label' => 'Due Date',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(100)'
             ],
         ];
     }

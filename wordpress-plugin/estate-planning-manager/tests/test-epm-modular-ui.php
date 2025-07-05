@@ -61,7 +61,20 @@ class Test_EPM_Modular_UI extends EPM_Test_Case {
         $model = new AutoModel();
         $fields = $model->getFormFields();
         $field_names = array_column($fields, 'name');
-        $this->assertTrue(in_array('vehicle', $field_names));
+        $expected = [
+            'type',
+            'vehicle',
+            'model',
+            'own_or_lease',
+            'legal_document_location',
+            'registration_location',
+            'insurance_policy_location',
+            'bill_of_sale_location',
+            'owner_person_id',
+        ];
+        foreach ($expected as $field) {
+            $this->assertTrue(in_array($field, $field_names), "AutoModel missing field: $field");
+        }
     }
     public function test_emergency_contacts_model_form_fields() {
         $model = new EmergencyContactsModel();

@@ -31,8 +31,8 @@ class BankingModel extends AbstractSectionModel {
         $sanitized['account_type'] = isset($data['account_type']) ? Sanitizer::text($data['account_type']) : null;
         $sanitized['account_number'] = isset($data['account_number']) ? Sanitizer::text($data['account_number']) : null;
         $sanitized['branch'] = isset($data['branch']) ? Sanitizer::text($data['branch']) : null;
-        $sanitized['owner'] = isset($data['owner']) ? Sanitizer::text($data['owner']) : null;
-        $sanitized['advisor'] = isset($data['advisor']) ? Sanitizer::text($data['advisor']) : null;
+        $sanitized['owner_person_id'] = isset($data['owner_person_id']) ? Sanitizer::int($data['owner_person_id']) : null;
+        $sanitized['advisor_person_id'] = isset($data['advisor_person_id']) ? Sanitizer::int($data['advisor_person_id']) : null;
         // Add more fields as needed
         return [empty($errors), $errors, $sanitized];
     }
@@ -51,7 +51,13 @@ class BankingModel extends AbstractSectionModel {
     }
 
     public function getFormFields() {
-        return array_values(self::getFieldDefinitions());
+        $fields = self::getFieldDefinitions();
+        $out = [];
+        foreach ($fields as $name => $def) {
+            if (!is_string($name) || $name === '' || !is_array($def)) continue;
+            $out[] = array_merge(['name' => $name], $def);
+        }
+        return $out;
     }
 
     public static function get_section_key() {
@@ -64,6 +70,19 @@ class BankingModel extends AbstractSectionModel {
         if (class_exists('EstatePlanningManager\\Models\\AccountTypesModel')) {
             foreach (\EstatePlanningManager\Models\AccountTypesModel::getDefaultRows() as $row) {
                 $accountTypeOptions[$row['value']] = $row['label'];
+            }
+        }
+        // Get people options for selectors
+        $peopleOptions = [];
+        $defaultAdvisorId = null;
+        if (class_exists('EstatePlanningManager\\Models\\PeopleModel')) {
+            $peopleOptions = [];
+            foreach (\EstatePlanningManager\Models\PeopleModel::getAllForDropdown() as $person) {
+                $peopleOptions[$person['id']] = $person['full_name'];
+            }
+            $defaultAdvisor = \EstatePlanningManager\Models\PeopleModel::getDefaultAdvisor();
+            if ($defaultAdvisor) {
+                $defaultAdvisorId = $defaultAdvisor['id'];
             }
         }
         return [
@@ -92,17 +111,20 @@ class BankingModel extends AbstractSectionModel {
                 'required' => false,
                 'db_type' => 'VARCHAR(255)'
             ],
-            'owner' => [
+            'owner_person_id' => [
                 'label' => 'Owner',
-                'type' => 'text',
+                'type' => 'select',
+                'options' => $peopleOptions,
                 'required' => false,
-                'db_type' => 'VARCHAR(255)'
+                'db_type' => 'BIGINT UNSIGNED'
             ],
-            'advisor' => [
+            'advisor_person_id' => [
                 'label' => 'Advisor',
-                'type' => 'text',
+                'type' => 'select',
+                'options' => $peopleOptions,
                 'required' => false,
-                'db_type' => 'VARCHAR(255)'
+                'db_type' => 'BIGINT UNSIGNED',
+                'default' => $defaultAdvisorId
             ],
         ];
     }

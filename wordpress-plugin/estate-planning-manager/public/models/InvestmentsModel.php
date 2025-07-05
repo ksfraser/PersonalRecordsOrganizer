@@ -5,6 +5,8 @@ require_once __DIR__ . '/AbstractSectionModel.php';
 
 require_once __DIR__ . '/Sanitizer.php';
 
+use EstatePlanningManager\Models\PeopleModel;
+
 if (!defined('ABSPATH')) exit;
 
 class InvestmentsModel extends AbstractSectionModel {
@@ -30,8 +32,8 @@ class InvestmentsModel extends AbstractSectionModel {
         $sanitized['investment_type'] = isset($data['investment_type']) ? Sanitizer::text($data['investment_type']) : null;
         $sanitized['financial_company'] = isset($data['financial_company']) ? Sanitizer::text($data['financial_company']) : null;
         $sanitized['account_number'] = isset($data['account_number']) ? Sanitizer::text($data['account_number']) : null;
-        $sanitized['beneficiary'] = isset($data['beneficiary']) ? Sanitizer::text($data['beneficiary']) : null;
-        $sanitized['advisor'] = isset($data['advisor']) ? Sanitizer::text($data['advisor']) : null;
+        $sanitized['beneficiary_person_id'] = isset($data['beneficiary_person_id']) ? Sanitizer::int($data['beneficiary_person_id']) : null;
+        $sanitized['advisor_person_id'] = isset($data['advisor_person_id']) ? Sanitizer::int($data['advisor_person_id']) : null;
         $sanitized['lender'] = isset($data['lender']) ? Sanitizer::text($data['lender']) : null;
         // Add more fields as needed
         return [empty($errors), $errors, $sanitized];
@@ -52,8 +54,8 @@ class InvestmentsModel extends AbstractSectionModel {
             ['name' => 'investment_type', 'label' => 'Investment Type'],
             ['name' => 'financial_company', 'label' => 'Financial Company'],
             ['name' => 'account_number', 'label' => 'Account Number'],
-            ['name' => 'beneficiary', 'label' => 'Beneficiary'],
-            ['name' => 'advisor', 'label' => 'Advisor'],
+            ['name' => 'beneficiary_person_id', 'label' => 'Beneficiary'],
+            ['name' => 'advisor_person_id', 'label' => 'Advisor'],
             ['name' => 'lender', 'label' => 'Lender'],
         ];
     }
@@ -66,12 +68,38 @@ class InvestmentsModel extends AbstractSectionModel {
                 'label' => 'Type of Investment',
                 'type' => 'text',
                 'required' => true,
-                'db_type' => 'VARCHAR(255)'
+                'db_type' => 'VARCHAR(100)'
             ],
-            'investment_value' => [
-                'label' => 'Value of Investment',
+            'financial_company' => [
+                'label' => 'Financial Company',
                 'type' => 'text',
                 'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'account_number' => [
+                'label' => 'Account Number',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
+            ],
+            'beneficiary_person_id' => [
+                'label' => 'Beneficiary',
+                'type' => 'select',
+                'options' => PeopleModel::getDropdownOptions(),
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED'
+            ],
+            'advisor_person_id' => [
+                'label' => 'Advisor',
+                'type' => 'select',
+                'options' => PeopleModel::getDropdownOptions(),
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED'
+            ],
+            'lender' => [
+                'label' => 'Lender',
+                'type' => 'text',
+                'required' => false,
                 'db_type' => 'VARCHAR(255)'
             ],
         ];

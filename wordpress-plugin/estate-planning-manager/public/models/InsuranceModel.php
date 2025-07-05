@@ -5,6 +5,8 @@ require_once __DIR__ . '/AbstractSectionModel.php';
 
 require_once __DIR__ . '/Sanitizer.php';
 
+use EstatePlanningManager\Models\PeopleModel;
+
 if (!defined('ABSPATH')) exit;
 
 class InsuranceModel extends AbstractSectionModel {
@@ -32,8 +34,8 @@ class InsuranceModel extends AbstractSectionModel {
         $sanitized['insurance_company'] = isset($data['insurance_company']) ? Sanitizer::text($data['insurance_company']) : null;
         $sanitized['policy_number'] = isset($data['policy_number']) ? Sanitizer::text($data['policy_number']) : null;
         $sanitized['beneficiary'] = isset($data['beneficiary']) ? Sanitizer::text($data['beneficiary']) : null;
-        $sanitized['advisor'] = isset($data['advisor']) ? Sanitizer::text($data['advisor']) : null;
-        $sanitized['owner'] = isset($data['owner']) ? Sanitizer::text($data['owner']) : null;
+        $sanitized['advisor_person_id'] = isset($data['advisor_person_id']) ? Sanitizer::int($data['advisor_person_id']) : null;
+        $sanitized['owner_person_id'] = isset($data['owner_person_id']) ? Sanitizer::int($data['owner_person_id']) : null;
         // Add more fields as needed
         return [empty($errors), $errors, $sanitized];
     }
@@ -55,8 +57,8 @@ class InsuranceModel extends AbstractSectionModel {
             ['name' => 'insurance_company', 'label' => 'Insurance Company'],
             ['name' => 'policy_number', 'label' => 'Policy Number'],
             ['name' => 'beneficiary', 'label' => 'Beneficiary'],
-            ['name' => 'advisor', 'label' => 'Advisor'],
-            ['name' => 'owner', 'label' => 'Owner'],
+            ['name' => 'advisor_person_id', 'label' => 'Advisor'],
+            ['name' => 'owner_person_id', 'label' => 'Owner'],
         ];
     }
     public static function get_section_key() {
@@ -64,6 +66,18 @@ class InsuranceModel extends AbstractSectionModel {
     }
     public static function getFieldDefinitions() {
         return [
+            'insurance_category' => [
+                'label' => 'Insurance Category',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(100)'
+            ],
+            'insurance_type' => [
+                'label' => 'Insurance Type',
+                'type' => 'text',
+                'required' => true,
+                'db_type' => 'VARCHAR(100)'
+            ],
             'insurance_company' => [
                 'label' => 'Insurance Company',
                 'type' => 'text',
@@ -76,11 +90,25 @@ class InsuranceModel extends AbstractSectionModel {
                 'required' => true,
                 'db_type' => 'VARCHAR(255)'
             ],
-            'coverage_amount' => [
-                'label' => 'Coverage Amount',
+            'beneficiary' => [
+                'label' => 'Beneficiary',
                 'type' => 'text',
-                'required' => true,
+                'required' => false,
                 'db_type' => 'VARCHAR(255)'
+            ],
+            'advisor_person_id' => [
+                'label' => 'Advisor',
+                'type' => 'select',
+                'options' => PeopleModel::getDropdownOptions(),
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED'
+            ],
+            'owner_person_id' => [
+                'label' => 'Owner',
+                'type' => 'select',
+                'options' => PeopleModel::getDropdownOptions(),
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED'
             ],
         ];
     }
