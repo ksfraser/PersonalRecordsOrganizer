@@ -74,8 +74,16 @@ abstract class AbstractSectionView implements SectionViewInterface
         }
         $fields = static::get_fields(static::$shortcodes);
         $section = static::get_section_key();
-        echo '<form method="post" class="epm-section-form">';
+        // Add action, hidden action, nonce, and redirect_to
+        echo '<form method="post" class="epm-section-form" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        echo '<input type="hidden" name="action" value="epm_save_section">';
         echo '<input type="hidden" name="section" value="' . esc_attr($section) . '">';
+        // Use add_query_arg to build redirect URL
+        $redirect_url = esc_url(add_query_arg(['epm_section_saved' => $section], (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '')));
+        echo '<input type="hidden" name="redirect_to" value="' . $redirect_url . '">';
+        if (function_exists('wp_nonce_field')) {
+            wp_nonce_field('epm_save_section_' . $section, 'epm_save_section_nonce');
+        }
         foreach ($fields as $field) {
             static::$shortcodes->render_form_field($field, $user_id);
         }

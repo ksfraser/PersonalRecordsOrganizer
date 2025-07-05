@@ -3,6 +3,7 @@ namespace EstatePlanningManager\Models;
 
 require_once __DIR__ . '/AbstractSectionModel.php';
 require_once __DIR__ . '/Sanitizer.php';
+require_once __DIR__ . '/PeopleModel.php';
 
 if (!defined('ABSPATH')) exit;
 
