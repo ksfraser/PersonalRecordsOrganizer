@@ -53,4 +53,33 @@ class PeopleModel {
         self::$advisors[] = $advisor;
         return $advisor;
     }
+
+    public static function addPerson($data) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_contacts';
+        $wpdb->insert($table, [
+            'full_name' => $data['full_name'] ?? '',
+            'email' => $data['email'] ?? '',
+            'phone' => $data['phone'] ?? '',
+            'address' => $data['address'] ?? '',
+            'user_id' => $data['user_id'] ?? 0,
+            'created_at' => current_time('mysql'),
+        ]);
+        return $wpdb->insert_id;
+    }
+    public static function addInstitute($data) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_institutes';
+        $wpdb->insert($table, [
+            'name' => $data['name'] ?? '',
+            'email' => $data['email'] ?? '',
+            'phone' => $data['phone'] ?? '',
+            'address' => $data['address'] ?? '',
+            'account_number' => $data['account_number'] ?? '',
+            'branch' => $data['branch'] ?? '',
+            'user_id' => $data['user_id'] ?? 0,
+            'created_at' => current_time('mysql'),
+        ]);
+        return $wpdb->insert_id;
+    }
 }

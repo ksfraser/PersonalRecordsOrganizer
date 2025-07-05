@@ -322,59 +322,33 @@ add_action('init', function() {
 });
 
 
-// === EPM Log Level Setting and Log Viewer Page ===
-add_action('admin_init', function() {
-    register_setting('general', 'epm_log_level', [
-        'type' => 'string',
-        'sanitize_callback' => 'sanitize_text_field',
-        'default' => 'info'
-    ]);
-    add_settings_field(
-        'epm_log_level',
-        'EPM Log Level',
-        function() {
-            $value = get_option('epm_log_level', 'info');
-            echo '<select id="epm_log_level" name="epm_log_level">'
-                . '<option value="debug"' . selected($value, 'debug', false) . '>Debug</option>'
-                . '<option value="info"' . selected($value, 'info', false) . '>Info</option>'
-                . '<option value="warning"' . selected($value, 'warning', false) . '>Warning</option>'
-                . '<option value="error"' . selected($value, 'error', false) . '>Error</option>'
-                . '</select>';
-        },
-        'general'
-    );
-});
+// === Register Handler Classes for Log Level and Log Viewer ===
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_LogLevelHandler.php';
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_LogViewerHandler.php';
+EPM_LogLevelHandler::register();
+EPM_LogViewerHandler::register();
 
-// Add EPM Log Viewer page to admin menu
-add_action('admin_menu', function() {
-    add_menu_page(
-        'EPM Log Viewer',
-        'EPM Log',
-        'manage_options',
-        'epm-log-viewer',
-        'epm_render_log_viewer',
-        'dashicons-media-text',
-        80
-    );
-});
+// === EPM Modal POST Handlers for admin-post.php ===
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_AddPersonHandler.php';
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_AddInstituteHandler.php';
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_SaveSectionHandler.php';
 
-// Render the EPM Log Viewer page
-function epm_render_log_viewer() {
-    $log_file = WP_CONTENT_DIR . '/uploads/epm-log.txt';
-    echo '<div class="wrap"><h1>EPM Log Viewer</h1>';
-    if (file_exists($log_file) && is_readable($log_file)) {
-        echo '<pre style="background:#fff;max-height:600px;overflow:auto;border:1px solid #ccc;padding:10px;">';
-        echo esc_html(file_get_contents($log_file));
-        echo '</pre>';
-    } else {
-        echo '<p>Log file not found or not readable: ' . esc_html($log_file) . '</p>';
-    }
-    echo '</div>';
-}
+add_action('admin_post_epm_add_person', [EPM_AddPersonHandler::class, 'handle']);
+add_action('admin_post_epm_add_institute', [EPM_AddInstituteHandler::class, 'handle']);
+add_action('admin_post_epm_save_section', [EPM_SaveSectionHandler::class, 'handle']);
 
-/**
- * Initialize the plugin
- */
+// Register EPM_AdminInitHandler and EPM_InitHandler for admin_init and init actions
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_AdminInitHandler.php';
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_InitHandler.php';
+
+add_action('admin_init', [EPM_AdminInitHandler::class, 'handle']);
+add_action('init', [EPM_InitHandler::class, 'handle']);
+
+// Register EPM_AdminMenuHandler for admin_menu
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_AdminMenuHandler.php';
+add_action('admin_menu', [EPM_AdminMenuHandler::class, 'handle']);
+
+// Initialize the plugin
 function epm_init() {
     return EstateplanningManager::instance();
 }
@@ -391,96 +365,4 @@ add_action('init', function() {
         @file_put_contents($log_file, "EPM Log initialized on " . date('Y-m-d H:i:s') . "\n");
         @chmod($log_file, 0664);
     }
-});
-
-// === EPM Modal POST Handlers for admin-post.php ===
-add_action('admin_post_epm_add_person', function() {
-    if (!current_user_can('read')) {
-        wp_die('Unauthorized', 403);
-    }
-    if (!isset($_POST['epm_add_person_nonce']) || !wp_verify_nonce($_POST['epm_add_person_nonce'], 'epm_add_person')) {
-        wp_die('Invalid nonce', 400);
-    }
-    $data = [
-        'full_name' => sanitize_text_field($_POST['full_name'] ?? ''),
-        'email' => sanitize_email($_POST['email'] ?? ''),
-        'phone' => sanitize_text_field($_POST['phone'] ?? ''),
-        'address' => sanitize_text_field($_POST['address'] ?? ''),
-        'user_id' => get_current_user_id(),
-    ];
-    // TODO: Save $data to the appropriate model/table
-    // For now, just redirect back
-    wp_redirect(wp_get_referer() ?: home_url());
-    exit;
-});
-
-add_action('admin_post_epm_add_institute', function() {
-    if (!current_user_can('read')) {
-        wp_die('Unauthorized', 403);
-    }
-    if (!isset($_POST['epm_add_institute_nonce']) || !wp_verify_nonce($_POST['epm_add_institute_nonce'], 'epm_add_institute')) {
-        wp_die('Invalid nonce', 400);
-    }
-    $data = [
-        'name' => sanitize_text_field($_POST['name'] ?? ''),
-        'email' => sanitize_email($_POST['email'] ?? ''),
-        'phone' => sanitize_text_field($_POST['phone'] ?? ''),
-        'address' => sanitize_text_field($_POST['address'] ?? ''),
-        'account_number' => sanitize_text_field($_POST['account_number'] ?? ''),
-        'branch' => sanitize_text_field($_POST['branch'] ?? ''),
-        'user_id' => get_current_user_id(),
-    ];
-    // TODO: Save $data to the appropriate model/table
-    // For now, just redirect back
-    wp_redirect(wp_get_referer() ?: home_url());
-    exit;
-});
-
-add_action('admin_post_nopriv_epm_add_person', function() {
-    wp_die('You must be logged in to add a person.', 403);
-});
-add_action('admin_post_nopriv_epm_add_institute', function() {
-    wp_die('You must be logged in to add an institute.', 403);
-});
-
-// === EPM Modal POST Handler for admin-post.php for all sections ===
-add_action('admin_post_epm_save_section', function() {
-    if (!is_user_logged_in()) {
-        wp_die('Unauthorized', 403);
-    }
-    $section = sanitize_text_field($_POST['section'] ?? '');
-    $nonce = $_POST['epm_save_section_nonce'] ?? '';
-    $redirect_to = isset($_POST['redirect_to']) ? esc_url_raw($_POST['redirect_to']) : home_url();
-    if (!$section || !$nonce || !wp_verify_nonce($nonce, 'epm_save_section_' . $section)) {
-        wp_die('Invalid nonce', 400);
-    }
-    $epm_section_models = [
-        'personal' => '\EstatePlanningManager\Models\PersonalModel',
-        'banking' => '\EstatePlanningManager\Models\BankingModel',
-        'investments' => '\EstatePlanningManager\Models\InvestmentsModel',
-        'real_estate' => '\EstatePlanningManager\Models\RealEstateModel',
-        'insurance' => '\EstatePlanningManager\Models\InsuranceModel',
-        'scheduled_payments' => '\EstatePlanningManager\Models\ScheduledPaymentsModel',
-        'personal_property' => '\EstatePlanningManager\Models\PersonalPropertyModel',
-        'auto_property' => '\EstatePlanningManager\Models\AutoModel',
-        'emergency_contacts' => '\EstatePlanningManager\Models\EmergencyContactsModel',
-    ];
-    if (isset($epm_section_models[$section])) {
-        $model_class = $epm_section_models[$section];
-        if (class_exists($model_class)) {
-            $model = new $model_class();
-            $data = $_POST;
-            unset($data['action'], $data['section'], $data['epm_save_section_nonce'], $data['redirect_to']);
-            $data['client_id'] = get_current_user_id();
-            $result = $model->saveRecord($data);
-            if ($result) {
-                wp_redirect($redirect_to);
-                exit;
-            } else {
-                error_log('[EPM] Save failed for section: ' . $section);
-                wp_die('Failed to save record.', 500);
-            }
-        }
-    }
-    wp_die('Invalid section', 400);
 });

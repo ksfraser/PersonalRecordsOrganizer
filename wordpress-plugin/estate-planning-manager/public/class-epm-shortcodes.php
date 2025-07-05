@@ -141,36 +141,10 @@ class EPM_Shortcodes {
         }
         // Add Person/Institute Modals and scripts for sections that need them
         if (in_array($section, array('scheduled_payments', 'insurance', 'banking', 'investments', 'real_estate'))) {
-            // Add Person Modal
-            echo '<div id="epm-add-person-modal" class="epm-modal" style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;border-radius:5px;padding:30px;z-index:9999;max-width:400px;width:90%;">';
-            echo '<h3>Add Person</h3>';
-            echo '<form id="epm-add-person-form" method="post" action="' . admin_url('admin-post.php') . '">';
-            echo '<input type="hidden" name="action" value="epm_add_person">';
-            wp_nonce_field('epm_add_person', 'epm_add_person_nonce');
-            echo '<label>Name:</label><input type="text" name="full_name" required><br>';
-            echo '<label>Email:</label><input type="email" name="email"><br>';
-            echo '<label>Phone:</label><input type="tel" name="phone"><br>';
-            echo '<label>Address:</label><input type="text" name="address"><br>';
-            echo '<button type="submit" class="epm-btn epm-btn-primary">Add</button>';
-            echo '<button type="button" class="epm-btn epm-btn-secondary epm-modal-cancel" style="margin-left:10px;">Cancel</button>';
-            echo '</form>';
-            echo '</div>';
-            // Add Institute Modal
-            echo '<div id="epm-add-institute-modal" class="epm-modal" style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;border-radius:5px;padding:30px;z-index:9999;max-width:400px;width:90%;">';
-            echo '<h3>Add Institute/Organization</h3>';
-            echo '<form id="epm-add-institute-form" method="post" action="' . admin_url('admin-post.php') . '">';
-            echo '<input type="hidden" name="action" value="epm_add_institute">';
-            wp_nonce_field('epm_add_institute', 'epm_add_institute_nonce');
-            echo '<label>Name:</label><input type="text" name="name" required><br>';
-            echo '<label>Email:</label><input type="email" name="email"><br>';
-            echo '<label>Phone:</label><input type="tel" name="phone"><br>';
-            echo '<label>Address:</label><input type="text" name="address"><br>';
-            echo '<label>Account Number:</label><input type="text" name="account_number"><br>';
-            echo '<label>Branch:</label><input type="text" name="branch"><br>';
-            echo '<button type="submit" class="epm-btn epm-btn-primary">Add</button>';
-            echo '<button type="button" class="epm-btn epm-btn-secondary epm-modal-cancel" style="margin-left:10px;">Cancel</button>';
-            echo '</form>';
-            echo '</div>';
+            require_once __DIR__ . '/modals/EPM_AddPersonModal.php';
+            require_once __DIR__ . '/modals/EPM_AddInstituteModal.php';
+            echo EPM_AddPersonModal::render();
+            echo EPM_AddInstituteModal::render();
         }
         $this->enqueue_form_scripts();
         // (Log level indicator and View Log link moved to admin UI)
@@ -432,18 +406,9 @@ class EPM_Shortcodes {
                 echo '</select>';
                 // Add New Advisor button for advisor_person_id
                 if ($field['name'] === 'advisor_person_id') {
+                    require_once __DIR__ . '/modals/EPM_AddAdvisorModal.php';
                     echo ' <button type="button" class="epm-btn epm-btn-secondary" id="epm-add-advisor-btn" style="margin-left:8px;">Add New Advisor</button>';
-                    // Modal for Add Advisor
-                    echo '<div id="epm-add-advisor-modal" class="epm-modal" style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;border-radius:5px;padding:30px;z-index:9999;max-width:400px;width:90%;">';
-                    echo '<h3>Add New Advisor</h3>';
-                    echo '<form id="epm-add-advisor-form" method="post" action="#">';
-                    echo '<label>Name:</label><input type="text" name="full_name" required><br>';
-                    echo '<label>Email:</label><input type="email" name="email"><br>';
-                    echo '<label>Phone:</label><input type="tel" name="phone"><br>';
-                    echo '<button type="submit" class="epm-btn epm-btn-primary">Add Advisor</button>';
-                    echo '<button type="button" class="epm-btn epm-btn-secondary epm-modal-cancel" style="margin-left:10px;">Cancel</button>';
-                    echo '</form>';
-                    echo '</div>';
+                    echo EPM_AddAdvisorModal::render();
                     // JS to open/close modal and add advisor (stub: just closes modal)
                     echo '<script>jQuery(function($){
                         $("#epm-add-advisor-btn").on("click",function(){
