@@ -97,6 +97,8 @@ final class EstateplanningManager {
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-suggested-updates.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-defaults-admin.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-assign-advisors.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-bank-names-admin.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-bank-location-types-admin.php';
         }
         
         // Public classes
@@ -347,6 +349,10 @@ add_action('init', [EPM_InitHandler::class, 'handle']);
 // Register EPM_AdminMenuHandler for admin_menu
 require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_AdminMenuHandler.php';
 add_action('admin_menu', [EPM_AdminMenuHandler::class, 'handle']);
+
+// Register EPM_GetBanksByLocationHandler for AJAX bank name loading
+require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_GetBanksByLocationHandler.php';
+EPM_GetBanksByLocationHandler::register();
 
 // Initialize the plugin
 function epm_init() {

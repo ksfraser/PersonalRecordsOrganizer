@@ -102,6 +102,19 @@ wp plugin activate estate-planning-manager --path=/path/to/wordpress
    - Assign appropriate roles to users
    - Configure individual permissions as needed
 
+### Database Tables
+
+The plugin will automatically create all required tables, including:
+- `epm_bank_accounts`
+- `epm_bank_names` (**new**: for admin-editable bank names by region)
+- `epm_bank_location_types` (**new**: for admin-editable bank regions)
+
+### Admin Screens
+
+After activation, new admin screens will be available under Estate Planning Manager:
+- **Bank Locations**: Manage regions (Canada/USA/Europe)
+- **Bank Names**: Manage banks by region
+
 ## Part 3: SuiteCRM Integration (Optional)
 
 ### Install SuiteCRM Customizations

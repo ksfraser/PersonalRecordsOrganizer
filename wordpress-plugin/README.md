@@ -138,12 +138,13 @@ If you have SuiteCRM, configure the integration:
 2. **User Management**: Create and manage user accounts
 3. **Data Selectors**: Configure which fields appear in exports
 4. **Audit Reports**: Monitor system activity and security
+5. **Bank Locations & Names**: Manage available bank regions and banks (see new admin screens)
 
 ## Features
 
 ### Data Management
 - **Personal Information**: Basic client details
-- **Bank Accounts**: Banking information with encryption
+- **Bank Accounts**: Banking information with encryption, **dynamic bank location and bank name selectors** (admin-editable)
 - **Investments**: RRSP, TFSA, and other investment accounts
 - **Real Estate**: Property records and valuations
 - **Insurance**: Life, disability, and other policies
@@ -168,6 +169,14 @@ If you have SuiteCRM, configure the integration:
 - **Suggested Updates**: Review changes before applying
 - **Contact Management**: Automatic contact creation
 - **Custom Modules**: Estate planning specific modules
+
+### Admin Management Screens
+- **Bank Locations**: Add/edit regions (Canada/USA/Europe) for banks
+- **Bank Names**: Add/edit banks by region
+
+### Modular Architecture
+- **Action Handlers**: All major plugin actions (form submissions, AJAX, admin screens) are now handled by dedicated classes in `includes/handlers/`
+- **Modal Logic**: Modal forms are modularized in `public/modals/`
 
 ## Troubleshooting
 

@@ -24,6 +24,7 @@ The Estate Planning Manager plugin includes a comprehensive test suite covering:
 - `tests/test-epm-audit-logger.php` - Audit logging, compliance tracking, data integrity
 - `tests/test-epm-suitecrm-api.php` - CRM integration, data synchronization, API handling
 - `tests/test-epm-modular-ui.php` - Modular UI functionality, view class rendering, AJAX integration
+- `tests/test-epm-bank-tables.php` - Bank names and locations, dynamic selectors, AJAX handling
 
 ### Supporting Files
 
@@ -154,6 +155,26 @@ Tests modular UI functionality including:
 - **Error Handling**: If a section view class is missing, an error is shown and no fallback rendering occurs.
 - **AJAX and Frontend JS Integration**: All AJAX and frontend JS for section forms and modals are triggered via the modular view classes.
 - **Unit Tests for View Classes**: Unit tests verify that the correct view class is called for each section, and that legacy rendering code is not used.
+
+### Bank Names & Bank Location Types Tests (`test-epm-bank-tables.php`)
+
+Tests for new admin-editable bank region and bank name tables:
+
+- **Table Creation**: `epm_bank_names`, `epm_bank_location_types`
+- **CRUD Operations**: Insert and retrieve bank names and locations
+- **Dynamic Selectors**: AJAX handler for loading bank names by region
+
+Key test methods:
+- `test_bank_names_table_exists()`
+- `test_bank_location_types_table_exists()`
+- `test_insert_and_retrieve_bank_name()`
+- `test_insert_and_retrieve_bank_location_type()`
+
+### Modular Action Handlers & Modal Logic
+
+- All major plugin actions (form submissions, AJAX, admin screens) are now handled by dedicated classes in `includes/handlers/`.
+- Modal form HTML and logic are modularized in `public/modals/`.
+- Unit tests should verify correct handler and modal class usage for new and existing features.
 
 ## Test Data
 

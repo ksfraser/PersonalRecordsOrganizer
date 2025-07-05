@@ -22,6 +22,8 @@ class BankAccountsTable implements TableInterface {
             . "client_id bigint(20) NOT NULL,\n"
             . "suitecrm_guid varchar(36) DEFAULT NULL,\n"
             . "wp_record_id bigint(20) DEFAULT NULL,\n"
+            . "bank_location VARCHAR(32) DEFAULT NULL,\n"
+            . "bank_name VARCHAR(255) DEFAULT NULL,\n"
             . implode(",\n", $modelColumns) . ",\n"
             . "created datetime DEFAULT CURRENT_TIMESTAMP,\n"
             . "lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n"

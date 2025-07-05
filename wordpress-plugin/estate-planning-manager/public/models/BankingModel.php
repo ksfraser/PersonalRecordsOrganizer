@@ -91,7 +91,8 @@ class BankingModel extends AbstractSectionModel {
                 'label' => 'Bank',
                 'type' => 'text',
                 'required' => true,
-                'db_type' => 'VARCHAR(255)'
+                'db_type' => 'VARCHAR(255)',
+                'deprecated' => true, // Marking as deprecated for UI
             ],
             'account_type' => [
                 'label' => 'Account Type',
@@ -126,6 +127,24 @@ class BankingModel extends AbstractSectionModel {
                 'required' => false,
                 'db_type' => 'BIGINT UNSIGNED',
                 'default' => $defaultAdvisorId
+            ],
+            'bank_location' => [
+                'label' => 'Bank Location',
+                'type' => 'select',
+                'options' => [
+                    'canada' => 'Canada',
+                    'usa' => 'USA',
+                    'europe' => 'Europe',
+                ],
+                'required' => true,
+                'db_type' => 'VARCHAR(32)'
+            ],
+            'bank_name' => [
+                'label' => 'Bank Name',
+                'type' => 'select',
+                'options' => [], // To be dynamically loaded by location in UI
+                'required' => true,
+                'db_type' => 'VARCHAR(255)'
             ],
         ];
     }
