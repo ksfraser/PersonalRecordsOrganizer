@@ -12,6 +12,7 @@ require_once EPM_PLUGIN_DIR . 'public/models/ScheduledPaymentsModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/PersonalPropertyModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/AutoModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/EmergencyContactsModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/SafetyDepositBoxModel.php';
 
 class EPM_SaveSectionHandler {
     public static function handle() {
@@ -34,6 +35,7 @@ class EPM_SaveSectionHandler {
             'personal_property' => '\EstatePlanningManager\Models\PersonalPropertyModel',
             'auto_property' => '\EstatePlanningManager\Models\AutoModel',
             'emergency_contacts' => '\EstatePlanningManager\Models\EmergencyContactsModel',
+            'safety_deposit_box' => '\EstatePlanningManager\Models\SafetyDepositBoxModel',
         ];
         // Debug after isset
         if (isset($epm_section_models[$section])) {

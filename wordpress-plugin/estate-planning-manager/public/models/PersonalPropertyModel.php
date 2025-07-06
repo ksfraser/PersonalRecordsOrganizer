@@ -39,10 +39,6 @@ class PersonalPropertyModel extends AbstractSectionModel {
         $sanitized['insurance_policy_location'] = isset($data['insurance_policy_location']) ? Sanitizer::textarea($data['insurance_policy_location']) : null;
         $sanitized['bill_of_sale_location'] = isset($data['bill_of_sale_location']) ? Sanitizer::textarea($data['bill_of_sale_location']) : null;
         $sanitized['location'] = isset($data['location']) ? Sanitizer::textarea($data['location']) : null;
-        $sanitized['safe_deposit_box_location'] = isset($data['safe_deposit_box_location']) ? Sanitizer::text($data['safe_deposit_box_location']) : null;
-        $sanitized['box_access_names'] = isset($data['box_access_names']) ? Sanitizer::textarea($data['box_access_names']) : null;
-        $sanitized['keys_location'] = isset($data['keys_location']) ? Sanitizer::textarea($data['keys_location']) : null;
-        $sanitized['contents_list_location'] = isset($data['contents_list_location']) ? Sanitizer::textarea($data['contents_list_location']) : null;
         $sanitized['owner_person_id'] = isset($data['owner_person_id']) ? Sanitizer::int($data['owner_person_id']) : null;
         $sanitized['auto_model_id'] = isset($data['auto_model_id']) ? Sanitizer::int($data['auto_model_id']) : null;
         // Add more fields as needed
@@ -70,10 +66,7 @@ class PersonalPropertyModel extends AbstractSectionModel {
             ['name' => 'insurance_policy_location', 'label' => 'Insurance Policy Location'],
             ['name' => 'bill_of_sale_location', 'label' => 'Bill of Sale Location'],
             ['name' => 'location', 'label' => 'Location'],
-            ['name' => 'safe_deposit_box_location', 'label' => 'Safe Deposit Box Location'],
-            ['name' => 'box_access_names', 'label' => 'Box Access Names'],
-            ['name' => 'keys_location', 'label' => 'Keys Location'],
-            ['name' => 'contents_list_location', 'label' => 'Contents List Location'],
+            // Removed safe deposit box fields
         ];
     }
     public static function get_section_key() {

@@ -34,6 +34,7 @@ require_once __DIR__ . '/BankLocationTypesTable.php';
 require_once __DIR__ . '/EmergencyContactsTable.php';
 require_once __DIR__ . '/AutoPropertyTable.php';
 require_once __DIR__ . '/ContactsTable.php';
+require_once __DIR__ . '/SafetyDepositBoxTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -71,6 +72,7 @@ class TableFactory {
             new EmergencyContactsTable(),
             new AutoPropertyTable(),
             new ContactsTable(),
+            new SafetyDepositBoxTable(),
         ];
     }
 
