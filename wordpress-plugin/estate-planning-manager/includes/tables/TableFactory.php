@@ -35,6 +35,10 @@ require_once __DIR__ . '/EmergencyContactsTable.php';
 require_once __DIR__ . '/AutoPropertyTable.php';
 require_once __DIR__ . '/ContactsTable.php';
 require_once __DIR__ . '/SafetyDepositBoxTable.php';
+require_once __DIR__ . '/EmploymentRecordsTable.php';
+require_once __DIR__ . '/VolunteeringTable.php';
+require_once __DIR__ . '/CharitableGiftsTable.php';
+require_once __DIR__ . '/FrequencyTypesTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -73,6 +77,10 @@ class TableFactory {
             new AutoPropertyTable(),
             new ContactsTable(),
             new SafetyDepositBoxTable(),
+            new EmploymentRecordsTable(),
+            new VolunteeringTable(),
+            new CharitableGiftsTable(),
+            new FrequencyTypesTable(),
         ];
     }
 

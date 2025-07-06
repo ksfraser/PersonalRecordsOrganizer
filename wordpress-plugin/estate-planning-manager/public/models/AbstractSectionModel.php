@@ -36,4 +36,32 @@ abstract class AbstractSectionModel {
         $result = $wpdb->insert($table, $insert);
         return $result !== false;
     }
+
+    /**
+     * Get year options for dropdowns, using DOB if available, or 80 years ago.
+     */
+    protected function getYearOptions($client_id) {
+        global $wpdb;
+        $current_year = (int)date('Y');
+        $earliest_year = $current_year - 80;
+        // Try to get DOB from personal info
+        $dob = null;
+        $personal_table = $wpdb->prefix . 'epm_personal_property';
+        if (method_exists($wpdb, 'get_row') && method_exists($wpdb, 'prepare')) {
+            $row = $wpdb->get_row($wpdb->prepare("SELECT dob FROM $personal_table WHERE client_id = %d", $client_id), ARRAY_A);
+            if ($row && !empty($row['dob'])) {
+                $dob = $row['dob'];
+                $dob_year = (int)date('Y', strtotime($dob));
+                $age_10_year = $dob_year + 10;
+                if ($age_10_year < $current_year) {
+                    $earliest_year = $age_10_year;
+                }
+            }
+        }
+        $years = [];
+        for ($y = $current_year; $y >= $earliest_year; $y--) {
+            $years[$y] = $y;
+        }
+        return $years;
+    }
 }

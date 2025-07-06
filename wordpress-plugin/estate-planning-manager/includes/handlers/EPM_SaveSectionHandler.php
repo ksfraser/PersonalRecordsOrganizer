@@ -13,6 +13,9 @@ require_once EPM_PLUGIN_DIR . 'public/models/PersonalPropertyModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/AutoModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/EmergencyContactsModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/SafetyDepositBoxModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/EmploymentRecordsModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/VolunteeringModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/CharitableGiftsModel.php';
 
 class EPM_SaveSectionHandler {
     public static function handle() {
@@ -36,6 +39,9 @@ class EPM_SaveSectionHandler {
             'auto_property' => '\EstatePlanningManager\Models\AutoModel',
             'emergency_contacts' => '\EstatePlanningManager\Models\EmergencyContactsModel',
             'safety_deposit_box' => '\EstatePlanningManager\Models\SafetyDepositBoxModel',
+            'employment_records' => '\EstatePlanningManager\Models\EmploymentRecordsModel',
+            'volunteering' => '\EstatePlanningManager\Models\VolunteeringModel',
+            'charitable_gifts' => '\EstatePlanningManager\Models\CharitableGiftsModel',
         ];
         // Debug after isset
         if (isset($epm_section_models[$section])) {
