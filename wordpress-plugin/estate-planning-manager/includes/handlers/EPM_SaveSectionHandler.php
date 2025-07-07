@@ -16,6 +16,14 @@ require_once EPM_PLUGIN_DIR . 'public/models/SafetyDepositBoxModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/EmploymentRecordsModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/VolunteeringModel.php';
 require_once EPM_PLUGIN_DIR . 'public/models/CharitableGiftsModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/PasswordManagementModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/EmailAccountsModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/SocialMediaAccountsModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/OnlineAccountsModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/HostingServicesModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/DebtorsModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/CreditorsModel.php';
+require_once EPM_PLUGIN_DIR . 'public/models/OtherContractualObligationsModel.php';
 
 class EPM_SaveSectionHandler {
     public static function handle() {
@@ -42,6 +50,14 @@ class EPM_SaveSectionHandler {
             'employment_records' => '\EstatePlanningManager\Models\EmploymentRecordsModel',
             'volunteering' => '\EstatePlanningManager\Models\VolunteeringModel',
             'charitable_gifts' => '\EstatePlanningManager\Models\CharitableGiftsModel',
+            'password_management' => '\EstatePlanningManager\Models\PasswordManagementModel',
+            'email_accounts' => '\EstatePlanningManager\Models\EmailAccountsModel',
+            'social_media_accounts' => '\EstatePlanningManager\Models\SocialMediaAccountsModel',
+            'online_accounts' => '\EstatePlanningManager\Models\OnlineAccountsModel',
+            'hosting_services' => '\EstatePlanningManager\Models\HostingServicesModel',
+            'debtors' => '\EstatePlanningManager\Models\DebtorsModel',
+            'creditors' => '\EstatePlanningManager\Models\CreditorsModel',
+            'other_contractual_obligations' => '\EstatePlanningManager\Models\OtherContractualObligationsModel',
         ];
         // Debug after isset
         if (isset($epm_section_models[$section])) {

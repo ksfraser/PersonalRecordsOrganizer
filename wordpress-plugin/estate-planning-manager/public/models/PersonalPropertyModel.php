@@ -32,8 +32,6 @@ class PersonalPropertyModel extends AbstractSectionModel {
         $sanitized['wp_record_id'] = isset($data['wp_record_id']) ? Sanitizer::int($data['wp_record_id']) : null;
         $sanitized['property_type'] = isset($data['property_type']) ? Sanitizer::text($data['property_type']) : null;
         $sanitized['item_type'] = isset($data['item_type']) ? Sanitizer::text($data['item_type']) : null;
-        $sanitized['vehicle_model'] = isset($data['vehicle_model']) ? Sanitizer::text($data['vehicle_model']) : null;
-        $sanitized['own_or_lease'] = isset($data['own_or_lease']) ? Sanitizer::text($data['own_or_lease']) : null;
         $sanitized['legal_document'] = isset($data['legal_document']) ? Sanitizer::textarea($data['legal_document']) : null;
         $sanitized['registration_location'] = isset($data['registration_location']) ? Sanitizer::textarea($data['registration_location']) : null;
         $sanitized['insurance_policy_location'] = isset($data['insurance_policy_location']) ? Sanitizer::textarea($data['insurance_policy_location']) : null;
@@ -59,14 +57,12 @@ class PersonalPropertyModel extends AbstractSectionModel {
         return [
             ['name' => 'property_type', 'label' => 'Property Type'],
             ['name' => 'item_type', 'label' => 'Item Type'],
-            ['name' => 'vehicle_model', 'label' => 'Vehicle Model'],
-            ['name' => 'own_or_lease', 'label' => 'Own or Lease'],
             ['name' => 'legal_document', 'label' => 'Legal Document'],
             ['name' => 'registration_location', 'label' => 'Registration Location'],
             ['name' => 'insurance_policy_location', 'label' => 'Insurance Policy Location'],
             ['name' => 'bill_of_sale_location', 'label' => 'Bill of Sale Location'],
             ['name' => 'location', 'label' => 'Location'],
-            // Removed safe deposit box fields
+            // Removed safe deposit box, vehicle_model, own_or_lease fields
         ];
     }
     public static function get_section_key() {

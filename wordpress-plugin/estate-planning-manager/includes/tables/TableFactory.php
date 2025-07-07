@@ -18,7 +18,9 @@ require_once __DIR__ . '/RealEstateTable.php';
 require_once __DIR__ . '/PersonalPropertyTable.php';
 require_once __DIR__ . '/DigitalAssetsTable.php';
 require_once __DIR__ . '/ScheduledPaymentsTable.php';
-require_once __DIR__ . '/DebtorsCreditorsTable.php';
+require_once __DIR__ . '/ScheduledPaymentTypesTable.php';
+require_once __DIR__ . '/DebtorsTable.php';
+require_once __DIR__ . '/CreditorsTable.php';
 require_once __DIR__ . '/InsuranceTable.php';
 require_once __DIR__ . '/PersonTable.php';
 require_once __DIR__ . '/PersonXrefTable.php';
@@ -39,6 +41,14 @@ require_once __DIR__ . '/EmploymentRecordsTable.php';
 require_once __DIR__ . '/VolunteeringTable.php';
 require_once __DIR__ . '/CharitableGiftsTable.php';
 require_once __DIR__ . '/FrequencyTypesTable.php';
+require_once __DIR__ . '/PasswordManagementTable.php';
+require_once __DIR__ . '/EmailAccountsTable.php';
+require_once __DIR__ . '/SocialMediaAccountsTable.php';
+require_once __DIR__ . '/OnlineAccountsTable.php';
+require_once __DIR__ . '/HostingServicesTable.php';
+require_once __DIR__ . '/SocialMediaPlatformTypesTable.php';
+require_once __DIR__ . '/PasswordStorageTypesTable.php';
+require_once __DIR__ . '/OtherContractualObligationsTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -64,7 +74,9 @@ class TableFactory {
             new PersonalPropertyTable(),
             new DigitalAssetsTable(),
             new ScheduledPaymentsTable(),
-            new DebtorsCreditorsTable(),
+            new ScheduledPaymentTypesTable(),
+            new DebtorsTable(),
+            new CreditorsTable(),
             new InsuranceTable(),
             new PersonTable(),
             new PersonXrefTable(),
@@ -81,6 +93,14 @@ class TableFactory {
             new VolunteeringTable(),
             new CharitableGiftsTable(),
             new FrequencyTypesTable(),
+            new PasswordManagementTable(),
+            new EmailAccountsTable(),
+            new SocialMediaAccountsTable(),
+            new OnlineAccountsTable(),
+            new HostingServicesTable(),
+            new SocialMediaPlatformTypesTable(),
+            new PasswordStorageTypesTable(),
+            new OtherContractualObligationsTable(),
         ];
     }
 

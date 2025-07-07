@@ -48,8 +48,14 @@ class EPM_Ajax_Handler {
         add_action('wp_ajax_epm_generate_pdf_and_send', array($this, 'generate_pdf_and_send'));
         add_action('wp_ajax_epm_add_person', array($this, 'add_person'));
         add_action('wp_ajax_epm_add_institute', array($this, 'add_institute'));
+        // Register new handler for adding social media platform types (authenticated users only)
+        add_action('wp_ajax_epm_add_social_media_type', array($this, 'add_social_media_type'));
+        // Register new handler for adding password storage types (authenticated users only)
+        add_action('wp_ajax_epm_add_password_storage_type', array($this, 'add_password_storage_type'));
+        // Register new handler for adding scheduled payment types (authenticated users only)
+        add_action('wp_ajax_epm_add_scheduled_payment_type', array($this, 'add_scheduled_payment_type'));
     }
-    
+
     /**
      * Save client data via AJAX
      */
@@ -344,6 +350,111 @@ class EPM_Ajax_Handler {
         ]);
         $id = $wpdb->insert_id;
         wp_send_json_success(['id' => $id, 'name' => $name]);
+    }
+
+    /**
+     * AJAX: Add Social Media Platform Type
+     */
+    public function add_social_media_type() {
+        check_ajax_referer('epm_add_social_media_type', '_ajax_nonce');
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Not logged in');
+        }
+        // Parse serialized data
+        parse_str($_POST['data'], $data);
+        $value = isset($data['value']) ? sanitize_key($data['value']) : '';
+        $label = isset($data['label']) ? sanitize_text_field($data['label']) : '';
+        if (!$value || !$label) {
+            wp_send_json_error('Both value and label are required.');
+        }
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_social_media_platform_types';
+        // Check for duplicate value
+        $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table WHERE value = %s", $value));
+        if ($exists) {
+            wp_send_json_error('This value already exists.');
+        }
+        $result = $wpdb->insert($table, [
+            'value' => $value,
+            'label' => $label,
+            'is_active' => 1,
+            'sort_order' => 0
+        ]);
+        if ($result) {
+            wp_send_json_success('Added successfully.');
+        } else {
+            wp_send_json_error('Database error.');
+        }
+    }
+
+    /**
+     * AJAX: Add Password Storage Type
+     */
+    public function add_password_storage_type() {
+        check_ajax_referer('epm_add_password_storage_type', '_ajax_nonce');
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Not logged in');
+        }
+        // Parse serialized data
+        parse_str($_POST['data'], $data);
+        $value = isset($data['value']) ? sanitize_key($data['value']) : '';
+        $label = isset($data['label']) ? sanitize_text_field($data['label']) : '';
+        if (!$value || !$label) {
+            wp_send_json_error('Both value and label are required.');
+        }
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_password_storage_types';
+        // Check for duplicate value
+        $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table WHERE value = %s", $value));
+        if ($exists) {
+            wp_send_json_error('This value already exists.');
+        }
+        $result = $wpdb->insert($table, [
+            'value' => $value,
+            'label' => $label,
+            'is_active' => 1,
+            'sort_order' => 0
+        ]);
+        if ($result) {
+            wp_send_json_success('Added successfully.');
+        } else {
+            wp_send_json_error('Database error.');
+        }
+    }
+
+    /**
+     * AJAX: Add Scheduled Payment Type
+     */
+    public function add_scheduled_payment_type() {
+        check_ajax_referer('epm_add_scheduled_payment_type', '_ajax_nonce');
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Not logged in');
+        }
+        // Parse serialized data
+        parse_str($_POST['data'], $data);
+        $value = isset($data['value']) ? sanitize_key($data['value']) : '';
+        $label = isset($data['label']) ? sanitize_text_field($data['label']) : '';
+        if (!$value || !$label) {
+            wp_send_json_error('Both value and label are required.');
+        }
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_scheduled_payment_types';
+        // Check for duplicate value
+        $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table WHERE value = %s", $value));
+        if ($exists) {
+            wp_send_json_error('This value already exists.');
+        }
+        $result = $wpdb->insert($table, [
+            'value' => $value,
+            'label' => $label,
+            'is_active' => 1,
+            'sort_order' => 0
+        ]);
+        if ($result) {
+            wp_send_json_success('Added successfully.');
+        } else {
+            wp_send_json_error('Database error.');
+        }
     }
 
     /**
