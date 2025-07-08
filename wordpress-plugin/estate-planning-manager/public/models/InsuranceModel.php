@@ -29,28 +29,45 @@ class InsuranceModel extends AbstractSectionModel {
         } else {
             $sanitized['client_id'] = Sanitizer::int($data['client_id']);
         }
-        $sanitized['insurance_category'] = isset($data['insurance_category']) ? Sanitizer::text($data['insurance_category']) : null;
-        $sanitized['insurance_type'] = isset($data['insurance_type']) ? Sanitizer::text($data['insurance_type']) : null;
+        // Category/type logic
+        $sanitized['insurance_category_id'] = isset($data['insurance_category_id']) ? Sanitizer::int($data['insurance_category_id']) : null;
+        $sanitized['insurance_type_id'] = isset($data['insurance_type_id']) ? Sanitizer::int($data['insurance_type_id']) : null;
+        // Xref logic
+        $xref_type = isset($data['insurance_category_id']) ? $data['insurance_category_id'] : null;
+        // Assume: 1=Life, 2=Auto, 3=House (should use lookup)
+        if ($xref_type == 2) { // Auto
+            $sanitized['vehicle_id'] = isset($data['vehicle_id']) ? Sanitizer::int($data['vehicle_id']) : null;
+            $sanitized['real_estate_id'] = null;
+            $sanitized['insured_contact_ids'] = null;
+        } elseif ($xref_type == 3) { // House
+            $sanitized['real_estate_id'] = isset($data['real_estate_id']) ? Sanitizer::int($data['real_estate_id']) : null;
+            $sanitized['vehicle_id'] = null;
+            $sanitized['insured_contact_ids'] = null;
+        } elseif ($xref_type == 1) { // Life
+            $sanitized['insured_contact_ids'] = isset($data['insured_contact_ids']) && is_array($data['insured_contact_ids']) ? array_map('intval', $data['insured_contact_ids']) : [];
+            $sanitized['vehicle_id'] = null;
+            $sanitized['real_estate_id'] = null;
+        } else {
+            $sanitized['vehicle_id'] = null;
+            $sanitized['real_estate_id'] = null;
+            $sanitized['insured_contact_ids'] = null;
+        }
+        // ...existing code for other fields...
         $sanitized['insurance_company'] = isset($data['insurance_company']) ? Sanitizer::text($data['insurance_company']) : null;
         $sanitized['policy_number'] = isset($data['policy_number']) ? Sanitizer::text($data['policy_number']) : null;
         $sanitized['beneficiary_contact_id'] = isset($data['beneficiary_contact_id']) ? Sanitizer::int($data['beneficiary_contact_id']) : null;
         $sanitized['advisor_person_id'] = isset($data['advisor_person_id']) ? Sanitizer::int($data['advisor_person_id']) : null;
         $sanitized['owner_contact_id'] = isset($data['owner_contact_id']) ? Sanitizer::int($data['owner_contact_id']) : null;
-        // New fields
         $sanitized['is_group_insurance'] = isset($data['is_group_insurance']) ? (bool)$data['is_group_insurance'] : false;
         if ($sanitized['is_group_insurance']) {
             if (!empty($data['group_insurance_sponsor_org_id']) && is_numeric($data['group_insurance_sponsor_org_id'])) {
                 $sanitized['group_insurance_sponsor_org_id'] = Sanitizer::int($data['group_insurance_sponsor_org_id']);
             } else {
                 $sanitized['group_insurance_sponsor_org_id'] = null;
-                // Optionally require sponsor if group insurance is set
-                // $errors[] = 'Group Insurance Sponsor is required for group insurance.';
             }
         } else {
             $sanitized['group_insurance_sponsor_org_id'] = null;
         }
-        // Remove old fields
-        // ...existing code...
         return [empty($errors), $errors, $sanitized];
     }
 
@@ -66,14 +83,63 @@ class InsuranceModel extends AbstractSectionModel {
     }
     public function getFormFields() {
         $fields = [
-            ['name' => 'insurance_category', 'label' => 'Insurance Category'],
-            ['name' => 'insurance_type', 'label' => 'Insurance Type'],
+            [
+                'name' => 'insurance_category_id',
+                'label' => 'Category',
+                'type' => 'select',
+                'options' => function() {
+                    return function_exists('epm_get_insurance_category_options') ? epm_get_insurance_category_options() : [];
+                },
+                'required' => true
+            ],
+            [
+                'name' => 'insurance_type_id',
+                'label' => 'Type',
+                'type' => 'select',
+                'options' => function($data = []) {
+                    if (isset($data['insurance_category_id']) && function_exists('epm_get_insurance_type_options')) {
+                        return epm_get_insurance_type_options($data['insurance_category_id']);
+                    }
+                    return [];
+                },
+                'required' => true
+            ],
+            [
+                'name' => 'vehicle_id',
+                'label' => 'Vehicle',
+                'type' => 'select',
+                'options' => function() {
+                    return function_exists('epm_get_vehicle_dropdown_options') ? epm_get_vehicle_dropdown_options() : [];
+                },
+                'show_if' => ['insurance_category_id' => [2]],
+                'required' => false
+            ],
+            [
+                'name' => 'real_estate_id',
+                'label' => 'Real Estate',
+                'type' => 'select',
+                'options' => function() {
+                    return function_exists('epm_get_real_estate_dropdown_options') ? epm_get_real_estate_dropdown_options() : [];
+                },
+                'show_if' => ['insurance_category_id' => [3]],
+                'required' => false
+            ],
+            [
+                'name' => 'insured_contact_ids',
+                'label' => 'Insured Person(s)',
+                'type' => 'multiselect',
+                'options' => function() {
+                    return function_exists('epm_get_contact_dropdown_options') ? epm_get_contact_dropdown_options() : [];
+                },
+                'show_if' => ['insurance_category_id' => [1]],
+                'required' => false
+            ],
+            // ...existing code for other fields...
             ['name' => 'insurance_company', 'label' => 'Insurance Company'],
             ['name' => 'policy_number', 'label' => 'Policy Number'],
             ['name' => 'beneficiary_contact_id', 'label' => 'Beneficiary (Contact)'],
             ['name' => 'advisor_person_id', 'label' => 'Advisor'],
             ['name' => 'owner_contact_id', 'label' => 'Owner (Contact)'],
-            // New fields
             ['name' => 'is_group_insurance', 'label' => 'Is Group Insurance', 'type' => 'checkbox'],
             [
                 'name' => 'group_insurance_sponsor_org_id',
@@ -83,7 +149,7 @@ class InsuranceModel extends AbstractSectionModel {
                     return function_exists('epm_get_organization_dropdown_options') ? epm_get_organization_dropdown_options() : [];
                 },
                 'show_if' => ['is_group_insurance' => true],
-                'add_button' => true // For Add Sponsor modal
+                'add_button' => true
             ],
         ];
         return $fields;
@@ -93,18 +159,58 @@ class InsuranceModel extends AbstractSectionModel {
     }
     public static function getFieldDefinitions() {
         return [
-            'insurance_category' => [
-                'label' => 'Insurance Category',
-                'type' => 'text',
+            'insurance_category_id' => [
+                'label' => 'Category',
+                'type' => 'select',
+                'options' => function() {
+                    return function_exists('epm_get_insurance_category_options') ? epm_get_insurance_category_options() : [];
+                },
                 'required' => true,
-                'db_type' => 'VARCHAR(100)'
+                'db_type' => 'BIGINT UNSIGNED'
             ],
-            'insurance_type' => [
-                'label' => 'Insurance Type',
-                'type' => 'text',
+            'insurance_type_id' => [
+                'label' => 'Type',
+                'type' => 'select',
+                'options' => function($data = []) {
+                    if (isset($data['insurance_category_id']) && function_exists('epm_get_insurance_type_options')) {
+                        return epm_get_insurance_type_options($data['insurance_category_id']);
+                    }
+                    return [];
+                },
                 'required' => true,
-                'db_type' => 'VARCHAR(100)'
+                'db_type' => 'BIGINT UNSIGNED'
             ],
+            'vehicle_id' => [
+                'label' => 'Vehicle',
+                'type' => 'select',
+                'options' => function() {
+                    return function_exists('epm_get_vehicle_dropdown_options') ? epm_get_vehicle_dropdown_options() : [];
+                },
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED',
+                'show_if' => ['insurance_category_id' => [2]]
+            ],
+            'real_estate_id' => [
+                'label' => 'Real Estate',
+                'type' => 'select',
+                'options' => function() {
+                    return function_exists('epm_get_real_estate_dropdown_options') ? epm_get_real_estate_dropdown_options() : [];
+                },
+                'required' => false,
+                'db_type' => 'BIGINT UNSIGNED',
+                'show_if' => ['insurance_category_id' => [3]]
+            ],
+            'insured_contact_ids' => [
+                'label' => 'Insured Person(s)',
+                'type' => 'multiselect',
+                'options' => function() {
+                    return function_exists('epm_get_contact_dropdown_options') ? epm_get_contact_dropdown_options() : [];
+                },
+                'required' => false,
+                'db_type' => 'TEXT',
+                'show_if' => ['insurance_category_id' => [1]]
+            ],
+            // ...existing code for other fields...
             'insurance_company' => [
                 'label' => 'Insurance Company',
                 'type' => 'text',
@@ -142,7 +248,6 @@ class InsuranceModel extends AbstractSectionModel {
                 'required' => false,
                 'db_type' => 'BIGINT UNSIGNED'
             ],
-            // New fields
             'is_group_insurance' => [
                 'label' => 'Is Group Insurance',
                 'type' => 'checkbox',

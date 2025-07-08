@@ -2,8 +2,8 @@
 require_once __DIR__ . '/RelationshipTypesTable.php';
 require_once __DIR__ . '/AccountTypesTable.php';
 require_once __DIR__ . '/ContactTypesTable.php';
-require_once __DIR__ . '/InsuranceCategoriesTable.php';
-require_once __DIR__ . '/InsuranceTypesTable.php';
+require_once __DIR__ . '/InsuranceCategoryTable.php';
+require_once __DIR__ . '/InsuranceTypeTable.php';
 require_once __DIR__ . '/PropertyTypesTable.php';
 require_once __DIR__ . '/InvestmentTypesTable.php';
 require_once __DIR__ . '/PaymentTypesTable.php';
@@ -60,8 +60,8 @@ class TableFactory {
             new RelationshipTypesTable(),
             new AccountTypesTable(),
             new ContactTypesTable(),
-            new InsuranceCategoriesTable(),
-            new InsuranceTypesTable(),
+            new InsuranceCategoryTable(),
+            new InsuranceTypeTable(),
             new PropertyTypesTable(),
             new InvestmentTypesTable(),
             new PaymentTypesTable(),

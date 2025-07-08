@@ -39,7 +39,7 @@ class EPM_InsuranceView extends AbstractSectionView
         }
         \EstatePlanningManager\Sections\EPM_InsuranceModal::render('insurance');
         $instance->renderSectionView($client_id, $readonly);
-        // Add JS to toggle Add Sponsor button
+        // Add JS to toggle Add Sponsor button, property selector, and insurance type selector
         echo '<script type="text/javascript">
         jQuery(document).ready(function($){
             function toggleSponsorBtn() {
@@ -48,6 +48,25 @@ class EPM_InsuranceView extends AbstractSectionView
             }
             $(document).on("change", "input[name=\\"is_group_insurance\\"]", toggleSponsorBtn);
             toggleSponsorBtn();
+
+            // Property and insurance type selector logic
+            function togglePropertyAndTypeSelectors() {
+                var type = $("select[name=\\"property_type\\"]").val();
+                var $propertyRow = $("[name=\\"property_id\\"]").closest(".form-row, tr, .epm-form-row");
+                var $typeRow = $("[name=\\"insurance_type\\"]").closest(".form-row, tr, .epm-form-row");
+                if(type === "auto" || type === "house") {
+                    $propertyRow.show();
+                } else {
+                    $propertyRow.hide();
+                }
+                if(type === "life") {
+                    $typeRow.show();
+                } else {
+                    $typeRow.show(); // Always show, backend will render as text or select as needed
+                }
+            }
+            $(document).on("change", "select[name=\\"property_type\\"]", togglePropertyAndTypeSelectors);
+            togglePropertyAndTypeSelectors();
         });
         </script>';
     }

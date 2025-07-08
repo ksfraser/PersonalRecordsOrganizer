@@ -1,0 +1,36 @@
+<?php
+namespace EstatePlanningManager\Tables;
+
+if (!defined('ABSPATH')) exit;
+
+class InsuranceTypeTable {
+    public static function getTableName() {
+        global $wpdb;
+        return $wpdb->prefix . 'epm_insurance_type';
+    }
+    public static function getCreateTableSql() {
+        global $wpdb;
+        $charset_collate = method_exists($wpdb, 'get_charset_collate') ? $wpdb->get_charset_collate() : '';
+        return "CREATE TABLE " . self::getTableName() . " (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            name VARCHAR(100) NOT NULL,
+            category_id BIGINT UNSIGNED NOT NULL,
+            FOREIGN KEY (category_id) REFERENCES {$wpdb->prefix}epm_insurance_category(id) ON DELETE CASCADE,
+            PRIMARY KEY (id)
+        ) $charset_collate;";
+    }
+    public static function getPreFillSql() {
+        $table = self::getTableName();
+        return [
+            // Life types
+            "INSERT INTO $table (id, name, category_id) VALUES
+                (1, 'Whole Life', 1),
+                (2, 'Universal', 1),
+                (3, 'Term', 1),
+                (4, 'Critical Illness', 1),
+                (5, 'House', 3),
+                (6, 'Auto', 2)
+            ON DUPLICATE KEY UPDATE name=VALUES(name), category_id=VALUES(category_id);"
+        ];
+    }
+}
