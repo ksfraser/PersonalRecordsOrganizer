@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit;
 require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/TableInterface.php';
 
-class InsuranceTypeTable extends EPM_AbstractTable implements TableInterface {
+class InsuranceTypeTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public static function getTableName() {
         global $wpdb;
         return $wpdb->prefix . 'epm_insurance_type';

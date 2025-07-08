@@ -6,7 +6,7 @@ require_once __DIR__ . '/TableInterface.php';
  * UserPreferencesTable
  * Creates the epm_user_preferences table for user-specific plugin settings.
  */
-class UserPreferencesTable extends EPM_AbstractTable implements TableInterface {
+class UserPreferencesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_user_preferences';

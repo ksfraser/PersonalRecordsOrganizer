@@ -3,8 +3,9 @@
 if (!defined('ABSPATH')) exit;
 
 require_once __DIR__ . '/EPM_AbstractTable.php';
+require_once __DIR__ . '/TableInterface.php';
 
-class DefaultsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable {
+class DefaultsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public static $table_name = 'epm_defaults';
 
     public static function get_full_table_name() {

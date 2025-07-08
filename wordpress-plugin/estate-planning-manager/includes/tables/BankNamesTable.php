@@ -6,7 +6,7 @@ require_once __DIR__ . '/TableInterface.php';
 /**
  * Table for storing known banks and credit unions by region.
  */
-class BankNamesTable extends EPM_AbstractTable implements TableInterface {
+class BankNamesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_bank_names';

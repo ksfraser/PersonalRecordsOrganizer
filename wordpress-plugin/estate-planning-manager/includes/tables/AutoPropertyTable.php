@@ -1,10 +1,9 @@
 <?php
 require_once __DIR__ . '/EPM_AbstractTable.php';
-
 require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/AutoModelTable.php';
 
-class AutoPropertyTable extends EPM_AbstractTable implements TableInterface {
+class AutoPropertyTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_auto_property';

@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/PasswordManagementModel.php';
 use EstatePlanningManager\Models\PasswordManagementModel;
 
-class PasswordManagementTable extends EPM_AbstractTable implements TableInterface {
+class PasswordManagementTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

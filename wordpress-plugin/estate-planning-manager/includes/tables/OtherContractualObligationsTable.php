@@ -3,7 +3,7 @@
 require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/TableInterface.php';
 
-class OtherContractualObligationsTable extends EPM_AbstractTable {
+class OtherContractualObligationsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_other_contractual_obligations';
