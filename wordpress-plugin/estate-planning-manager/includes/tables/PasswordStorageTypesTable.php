@@ -1,5 +1,8 @@
 <?php
-class PasswordStorageTypesTable extends EPM_AbstractTable implements TableInterface {
+require_once __DIR__ . '/EPM_AbstractTable.php';
+require_once __DIR__ . '/TableInterface.php';
+
+class PasswordStorageTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_password_storage_types';

@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/PersonalPropertyModel.php';
 use EstatePlanningManager\Models\PersonalPropertyModel;
 
-class PersonalPropertyTable extends EPM_AbstractTable implements TableInterface {
+class PersonalPropertyTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     /**
      * Helper to map model field definitions to SQL columns
      */

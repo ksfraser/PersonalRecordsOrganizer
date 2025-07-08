@@ -1,6 +1,9 @@
 <?php
 namespace EstatePlanningManager\Tables;
 
+require_once __DIR__ . '/EPM_AbstractTable.php';
+require_once __DIR__ . '/TableInterface.php';
+
 if (!defined('ABSPATH')) exit;
 
 require_once __DIR__ . '/EPM_AbstractTable.php';

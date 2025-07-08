@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/RealEstateModel.php';
 use EstatePlanningManager\Models\RealEstateModel;
 
-class RealEstateTable extends EPM_AbstractTable implements TableInterface {
+class RealEstateTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

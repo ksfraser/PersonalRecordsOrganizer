@@ -4,6 +4,7 @@ namespace EstatePlanningManager\Tables;
 if (!defined('ABSPATH')) exit;
 
 require_once __DIR__ . '/EPM_AbstractTable.php';
+require_once __DIR__ . '/TableInterface.php';
 
 class InsuranceTypeTable extends EPM_AbstractTable implements TableInterface {
     public static function getTableName() {

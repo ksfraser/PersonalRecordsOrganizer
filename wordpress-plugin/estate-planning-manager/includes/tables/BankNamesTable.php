@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/EPM_AbstractTable.php';
+require_once __DIR__ . '/TableInterface.php';
+
 /**
  * Table for storing known banks and credit unions by region.
  */

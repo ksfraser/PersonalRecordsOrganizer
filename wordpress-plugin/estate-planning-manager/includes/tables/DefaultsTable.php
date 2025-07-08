@@ -2,7 +2,9 @@
 // Table class for epm_defaults
 if (!defined('ABSPATH')) exit;
 
-class EPM_DefaultsTable {
+require_once __DIR__ . '/EPM_AbstractTable.php';
+
+class DefaultsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable {
     public static $table_name = 'epm_defaults';
 
     public static function get_full_table_name() {

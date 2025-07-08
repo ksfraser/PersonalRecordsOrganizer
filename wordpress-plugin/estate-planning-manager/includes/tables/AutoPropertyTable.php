@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/EPM_AbstractTable.php';
+
 require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/AutoModelTable.php';
 

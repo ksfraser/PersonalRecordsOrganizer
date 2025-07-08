@@ -1,4 +1,6 @@
 <?php
+
+
 namespace EstatePlanningManager\Tables;
 // Abstract base class for EPM table classes
 if (!defined('ABSPATH')) exit;

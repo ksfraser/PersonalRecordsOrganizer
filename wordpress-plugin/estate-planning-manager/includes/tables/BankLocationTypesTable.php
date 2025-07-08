@@ -5,7 +5,7 @@ require_once __DIR__ . '/TableInterface.php';
 /**
  * Table for storing bank location types (regions).
  */
-class BankLocationTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements TableInterface {
+class BankLocationTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_bank_location_types';

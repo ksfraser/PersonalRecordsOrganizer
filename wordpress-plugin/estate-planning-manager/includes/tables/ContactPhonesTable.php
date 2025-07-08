@@ -1,5 +1,7 @@
 <?php
-class ContactPhonesTable extends EPM_AbstractTable {
+require_once __DIR__ . '/EPM_AbstractTable.php';
+
+class ContactPhonesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable {
     public function create($charset_collate) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_contact_phones';
