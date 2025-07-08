@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/AccountTypesModel.php';
 use EstatePlanningManager\Models\AccountTypesModel;
 
-class AccountTypesTable extends EPM_AbstractTable implements TableInterface {
+class AccountTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {
