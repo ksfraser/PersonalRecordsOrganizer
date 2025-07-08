@@ -13,6 +13,7 @@ class ContactsTable implements TableInterface {
             phone varchar(50) DEFAULT NULL,
             address varchar(255) DEFAULT NULL,
             client_id bigint(20) DEFAULT 0,
+            is_advisor TINYINT(1) DEFAULT 0,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY client_id (client_id)

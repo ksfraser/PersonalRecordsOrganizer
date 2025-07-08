@@ -49,6 +49,8 @@ require_once __DIR__ . '/HostingServicesTable.php';
 require_once __DIR__ . '/SocialMediaPlatformTypesTable.php';
 require_once __DIR__ . '/PasswordStorageTypesTable.php';
 require_once __DIR__ . '/OtherContractualObligationsTable.php';
+require_once __DIR__ . '/ContactPhonesTable.php';
+require_once __DIR__ . '/ContactEmailsTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -101,6 +103,8 @@ class TableFactory {
             new SocialMediaPlatformTypesTable(),
             new PasswordStorageTypesTable(),
             new OtherContractualObligationsTable(),
+            new ContactPhonesTable(),
+            new ContactEmailsTable(),
         ];
     }
 
