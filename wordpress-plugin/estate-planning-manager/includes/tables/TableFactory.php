@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/RelationshipTypesTable.php';
 require_once __DIR__ . '/AccountTypesTable.php';
 require_once __DIR__ . '/ContactTypesTable.php';
@@ -61,8 +62,8 @@ class TableFactory {
             new RelationshipTypesTable(),
             new AccountTypesTable(),
             new ContactTypesTable(),
-            new InsuranceCategoryTable(),
-            new InsuranceTypeTable(),
+            new \EstatePlanningManager\Tables\InsuranceCategoryTable(),
+            new \EstatePlanningManager\Tables\InsuranceTypeTable(),
             new PropertyTypesTable(),
             new InvestmentTypesTable(),
             new PaymentTypesTable(),
@@ -106,7 +107,7 @@ class TableFactory {
             new OtherContractualObligationsTable(),
             new ContactPhonesTable(),
             new ContactEmailsTable(),
-            new DefaultsTable(),
+            new EPM_DefaultsTable(),
         ];
     }
 

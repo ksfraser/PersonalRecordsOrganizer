@@ -3,7 +3,9 @@ namespace EstatePlanningManager\Tables;
 
 if (!defined('ABSPATH')) exit;
 
-class InsuranceTypeTable {
+require_once __DIR__ . '/EPM_AbstractTable.php';
+
+class InsuranceTypeTable extends EPM_AbstractTable implements TableInterface {
     public static function getTableName() {
         global $wpdb;
         return $wpdb->prefix . 'epm_insurance_type';
@@ -32,5 +34,17 @@ class InsuranceTypeTable {
                 (6, 'Auto', 2)
             ON DUPLICATE KEY UPDATE name=VALUES(name), category_id=VALUES(category_id);"
         ];
+    }
+    public function create($charset_collate) {
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $sql = self::getCreateTableSql();
+        dbDelta($sql);
+    }
+    public function populate($charset_collate) {
+        global $wpdb;
+        foreach (self::getPreFillSql() as $sql) {
+            $wpdb->query($sql);
+        }
     }
 }

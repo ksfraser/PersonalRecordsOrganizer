@@ -3,7 +3,7 @@ require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/EmploymentRecordsModel.php';
 use EstatePlanningManager\Models\EmploymentRecordsModel;
 
-class EmploymentRecordsTable implements TableInterface {
+class EmploymentRecordsTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

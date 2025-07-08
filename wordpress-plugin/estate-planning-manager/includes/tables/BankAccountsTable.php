@@ -3,7 +3,7 @@ require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/BankingModel.php';
 use EstatePlanningManager\Models\BankingModel;
 
-class BankAccountsTable implements TableInterface {
+class BankAccountsTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

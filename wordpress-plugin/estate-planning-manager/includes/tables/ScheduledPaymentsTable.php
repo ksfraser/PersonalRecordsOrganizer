@@ -3,7 +3,7 @@ require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/ScheduledPaymentsModel.php';
 use EstatePlanningManager\Models\ScheduledPaymentsModel;
 
-class ScheduledPaymentsTable implements TableInterface {
+class ScheduledPaymentsTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

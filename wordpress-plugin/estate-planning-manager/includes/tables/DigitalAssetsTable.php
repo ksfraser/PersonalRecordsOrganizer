@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/TableInterface.php';
 
-class DigitalAssetsTable implements TableInterface {
+class DigitalAssetsTable extends EPM_AbstractTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_digital_assets';

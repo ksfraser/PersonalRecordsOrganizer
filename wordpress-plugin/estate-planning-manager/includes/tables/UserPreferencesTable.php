@@ -1,9 +1,11 @@
 <?php
+require_once __DIR__ . '/EPM_AbstractTable.php';
+
 /**
  * UserPreferencesTable
  * Creates the epm_user_preferences table for user-specific plugin settings.
  */
-class UserPreferencesTable implements TableInterface {
+class UserPreferencesTable extends EPM_AbstractTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_user_preferences';

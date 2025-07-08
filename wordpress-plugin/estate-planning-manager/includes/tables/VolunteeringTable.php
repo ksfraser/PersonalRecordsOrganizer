@@ -1,9 +1,11 @@
 <?php
 require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/VolunteeringModel.php';
+require_once __DIR__ . '/EPM_AbstractTable.php';
+
 use EstatePlanningManager\Models\VolunteeringModel;
 
-class VolunteeringTable implements TableInterface {
+class VolunteeringTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

@@ -1,9 +1,8 @@
 <?php
-class ContactPhonesTable {
-    public function create() {
+class ContactPhonesTable extends EPM_AbstractTable {
+    public function create($charset_collate) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_contact_phones';
-        $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE $table (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             contact_id BIGINT UNSIGNED NOT NULL,

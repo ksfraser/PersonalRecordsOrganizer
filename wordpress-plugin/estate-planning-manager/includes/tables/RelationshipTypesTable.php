@@ -3,7 +3,7 @@ require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/RelationshipTypesModel.php';
 use EstatePlanningManager\Models\RelationshipTypesModel;
 
-class RelationshipTypesTable implements TableInterface {
+class RelationshipTypesTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

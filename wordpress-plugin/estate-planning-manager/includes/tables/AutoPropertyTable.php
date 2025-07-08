@@ -2,7 +2,7 @@
 require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/AutoModelTable.php';
 
-class AutoPropertyTable implements TableInterface {
+class AutoPropertyTable extends EPM_AbstractTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_auto_property';

@@ -6,7 +6,8 @@ class Test_EPM_OtherContractualObligationsTable extends TestCase {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_other_contractual_obligations';
         $tableClass = new OtherContractualObligationsTable();
-        $tableClass->create();
+        $charset_collate = method_exists($wpdb, 'get_charset_collate') ? $wpdb->get_charset_collate() : '';
+        $tableClass->create($charset_collate);
         $result = $wpdb->get_results("SHOW TABLES LIKE '$table'");
         $this->assertNotEmpty($result, 'Table should be created');
     }

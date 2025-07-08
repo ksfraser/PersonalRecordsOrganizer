@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/TableInterface.php';
 
-class ContactTypesTable implements TableInterface {
+class ContactTypesTable extends EPM_AbstractTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_contact_types';

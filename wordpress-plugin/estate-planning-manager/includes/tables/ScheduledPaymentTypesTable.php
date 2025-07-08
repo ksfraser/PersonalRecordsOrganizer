@@ -1,5 +1,5 @@
 <?php
-class ScheduledPaymentTypesTable implements TableInterface {
+class ScheduledPaymentTypesTable extends EPM_AbstractTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_scheduled_payment_types';

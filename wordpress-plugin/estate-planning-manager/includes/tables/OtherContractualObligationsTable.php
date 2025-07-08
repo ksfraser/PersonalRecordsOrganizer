@@ -1,9 +1,8 @@
 <?php
-class OtherContractualObligationsTable {
-    public function create() {
+class OtherContractualObligationsTable extends EPM_AbstractTable {
+    public function create($charset_collate) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_other_contractual_obligations';
-        $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE $table (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             client_id BIGINT UNSIGNED NOT NULL,
@@ -18,5 +17,9 @@ class OtherContractualObligationsTable {
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+    }
+
+    public function populate($charset_collate) {
+        // No default data for this table
     }
 }

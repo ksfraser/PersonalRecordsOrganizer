@@ -3,7 +3,7 @@ require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/CharitableGiftsModel.php';
 use EstatePlanningManager\Models\CharitableGiftsModel;
 
-class CharitableGiftsTable implements TableInterface {
+class CharitableGiftsTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

@@ -3,7 +3,7 @@ require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/SocialMediaAccountsModel.php';
 use EstatePlanningManager\Models\SocialMediaAccountsModel;
 
-class SocialMediaAccountsTable implements TableInterface {
+class SocialMediaAccountsTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {
@@ -33,5 +33,4 @@ class SocialMediaAccountsTable implements TableInterface {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
     }
-    public function populate($charset_collate) {}
 }

@@ -3,7 +3,7 @@ require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/PaymentTypesModel.php';
 use EstatePlanningManager\Models\PaymentTypesModel;
 
-class PaymentTypesTable implements TableInterface {
+class PaymentTypesTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {

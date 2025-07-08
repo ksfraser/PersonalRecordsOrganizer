@@ -2,7 +2,7 @@
 /**
  * Table for storing known banks and credit unions by region.
  */
-class BankNamesTable implements TableInterface {
+class BankNamesTable extends EPM_AbstractTable implements TableInterface {
     public function create($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_bank_names';

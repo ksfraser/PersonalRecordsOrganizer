@@ -3,7 +3,7 @@ require_once __DIR__ . '/TableInterface.php';
 require_once __DIR__ . '/../../public/models/PropertyTypesModel.php';
 use EstatePlanningManager\Models\PropertyTypesModel;
 
-class PropertyTypesTable implements TableInterface {
+class PropertyTypesTable extends EPM_AbstractTable implements TableInterface {
     private function getSqlColumnsFromFieldDefinitions($fields) {
         $columns = [];
         foreach ($fields as $name => $def) {
