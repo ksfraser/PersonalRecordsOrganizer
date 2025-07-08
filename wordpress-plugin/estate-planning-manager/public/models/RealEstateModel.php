@@ -83,6 +83,12 @@ class RealEstateModel extends AbstractSectionModel {
     }
     public static function getFieldDefinitions() {
         return [
+            'property_type' => [
+                'label' => 'Property Type',
+                'type' => 'text',
+                'required' => false,
+                'db_type' => 'VARCHAR(64)'
+            ],
             'property_address' => [
                 'label' => 'Property Address',
                 'type' => 'text',

@@ -10,24 +10,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/trait-epm-singleton.php';
+
 class EPM_Admin_Suggested_Updates {
-    
-    /**
-     * Instance of this class
-     * @var EPM_Admin_Suggested_Updates
-     */
-    private static $instance = null;
-    
-    /**
-     * Get instance (Singleton pattern)
-     * @return EPM_Admin_Suggested_Updates
-     */
-    public static function instance() {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
+    use EPM_Singleton;
     
     /**
      * Initialize admin suggested updates

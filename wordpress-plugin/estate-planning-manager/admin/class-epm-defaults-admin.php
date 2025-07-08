@@ -2,14 +2,10 @@
 // Admin screen for managing advisor defaults in EPM
 if (!defined('ABSPATH')) exit;
 
+require_once __DIR__ . '/trait-epm-singleton.php';
+
 class EPM_Defaults_Admin {
-    private static $instance = null;
-    public static function instance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
+    use EPM_Singleton;
 
     public static function init() {
         add_action('admin_menu', [__CLASS__, 'add_menu']);

@@ -58,8 +58,8 @@ class EPM_Admin {
             30
         );
         // Add all EPM-related screens as submenus
-        add_submenu_page('estate-planning-manager', __('Suggested Updates', 'estate-planning-manager'), __('Suggested Updates', 'estate-planning-manager'), 'manage_options', 'epm-suggested-updates', 'EPM_Admin_Suggested_Updates::instance()->render_admin_page');
-        add_submenu_page('estate-planning-manager', __('Selectors', 'estate-planning-manager'), __('Selectors', 'estate-planning-manager'), 'manage_options', 'epm-selectors', 'EPM_Admin_Selectors::instance()->render_admin_page');
+        add_submenu_page('estate-planning-manager', __('Suggested Updates', 'estate-planning-manager'), __('Suggested Updates', 'estate-planning-manager'), 'manage_options', 'epm-suggested-updates', array(EPM_Admin_Suggested_Updates::instance(), 'render_admin_page'));
+        add_submenu_page('estate-planning-manager', __('Selectors', 'estate-planning-manager'), __('Selectors', 'estate-planning-manager'), 'manage_options', 'epm-selectors', array(EPM_Admin_Selectors::instance(), 'render_admin_page'));
         add_submenu_page('estate-planning-manager', __('Insurance Categories', 'estate-planning-manager'), __('Insurance Categories', 'estate-planning-manager'), 'manage_options', 'epm-insurance-categories', ['\EstatePlanningManager\Admin\EPM_Admin_Insurance_Category', 'render']);
         add_submenu_page('estate-planning-manager', __('Insurance Types', 'estate-planning-manager'), __('Insurance Types', 'estate-planning-manager'), 'manage_options', 'epm-insurance-types', ['\EstatePlanningManager\Admin\EPM_Admin_Insurance_Type', 'render']);
         add_submenu_page('estate-planning-manager', __('Log Viewer', 'estate-planning-manager'), __('Log Viewer', 'estate-planning-manager'), 'manage_options', 'epm-log-viewer', ['EPM_Admin_Log_Viewer', 'render_page']);

@@ -51,6 +51,7 @@ require_once __DIR__ . '/PasswordStorageTypesTable.php';
 require_once __DIR__ . '/OtherContractualObligationsTable.php';
 require_once __DIR__ . '/ContactPhonesTable.php';
 require_once __DIR__ . '/ContactEmailsTable.php';
+require_once __DIR__ . '/DefaultsTable.php';
 
 class TableFactory {
     public static function getTables() {
@@ -105,6 +106,7 @@ class TableFactory {
             new OtherContractualObligationsTable(),
             new ContactPhonesTable(),
             new ContactEmailsTable(),
+            new DefaultsTable(),
         ];
     }
 

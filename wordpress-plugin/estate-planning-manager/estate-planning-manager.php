@@ -99,6 +99,8 @@ final class EstateplanningManager {
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-assign-advisors.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-bank-names-admin.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-bank-location-types-admin.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-insurance-type.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-insurance-category.php';
         }
         
         // Public classes
