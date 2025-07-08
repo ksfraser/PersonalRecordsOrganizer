@@ -10,6 +10,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/class-epm-admin-suggested-updates.php';
+require_once __DIR__ . '/class-epm-admin-selectors.php';
+require_once __DIR__ . '/class-epm-admin-insurance-category.php';
+require_once __DIR__ . '/class-epm-admin-insurance-type.php';
+require_once __DIR__ . '/class-epm-admin-log-viewer.php';
+
 class EPM_Admin {
     
     /**
