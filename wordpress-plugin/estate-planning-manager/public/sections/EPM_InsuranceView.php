@@ -1,6 +1,9 @@
 <?php
 namespace EstatePlanningManager\Sections;
 
+require_once __DIR__ . '/EPM_InsuranceModal.php';
+require_once __DIR__ . '/EPM_GroupSponsorModal.php';
+require_once __DIR__ . '/../includes/epm-insurance-selectors.php';
 require_once __DIR__ . '/AbstractSectionView.php';
 require_once __DIR__ . '/../models/InsuranceModel.php';
 
