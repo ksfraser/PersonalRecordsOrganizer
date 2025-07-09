@@ -13,6 +13,7 @@ class EPM_Admin_Contact_Phones {
         ?>
         <div class="wrap">
             <h1>Contact Phones</h1>
+            <button class="button epm-invite-contact-btn" style="margin-bottom:15px;">Invite Contact</button>
             <table class="widefat">
                 <thead>
                     <tr><th>ID</th><th>Contact ID</th><th>Phone</th><th>Type</th><th>Primary</th><th>Created</th><th>Last Updated</th></tr>
@@ -27,6 +28,7 @@ class EPM_Admin_Contact_Phones {
                         <td><?php echo $row->is_primary ? 'Yes' : 'No'; ?></td>
                         <td><?php echo esc_html($row->created); ?></td>
                         <td><?php echo esc_html($row->lastupdated); ?></td>
+                        <td><button class="button epm-invite-contact-btn" data-contact-id="<?php echo esc_attr($row->contact_id); ?>">Invite</button></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

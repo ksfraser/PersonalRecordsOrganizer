@@ -1,0 +1,5 @@
+/* assets/css/admin-invite.css */
+.epm-modal { position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+.epm-modal-content { background: #fff; padding: 2em; border-radius: 8px; min-width: 320px; position: relative; }
+.epm-modal-close { position: absolute; top: 8px; right: 12px; font-size: 1.5em; cursor: pointer; }
+.epm-invite-result { margin-top: 1em; color: #007cba; }

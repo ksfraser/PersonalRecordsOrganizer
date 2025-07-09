@@ -17,6 +17,7 @@ require_once __DIR__ . '/class-epm-admin-insurance-type.php';
 require_once __DIR__ . '/class-epm-admin-log-viewer.php';
 require_once __DIR__ . '/class-epm-admin-phone-line-types.php';
 require_once __DIR__ . '/class-epm-admin-contact-phones.php';
+require_once __DIR__ . '/class-epm-admin-contact-emails.php';
 
 class EPM_Admin {
     
@@ -59,6 +60,13 @@ class EPM_Admin {
                 wp_enqueue_script('epm-admin-contact-phones', EPM_PLUGIN_URL . 'assets/js/admin-contact-phones.js', array('jquery'), null, true);
             }
         });
+        // Enqueue invite modal and JS for Contact Phones and Emails screens
+        add_action('admin_enqueue_scripts', function($hook) {
+            if (strpos($hook, 'epm-contact-phones') !== false || strpos($hook, 'epm-contact-emails') !== false) {
+                wp_enqueue_script('epm-admin-invite', EPM_PLUGIN_URL . 'assets/js/admin-invite.js', array('jquery'), null, true);
+                wp_enqueue_style('epm-admin-invite', EPM_PLUGIN_URL . 'assets/css/admin-invite.css', array(), null);
+            }
+        });
     }
     
     /**
@@ -95,6 +103,14 @@ class EPM_Admin {
             'manage_options',
             'epm-contact-phones',
             ['EPM_Admin_Contact_Phones', 'render_page']
+        );
+        add_submenu_page(
+            'estate-planning-manager',
+            'Contact Emails',
+            'Contact Emails',
+            'manage_options',
+            'epm-contact-emails',
+            ['EPM_Admin_Contact_Emails', 'render_page']
         );
         // Add other EPM-related screens here as needed
     }

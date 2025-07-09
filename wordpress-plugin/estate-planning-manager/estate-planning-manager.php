@@ -356,6 +356,44 @@ add_action('admin_menu', [EPM_AdminMenuHandler::class, 'handle']);
 require_once EPM_PLUGIN_DIR . 'includes/handlers/EPM_GetBanksByLocationHandler.php';
 EPM_GetBanksByLocationHandler::register();
 
+// === AJAX handler for epm_invite_contact ===
+add_action('wp_ajax_epm_invite_contact', function() {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Permission denied');
+    }
+    $email = isset($_POST['invite_email']) ? sanitize_email($_POST['invite_email']) : '';
+    $contact_id = isset($_POST['contact_id']) ? intval($_POST['contact_id']) : 0;
+    if (!$email || !$contact_id) {
+        wp_send_json_error('Missing email or contact ID');
+    }
+    global $wpdb;
+    $invites_table = $wpdb->prefix . 'epm_invites';
+    // Check if invite already exists for this email and contact
+    $existing = $wpdb->get_var($wpdb->prepare("SELECT id FROM $invites_table WHERE email = %s AND contact_id = %d AND status = 'pending'", $email, $contact_id));
+    if ($existing) {
+        wp_send_json_error('Invite already sent to this email for this contact.');
+    }
+    // Insert invite record
+    $token = wp_generate_password(32, false);
+    $wpdb->insert($invites_table, [
+        'email' => $email,
+        'contact_id' => $contact_id,
+        'token' => $token,
+        'user_role' => 'estate_planning_client',
+        'status' => 'pending',
+        'created' => current_time('mysql'),
+    ]);
+    // Send invite email
+    $invite_url = add_query_arg([
+        'epm_invite_token' => $token,
+        'epm_invite_email' => rawurlencode($email)
+    ], site_url('/register/'));
+    $subject = 'You are invited to Estate Planning Manager';
+    $message = 'You have been invited. Please register here: ' . $invite_url;
+    wp_mail($email, $subject, $message);
+    wp_send_json_success('Invite sent!');
+});
+
 // Initialize the plugin
 function epm_init() {
     return EstateplanningManager::instance();

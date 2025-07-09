@@ -99,6 +99,20 @@ class EPM_Assign_Advisors_Admin {
                     if ($client_id) {
                         global $wpdb;
                         $wpdb->update($wpdb->prefix . 'epm_clients', ['advisor_id' => $advisor_id ?: null], ['id' => $client_id]);
+                        // --- Ensure advisor is in epm_contacts ---
+                        $advisor_user = get_user_by('ID', $advisor_id);
+                        if ($advisor_user) {
+                            $contact_id = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}epm_contacts WHERE user_id = %d", $advisor_id));
+                            if (!$contact_id) {
+                                // Add advisor to contacts
+                                \EstatePlanningManager\Models\PeopleModel::addPerson([
+                                    'full_name' => $advisor_user->display_name,
+                                    'email' => $advisor_user->user_email,
+                                    'phone' => get_user_meta($advisor_id, 'phone', true),
+                                    'user_id' => $advisor_id
+                                ]);
+                            }
+                        }
                     }
                 }
             }

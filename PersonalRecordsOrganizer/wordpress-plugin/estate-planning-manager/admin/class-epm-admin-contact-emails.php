@@ -28,6 +28,7 @@ class EPM_Admin_Contact_Emails {
         ?>
         <div class="wrap">
             <h1>Contact Emails</h1>
+            <button class="button epm-invite-contact-btn" style="margin-bottom:15px;">Invite Contact</button>
             <form method="get" style="margin-bottom:15px;">
                 <input type="hidden" name="page" value="epm-contact-emails">
                 <label>Client:
@@ -45,7 +46,7 @@ class EPM_Admin_Contact_Emails {
             </form>
             <table class="widefat">
                 <thead>
-                    <tr><th>ID</th><th>Client ID</th><th>Email</th><th>Is Primary</th><th>Created</th><th>Last Updated</th><th>Matching Users</th></tr>
+                    <tr><th>ID</th><th>Client ID</th><th>Email</th><th>Is Primary</th><th>Created</th><th>Last Updated</th><th>Matching Users</th><th>Action</th></tr>
                 </thead>
                 <tbody>
                 <?php foreach ($emails as $row): ?>
@@ -66,6 +67,7 @@ class EPM_Admin_Contact_Emails {
                                 echo '<em>None</em>';
                             }
                         ?></td>
+                        <td><button class="button epm-invite-contact-btn" data-contact-id="<?php echo esc_attr($row->client_id); ?>" data-email="<?php echo esc_attr($row->email); ?>">Invite</button></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
