@@ -82,4 +82,16 @@ class PeopleModel {
         ]);
         return $wpdb->insert_id;
     }
+    public static function addContactEmail($data) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_contact_emails';
+        $wpdb->insert($table, [
+            'contact_id' => $data['contact_id'] ?? 0,
+            'email' => $data['email'] ?? '',
+            'is_primary' => !empty($data['is_primary']) ? 1 : 0,
+            'created' => current_time('mysql'),
+            'lastupdated' => current_time('mysql'),
+        ]);
+        return $wpdb->insert_id;
+    }
 }

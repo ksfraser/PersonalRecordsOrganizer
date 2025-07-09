@@ -9,17 +9,48 @@ class EPM_Admin_Contact_Phones {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_contact_phones';
         $type_options = PhoneLineTypesModel::getOptions();
-        $phones = $wpdb->get_results("SELECT * FROM $table_name ORDER BY contact_id, is_primary DESC, id");
+        $client_options = \EstatePlanningManager\Models\PeopleModel::getDropdownOptions();
         ?>
         <div class="wrap">
             <h1>Contact Phones</h1>
             <button class="button epm-invite-contact-btn" style="margin-bottom:15px;">Invite Contact</button>
+            <form method="get" style="margin-bottom:15px;">
+                <input type="hidden" name="page" value="epm-contact-phones">
+                <label>Contact:
+                    <select name="contact_id">
+                        <option value="">All Contacts</option>
+                        <?php foreach ($client_options as $id => $name): ?>
+                            <option value="<?php echo esc_attr($id); ?>" <?php if(isset($_GET['contact_id']) && $_GET['contact_id'] == $id) echo 'selected'; ?>><?php echo esc_html($name); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+                <label style="margin-left:10px;">Phone:
+                    <input type="text" name="search_phone" value="<?php echo isset($_GET['search_phone']) ? esc_attr($_GET['search_phone']) : ''; ?>" placeholder="Search phone">
+                </label>
+                <button type="submit" class="button">Filter</button>
+            </form>
             <table class="widefat">
                 <thead>
                     <tr><th>ID</th><th>Contact ID</th><th>Phone</th><th>Type</th><th>Primary</th><th>Created</th><th>Last Updated</th></tr>
                 </thead>
                 <tbody>
-                <?php foreach ($phones as $row): ?>
+                <?php
+                // Filtering logic
+                $where = [];
+                $params = [];
+                if (!empty($_GET['contact_id'])) {
+                    $where[] = 'contact_id = %d';
+                    $params[] = intval($_GET['contact_id']);
+                }
+                if (!empty($_GET['search_phone'])) {
+                    $where[] = 'phone LIKE %s';
+                    $params[] = '%' . sanitize_text_field($_GET['search_phone']) . '%';
+                }
+                $where_sql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+                $sql = "SELECT * FROM $table_name $where_sql ORDER BY contact_id, is_primary DESC, id";
+                $phones = $params ? $wpdb->get_results($wpdb->prepare($sql, ...$params)) : $wpdb->get_results($sql);
+
+                foreach ($phones as $row): ?>
                     <tr>
                         <td><?php echo esc_html($row->id); ?></td>
                         <td><?php echo esc_html($row->contact_id); ?></td>

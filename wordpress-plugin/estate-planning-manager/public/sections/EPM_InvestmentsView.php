@@ -26,6 +26,10 @@ class EPM_InvestmentsView extends AbstractSectionView
     {
         $instance = new self();
         $instance->renderSectionView($client_id, $readonly);
+        // Add Contact modal for Investments
+        if (!$readonly && class_exists('EPM_AddContactModal')) {
+            echo \EPM_AddContactModal::render();
+        }
     }
 
     public function getModel() {
