@@ -1,5 +1,6 @@
 <?php
-// Table class for epm_defaults
+namespace EstatePlanningManager\Tables;
+
 if (!defined('ABSPATH')) exit;
 
 require_once __DIR__ . '/EPM_AbstractTable.php';
@@ -20,12 +21,18 @@ class DefaultsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable impl
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         $sql = "CREATE TABLE $table_name (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            user_id BIGINT UNSIGNED NOT NULL,
-            meta_key VARCHAR(100) NOT NULL,
-            meta_value TEXT NULL,
+            advisor_user_id BIGINT UNSIGNED NOT NULL,
+            name VARCHAR(100) NOT NULL,
+            value TEXT NULL,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            lastupdated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
-            UNIQUE KEY user_key (user_id, meta_key)
+            UNIQUE KEY user_key (advisor_user_id, name)
         ) $charset_collate;";
         dbDelta($sql);
+    }
+
+    public function create($charset_collate) {
+        self::create_table();
     }
 }

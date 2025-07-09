@@ -14,6 +14,7 @@ class BankAccountsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
         return $columns;
     }
     public function create($charset_collate) {
+        ob_start(); // Prevent accidental output
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_bank_accounts';
         $modelFields = BankingModel::getFieldDefinitions();
@@ -34,7 +35,15 @@ class BankAccountsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
             . "KEY wp_record_id (wp_record_id)\n"
             . ") $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
+        // Always log the SQL for debugging
+        error_log('[EPM] BankAccountsTable SQL: ' . $sql);
+        $result = dbDelta($sql);
+        error_log('[EPM] BankAccountsTable dbDelta result: ' . print_r($result, true));
+        // Check if table exists after creation attempt
+        if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table_name)) != $table_name) {
+            error_log('[EPM] BankAccountsTable ERROR: Table not created: ' . $table_name);
+        }
+        ob_end_clean(); // Discard any output
     }
     public function populate($charset_collate) {
         // No default data for user data tables

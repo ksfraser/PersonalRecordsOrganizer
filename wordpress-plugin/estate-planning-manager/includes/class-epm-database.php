@@ -304,6 +304,9 @@ class EPM_Database {
      * Set an advisor default value
      */
     public function set_advisor_default($advisor_user_id, $name, $value) {
+        if (empty($advisor_user_id) || empty($name)) {
+            return false;
+        }
         global $wpdb;
         $table = $wpdb->prefix . 'epm_defaults';
         $exists = $wpdb->get_var($wpdb->prepare(
