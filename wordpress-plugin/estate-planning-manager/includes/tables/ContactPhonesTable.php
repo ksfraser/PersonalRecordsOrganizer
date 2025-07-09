@@ -12,12 +12,14 @@ class ContactPhonesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable
             . "contact_id bigint(20) NOT NULL,\n"
             . "phone varchar(50) NOT NULL,\n"
             . "type_id bigint(20) DEFAULT NULL,\n"
+            . "suitecrm_guid varchar(36) DEFAULT NULL,\n"
             . "is_primary tinyint(1) DEFAULT 0,\n"
             . "created datetime DEFAULT CURRENT_TIMESTAMP,\n"
             . "lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n"
             . "PRIMARY KEY (id),\n"
             . "KEY contact_id (contact_id),\n"
-            . "KEY type_id (type_id)\n"
+            . "KEY type_id (type_id),\n"
+            . "KEY suitecrm_guid (suitecrm_guid)\n"
             . ") $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);

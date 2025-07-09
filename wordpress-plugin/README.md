@@ -11,6 +11,7 @@ The Estate Planning Manager transforms spreadsheet-based estate planning records
 - **PDF Generation**: Selective export with privacy controls
 - **Data Security**: AES-256 encryption and PIPEDA compliance
 - **Audit Logging**: Complete activity tracking
+- **Admin CRUD Screens**: Add, edit, and delete Insurance Categories and Insurance Types directly from the admin interface
 
 ## Installation Methods
 
@@ -173,6 +174,8 @@ If you have SuiteCRM, configure the integration:
 ### Admin Management Screens
 - **Bank Locations**: Add/edit regions (Canada/USA/Europe) for banks
 - **Bank Names**: Add/edit banks by region
+- **Insurance Categories**: Add/edit insurance categories
+- **Insurance Types**: Add/edit insurance types
 
 ### Modular Architecture
 - **Action Handlers**: All major plugin actions (form submissions, AJAX, admin screens) are now handled by dedicated classes in `includes/handlers/`

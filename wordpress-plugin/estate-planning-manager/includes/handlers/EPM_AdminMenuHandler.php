@@ -10,7 +10,7 @@ class EPM_AdminMenuHandler {
             'EPM Log',
             'manage_options',
             'epm-log-viewer',
-            'epm_render_log_viewer',
+            ['EPM_Admin_Log_Viewer', 'render_page'],
             'dashicons-media-text',
             80
         );

@@ -15,6 +15,8 @@ require_once __DIR__ . '/class-epm-admin-selectors.php';
 require_once __DIR__ . '/class-epm-admin-insurance-category.php';
 require_once __DIR__ . '/class-epm-admin-insurance-type.php';
 require_once __DIR__ . '/class-epm-admin-log-viewer.php';
+require_once __DIR__ . '/class-epm-admin-phone-line-types.php';
+require_once __DIR__ . '/class-epm-admin-contact-phones.php';
 
 class EPM_Admin {
     

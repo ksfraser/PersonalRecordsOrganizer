@@ -13,6 +13,7 @@ The Estate Planning Manager plugin includes a comprehensive test suite covering:
 - SuiteCRM API integration
 - User permissions and role management
 - Modular UI functionality
+- **Admin CRUD for Insurance Categories and Types**: Tests for add, edit, delete, and retrieval of insurance categories and types via the admin interface and database
 
 ## Test Structure
 
@@ -25,6 +26,7 @@ The Estate Planning Manager plugin includes a comprehensive test suite covering:
 - `tests/test-epm-suitecrm-api.php` - CRM integration, data synchronization, API handling
 - `tests/test-epm-modular-ui.php` - Modular UI functionality, view class rendering, AJAX integration
 - `tests/test-epm-bank-tables.php` - Bank names and locations, dynamic selectors, AJAX handling
+- `tests/test-epm-insurance-category-type.php` - Insurance category and type CRUD operations
 
 ### Supporting Files
 
@@ -169,6 +171,20 @@ Key test methods:
 - `test_bank_location_types_table_exists()`
 - `test_insert_and_retrieve_bank_name()`
 - `test_insert_and_retrieve_bank_location_type()`
+
+### Insurance Category & Type CRUD Tests (`test-epm-insurance-category-type.php`)
+
+Tests for the admin CRUD screens for insurance categories and types:
+
+- **Prefill Options**: Verifies default options are present
+- **Category CRUD**: Add, edit, delete, and retrieve insurance categories
+- **Type CRUD**: Add, edit, delete, and retrieve insurance types (with category selection)
+
+Key test methods:
+- `test_category_options_prefilled()`
+- `test_type_options_prefilled()`
+- `test_category_crud()`
+- `test_type_crud()`
 
 ### Modular Action Handlers & Modal Logic
 

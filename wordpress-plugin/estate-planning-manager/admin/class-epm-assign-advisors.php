@@ -128,7 +128,8 @@ class EPM_Assign_Advisors_Admin {
             'status' => 'pending',
             'created' => current_time('mysql'),
             'lastupdated' => current_time('mysql'),
-            'advisor_id' => $advisor_id
+            'advisor_id' => $advisor_id,
+            'user_role' => 'estate_planning_client' // Set the desired WP role
         ]);
         // TODO: Send email invite (implement as needed)
         wp_send_json_success();
