@@ -343,6 +343,18 @@ class EPM_Shortcodes {
             'auto_property' => 'EstatePlanningManager\\Sections\\EPM_AutoView',
             'personal_property' => 'EstatePlanningManager\\Sections\\EPM_PersonalPropertyView',
             'emergency_contacts' => 'EstatePlanningManager\\Sections\\EPM_EmergencyContactsView',
+            'family_contacts' => 'EstatePlanningManager\\Sections\\EPM_FamilyContactsView',
+            'volunteering' => 'EstatePlanningManager\\Sections\\EPM_VolunteeringView',
+            'password_storage' => 'EstatePlanningManager\\Sections\\EPM_PasswordManagementView',
+            'digital_assets' => 'EstatePlanningManager\\Sections\\EPM_DigitalAssetsView',
+            'social_media_accounts' => 'EstatePlanningManager\\Sections\\EPM_SocialMediaAccountsView',
+            'email_accounts' => 'EstatePlanningManager\\Sections\\EPM_EmailAccountsView',
+            'hosting_services' => 'EstatePlanningManager\\Sections\\EPM_HostingServicesView',
+            'key_contacts' => 'EstatePlanningManager\\Sections\\EPM_KeyContactsView',
+            'debtors' => 'EstatePlanningManager\\Sections\\EPM_DebtorsView',
+            'creditors' => 'EstatePlanningManager\\Sections\\EPM_CreditorsView',
+            'charitable_gifts' => 'EstatePlanningManager\\Sections\\EPM_CharitableGiftsView',
+            'other_contracts' => 'EstatePlanningManager\\Sections\\EPM_OtherContractualObligationsView',
         );
         if (isset($map[$section])) {
             $class = $map[$section];
@@ -530,11 +542,80 @@ class EPM_Shortcodes {
         require_once __DIR__ . '/models/AutoModel.php';
         require_once __DIR__ . '/models/PersonalPropertyModel.php';
         require_once __DIR__ . '/models/EmergencyContactsModel.php';
+        require_once __DIR__ . '/models/FamilyContactsModel.php';
+        require_once __DIR__ . '/models/VolunteeringModel.php';
+        require_once __DIR__ . '/models/PasswordManagementModel.php';
+        require_once __DIR__ . '/models/DigitalAssetsModel.php';
+        require_once __DIR__ . '/models/SocialMediaAccountsModel.php';
+        require_once __DIR__ . '/models/EmailAccountsModel.php';
+        require_once __DIR__ . '/models/HostingServicesModel.php';
+        require_once __DIR__ . '/models/KeyContactsModel.php';
+        require_once __DIR__ . '/models/DebtorsModel.php';
+        require_once __DIR__ . '/models/CreditorsModel.php';
+        require_once __DIR__ . '/models/CharitableGiftsModel.php';
+        require_once __DIR__ . '/models/OtherContractualObligationsModel.php';
+        require_once __DIR__ . '/models/SafetyDepositBoxModel.php';
+        require_once __DIR__ . '/models/OnlineAccountsModel.php';
+        require_once __DIR__ . '/models/EmploymentRecordsModel.php';
 
         $sections = array(
+            // Personal & family
             'personal' => array(
                 'title' => 'Personal Information',
                 'fields' => $this->normalize_fields(\EstatePlanningManager\Models\PersonalModel::getFieldDefinitions())
+            ),
+            'emergency_contacts' => array(
+                'title' => 'Emergency Contacts',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\EmergencyContactsModel::getFieldDefinitions())
+            ),
+            'key_contacts' => array(
+                'title' => 'Key Contacts',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\KeyContactsModel::getFieldDefinitions())
+            ),
+            'family_contacts' => array(
+                'title' => 'Family Contacts',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\FamilyContactsModel::getFieldDefinitions())
+            ),
+            'volunteering' => array(
+                'title' => 'Volunteering',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\VolunteeringModel::getFieldDefinitions())
+            ),
+            'password_storage' => array(
+                'title' => 'Password Storage',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\PasswordManagementModel::getFieldDefinitions())
+            ),
+            'digital_assets' => array(
+                'title' => 'Digital Assets',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\DigitalAssetsModel::getFieldDefinitions())
+            ),
+            'social_media_accounts' => array(
+                'title' => 'Social Media Accounts',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\SocialMediaAccountsModel::getFieldDefinitions())
+            ),
+            'email_accounts' => array(
+                'title' => 'Email Accounts',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\EmailAccountsModel::getFieldDefinitions())
+            ),
+            'hosting_services' => array(
+                'title' => 'Hosting Services',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\HostingServicesModel::getFieldDefinitions())
+            ),
+            'online_accounts' => array(
+                'title' => 'Online Accounts',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\OnlineAccountsModel::getFieldDefinitions())
+            ),
+            // Assets
+            'safety_deposit_box' => array(
+                'title' => 'Safety Deposit Box',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\SafetyDepositBoxModel::getFieldDefinitions())
+            ),
+            'debtors' => array(
+                'title' => 'Debtors',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\DebtorsModel::getFieldDefinitions())
+            ),
+            'real_estate' => array(
+                'title' => 'Real Estate Information',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\RealEstateModel::getFieldDefinitions())
             ),
             'banking' => array(
                 'title' => 'Banking Information',
@@ -548,14 +629,6 @@ class EPM_Shortcodes {
                 'title' => 'Insurance Information',
                 'fields' => $this->normalize_fields(\EstatePlanningManager\Models\InsuranceModel::getFieldDefinitions())
             ),
-            'real_estate' => array(
-                'title' => 'Real Estate Information',
-                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\RealEstateModel::getFieldDefinitions())
-            ),
-            'scheduled_payments' => array(
-                'title' => 'Scheduled Payments',
-                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\ScheduledPaymentsModel::getFieldDefinitions())
-            ),
             'auto_property' => array(
                 'title' => 'Automobile Property',
                 'fields' => $this->normalize_fields(\EstatePlanningManager\Models\AutoModel::getFieldDefinitions())
@@ -564,9 +637,28 @@ class EPM_Shortcodes {
                 'title' => 'Personal Property',
                 'fields' => $this->normalize_fields(\EstatePlanningManager\Models\PersonalPropertyModel::getFieldDefinitions())
             ),
-            'emergency_contacts' => array(
-                'title' => 'Emergency Contacts',
-                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\EmergencyContactsModel::getFieldDefinitions())
+            // Liabilities
+            'creditors' => array(
+                'title' => 'Creditors (Loans, Credit Cards, etc)',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\CreditorsModel::getFieldDefinitions())
+            ),
+            'charitable_gifts' => array(
+                'title' => 'Charitable Gifts',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\CharitableGiftsModel::getFieldDefinitions())
+            ),
+            'other_contracts' => array(
+                'title' => 'Other Contractual Obligations',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\OtherContractualObligationsModel::getFieldDefinitions())
+            ),
+            // Income
+            'employment' => array(
+                'title' => 'Employment',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\EmploymentRecordsModel::getFieldDefinitions())
+            ),
+            // Expenses
+            'scheduled_payments' => array(
+                'title' => 'Scheduled Payments',
+                'fields' => $this->normalize_fields(\EstatePlanningManager\Models\ScheduledPaymentsModel::getFieldDefinitions())
             ),
         );
         return apply_filters('epm_form_sections', $sections);
