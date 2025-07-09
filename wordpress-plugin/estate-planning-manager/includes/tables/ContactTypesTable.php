@@ -4,6 +4,7 @@ require_once __DIR__ . '/TableInterface.php';
 
 class ContactTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
     public function create($charset_collate) {
+        ob_start();
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_contact_types';
         $sql = "CREATE TABLE $table_name (
@@ -19,8 +20,10 @@ class ContactTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
         ) $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+        ob_end_clean();
     }
     public function populate($charset_collate) {
+        ob_start();
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_contact_types';
         $defaults = [
@@ -34,7 +37,10 @@ class ContactTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
             ['other', 'Other']
         ];
         $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
-        if ($count > 0) return;
+        if ($count > 0) {
+            ob_end_clean();
+            return;
+        }
         $sort_order = 0;
         foreach ($defaults as $row) {
             $wpdb->insert($table_name, [
@@ -45,5 +51,6 @@ class ContactTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
             ], ['%s', '%s', '%d', '%d']);
             $sort_order += 10;
         }
+        ob_end_clean();
     }
 }

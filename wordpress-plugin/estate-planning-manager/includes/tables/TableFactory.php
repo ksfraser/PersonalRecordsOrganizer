@@ -53,6 +53,8 @@ require_once __DIR__ . '/OtherContractualObligationsTable.php';
 require_once __DIR__ . '/ContactPhonesTable.php';
 require_once __DIR__ . '/ContactEmailsTable.php';
 require_once __DIR__ . '/DefaultsTable.php';
+require_once __DIR__ . '/ContactAddressesTable.php';
+require_once __DIR__ . '/PhoneLineTypesTable.php';
 
 use EstatePlanningManager\Tables\InsuranceCategoryTable;
 use EstatePlanningManager\Tables\InsuranceTypeTable;
@@ -112,6 +114,8 @@ class TableFactory {
             new ContactPhonesTable(),
             new ContactEmailsTable(),
             new DefaultsTable(),
+            new ContactAddressesTable(),
+            new PhoneLineTypesTable(),
         ];
     }
 

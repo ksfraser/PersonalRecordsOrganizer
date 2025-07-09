@@ -15,6 +15,7 @@ class DefaultsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable impl
     }
 
     public static function create_table() {
+        ob_start();
         global $wpdb;
         $table_name = self::get_full_table_name();
         $charset_collate = $wpdb->get_charset_collate();
@@ -30,6 +31,7 @@ class DefaultsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable impl
             UNIQUE KEY user_key (advisor_user_id, name)
         ) $charset_collate;";
         dbDelta($sql);
+        ob_end_clean();
     }
 
     public function create($charset_collate) {

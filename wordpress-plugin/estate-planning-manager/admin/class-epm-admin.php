@@ -48,6 +48,15 @@ class EPM_Admin {
     public function init() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+        add_action('wp_ajax_epm_save_contact_phone', function() {
+            include_once EPM_PLUGIN_DIR . 'admin/ajax-save-contact-phone.php';
+            exit;
+        });
+        add_action('admin_enqueue_scripts', function($hook) {
+            if (strpos($hook, 'epm-contact-phones') !== false) {
+                wp_enqueue_script('epm-admin-contact-phones', EPM_PLUGIN_URL . 'assets/js/admin-contact-phones.js', array('jquery'), null, true);
+            }
+        });
     }
     
     /**
@@ -69,6 +78,22 @@ class EPM_Admin {
         add_submenu_page('estate-planning-manager', __('Insurance Categories', 'estate-planning-manager'), __('Insurance Categories', 'estate-planning-manager'), 'manage_options', 'epm-insurance-categories', ['\EstatePlanningManager\Admin\EPM_Admin_Insurance_Category', 'render']);
         add_submenu_page('estate-planning-manager', __('Insurance Types', 'estate-planning-manager'), __('Insurance Types', 'estate-planning-manager'), 'manage_options', 'epm-insurance-types', ['\EstatePlanningManager\Admin\EPM_Admin_Insurance_Type', 'render']);
         add_submenu_page('estate-planning-manager', __('Log Viewer', 'estate-planning-manager'), __('Log Viewer', 'estate-planning-manager'), 'manage_options', 'epm-log-viewer', ['EPM_Admin_Log_Viewer', 'render_page']);
+        add_submenu_page(
+            'estate-planning-manager',
+            'Phone Line Types',
+            'Phone Line Types',
+            'manage_options',
+            'epm-phone-line-types',
+            ['EPM_Admin_Phone_Line_Types', 'render_page']
+        );
+        add_submenu_page(
+            'estate-planning-manager',
+            'Contact Phones',
+            'Contact Phones',
+            'manage_options',
+            'epm-contact-phones',
+            ['EPM_Admin_Contact_Phones', 'render_page']
+        );
         // Add other EPM-related screens here as needed
     }
     

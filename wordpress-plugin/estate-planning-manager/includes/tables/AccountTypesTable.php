@@ -14,6 +14,7 @@ class AccountTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
         return $columns;
     }
     public function create($charset_collate) {
+        ob_start();
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_account_types';
         $modelFields = AccountTypesModel::getFieldDefinitions();
@@ -28,6 +29,7 @@ class AccountTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
             . ") $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+        ob_end_clean();
     }
     public function populate($charset_collate) {
         global $wpdb;
