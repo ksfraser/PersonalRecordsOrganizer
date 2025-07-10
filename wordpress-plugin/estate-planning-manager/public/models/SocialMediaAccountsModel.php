@@ -6,6 +6,31 @@ require_once __DIR__ . '/AbstractSectionModel.php';
 if (!defined('ABSPATH')) exit;
 
 class SocialMediaAccountsModel extends AbstractSectionModel {
+    /**
+     * Create the social media accounts table if it does not exist
+     */
+    public static function createTable($charset_collate) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_social_media_accounts';
+        $sql = "CREATE TABLE IF NOT EXISTS $table (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            client_id BIGINT UNSIGNED NOT NULL,
+            suitecrm_guid VARCHAR(36) DEFAULT NULL,
+            wp_record_id BIGINT UNSIGNED DEFAULT NULL,
+            type VARCHAR(100) DEFAULT NULL,
+            platform VARCHAR(100) NOT NULL,
+            username VARCHAR(255) NOT NULL,
+            email VARCHAR(255) DEFAULT NULL,
+            password VARCHAR(255) NOT NULL,
+            profile_url VARCHAR(255) DEFAULT NULL,
+            notes TEXT DEFAULT NULL,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            KEY idx_client (client_id)
+        ) ENGINE=InnoDB $charset_collate;";
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
     public function getTableName() {
         global $wpdb;
         return $wpdb->prefix . 'epm_social_media_accounts';

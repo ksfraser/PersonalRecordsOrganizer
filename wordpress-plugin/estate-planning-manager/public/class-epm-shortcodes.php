@@ -524,15 +524,43 @@ class EPM_Shortcodes {
         ) ENGINE=InnoDB $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
-        // Create volunteering table
-        require_once __DIR__ . '/models/VolunteeringModel.php';
-        \EstatePlanningManager\Models\VolunteeringModel::createTable($charset_collate);
-        // Create password management table
-        require_once __DIR__ . '/models/PasswordManagementModel.php';
-        \EstatePlanningManager\Models\PasswordManagementModel::createTable($charset_collate);
-        // Create digital assets table
-        require_once __DIR__ . '/models/DigitalAssetsModel.php';
-        \EstatePlanningManager\Models\DigitalAssetsModel::createTable($charset_collate);
+        // Create all section tables (add missing ones)
+        $modelTableMap = [
+            'PersonalModel',
+            'BankingModel',
+            'InvestmentsModel',
+            'InsuranceModel',
+            'RealEstateModel',
+            'ScheduledPaymentsModel',
+            'AutoModel',
+            'PersonalPropertyModel',
+            'EmergencyContactsModel',
+            'FamilyContactsModel',
+            'VolunteeringModel',
+            'PasswordManagementModel',
+            'DigitalAssetsModel',
+            'SocialMediaAccountsModel',
+            'EmailAccountsModel',
+            'HostingServicesModel',
+            'KeyContactsModel',
+            'DebtorsModel',
+            'CreditorsModel',
+            'CharitableGiftsModel',
+            'OtherContractualObligationsModel',
+            'SafetyDepositBoxModel',
+            'OnlineAccountsModel',
+            'EmploymentRecordsModel',
+        ];
+        foreach ($modelTableMap as $model) {
+            $file = __DIR__ . "/models/{$model}.php";
+            if (file_exists($file)) {
+                require_once $file;
+                $fqcn = "\\EstatePlanningManager\\Models\\$model";
+                if (method_exists($fqcn, 'createTable')) {
+                    $fqcn::createTable($charset_collate);
+                }
+            }
+        }
     }
 
     // --- BEGIN: Ensure all required methods exist and are public/protected as needed ---
