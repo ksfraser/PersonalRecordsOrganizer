@@ -6,6 +6,30 @@ require_once __DIR__ . '/AbstractSectionModel.php';
 if (!defined('ABSPATH')) exit;
 
 class VolunteeringModel extends AbstractSectionModel {
+    /**
+     * Create the volunteering table if it does not exist
+     */
+    public static function createTable($charset_collate) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_volunteering';
+        $sql = "CREATE TABLE IF NOT EXISTS $table (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            client_id BIGINT UNSIGNED NOT NULL,
+            suitecrm_guid VARCHAR(36) DEFAULT NULL,
+            wp_record_id BIGINT UNSIGNED DEFAULT NULL,
+            organization_name VARCHAR(255) NOT NULL,
+            start_year INT(4) NOT NULL,
+            end_year INT(4) DEFAULT NULL,
+            address VARCHAR(255) DEFAULT NULL,
+            phone VARCHAR(50) DEFAULT NULL,
+            email VARCHAR(100) DEFAULT NULL,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            KEY idx_client (client_id)
+        ) ENGINE=InnoDB $charset_collate;";
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
     public function getTableName() {
         global $wpdb;
         return $wpdb->prefix . 'epm_volunteering';
@@ -21,11 +45,15 @@ class VolunteeringModel extends AbstractSectionModel {
     }
 
     public function getFormFields($client_id = null) {
-        $year_options = $this->getYearOptions($client_id);
+        $current_year = (int)date('Y');
+        $years = [];
+        for ($y = $current_year; $y >= $current_year - 80; $y--) {
+            $years[$y] = $y;
+        }
         return [
             ['name' => 'organization_name', 'label' => 'Organization Name'],
-            ['name' => 'start_year', 'label' => 'Start Year', 'type' => 'select', 'options' => $year_options],
-            ['name' => 'end_year', 'label' => 'End Year', 'type' => 'select', 'options' => $year_options],
+            ['name' => 'start_year', 'label' => 'Start Year', 'type' => 'select', 'options' => $years],
+            ['name' => 'end_year', 'label' => 'End Year', 'type' => 'select', 'options' => $years],
             ['name' => 'address', 'label' => 'Address'],
             ['name' => 'phone', 'label' => 'Phone'],
             ['name' => 'email', 'label' => 'Email'],

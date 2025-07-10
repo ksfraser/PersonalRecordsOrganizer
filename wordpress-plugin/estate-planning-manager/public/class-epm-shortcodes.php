@@ -510,6 +510,7 @@ class EPM_Shortcodes {
     public static function activate() {
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
+        // Create section shares table
         $table_name = $wpdb->prefix . 'epm_section_shares';
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -523,6 +524,15 @@ class EPM_Shortcodes {
         ) ENGINE=InnoDB $charset_collate;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+        // Create volunteering table
+        require_once __DIR__ . '/models/VolunteeringModel.php';
+        \EstatePlanningManager\Models\VolunteeringModel::createTable($charset_collate);
+        // Create password management table
+        require_once __DIR__ . '/models/PasswordManagementModel.php';
+        \EstatePlanningManager\Models\PasswordManagementModel::createTable($charset_collate);
+        // Create digital assets table
+        require_once __DIR__ . '/models/DigitalAssetsModel.php';
+        \EstatePlanningManager\Models\DigitalAssetsModel::createTable($charset_collate);
     }
 
     // --- BEGIN: Ensure all required methods exist and are public/protected as needed ---

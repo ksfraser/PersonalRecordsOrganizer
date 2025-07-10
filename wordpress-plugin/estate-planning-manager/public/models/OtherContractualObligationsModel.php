@@ -2,6 +2,41 @@
 namespace EstatePlanningManager\Models;
 
 class OtherContractualObligationsModel extends AbstractSectionModel {
+    /**
+     * Return field definitions for the Other Contractual Obligations section (for use in forms and shortcodes)
+     */
+    public static function getFieldDefinitions() {
+        return [
+            'obligation_type' => [
+                'label' => 'Obligation Type',
+                'type' => 'text',
+            ],
+            'counterparty' => [
+                'label' => 'Counterparty',
+                'type' => 'text',
+            ],
+            'amount' => [
+                'label' => 'Amount',
+                'type' => 'text',
+            ],
+            'start_date' => [
+                'label' => 'Start Date',
+                'type' => 'date',
+            ],
+            'end_date' => [
+                'label' => 'End Date',
+                'type' => 'date',
+            ],
+            'document_location' => [
+                'label' => 'Document Location',
+                'type' => 'text',
+            ],
+            'description' => [
+                'label' => 'Description',
+                'type' => 'textarea',
+            ],
+        ];
+    }
     protected $table = 'epm_other_contractual_obligations';
     protected $fields = [
         'id',
