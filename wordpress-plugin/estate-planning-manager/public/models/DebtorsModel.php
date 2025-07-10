@@ -8,6 +8,61 @@ require_once __DIR__ . '/PeopleModel.php';
 if (!defined('ABSPATH')) exit;
 
 class DebtorsModel extends AbstractSectionModel {
+    /**
+     * Return field definitions for the Debtors section (for use in forms and shortcodes)
+     */
+    public static function getFieldDefinitions() {
+        return [
+            'person_org' => [
+                'label' => 'Debtor Type',
+                'type' => 'select',
+                'options' => [
+                    'person' => 'Person',
+                    'organization' => 'Organization'
+                ],
+            ],
+            'contact_id_person' => [
+                'label' => 'Contact (Person)',
+                'type' => 'select',
+                'options' => [], // Populated dynamically
+            ],
+            'contact_id_org' => [
+                'label' => 'Contact (Organization)',
+                'type' => 'select',
+                'options' => [], // Populated dynamically
+            ],
+            'add_contact' => [
+                'label' => '',
+                'type' => 'button',
+                'button_label' => 'Add Contact',
+            ],
+            'scheduled_payment_id' => [
+                'label' => 'Linked Scheduled Payment',
+                'type' => 'select',
+                'options' => [], // Populated dynamically
+            ],
+            'account_number' => [
+                'label' => 'Account Number',
+                'type' => 'text',
+            ],
+            'amount' => [
+                'label' => 'Amount',
+                'type' => 'text',
+            ],
+            'date_of_loan' => [
+                'label' => 'Date of Loan',
+                'type' => 'date',
+            ],
+            'document_location' => [
+                'label' => 'Document Location',
+                'type' => 'text',
+            ],
+            'description' => [
+                'label' => 'Description',
+                'type' => 'textarea',
+            ],
+        ];
+    }
     public function getTableName() {
         global $wpdb;
         return $wpdb->prefix . 'epm_debtors';
