@@ -1,4 +1,7 @@
 <?php
+// Ensure logger is always loaded
+require_once dirname(__DIR__) . '/includes/class-epm-logger.php';
+
 /**
  * Shortcodes Class
  * 

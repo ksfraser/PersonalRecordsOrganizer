@@ -83,16 +83,22 @@ final class EstateplanningManager {
      */
     private function load_dependencies() {
         // Core classes - only load files that exist
+        require_once EPM_PLUGIN_DIR . 'includes/class-epm-logger.php'; // Ensure logger is loaded first
+        // Log plugin load and log file path for debugging
+        if (class_exists('EstatePlanningManager\Logger')) {
+            \EstatePlanningManager\Logger::log('Estate Planning Manager plugin loaded. Log file: ' . \EstatePlanningManager\Logger::getLogDir() . '/epm.log');
+        }
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-database.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-security.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-suitecrm-api.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-pdf-generator.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-audit-logger.php';
         require_once EPM_PLUGIN_DIR . 'includes/class-epm-field-definitions.php';
-        
+
         // Admin classes
         if (is_admin()) {
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin.php';
+            require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-settings.php'; // Admin settings page for log file path
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-selectors.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-suggested-updates.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-defaults-admin.php';
@@ -102,7 +108,7 @@ final class EstateplanningManager {
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-insurance-type.php';
             require_once EPM_PLUGIN_DIR . 'admin/class-epm-admin-insurance-category.php';
         }
-        
+
         // Public classes
         require_once EPM_PLUGIN_DIR . 'public/class-epm-frontend.php';
         require_once EPM_PLUGIN_DIR . 'public/class-epm-shortcodes.php';

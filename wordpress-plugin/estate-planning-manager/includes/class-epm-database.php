@@ -1,4 +1,6 @@
 <?php
+// Ensure logger is always loaded
+require_once __DIR__ . '/class-epm-logger.php';
 /**
  * Database Management Class
  * 
@@ -84,13 +86,14 @@ class EPM_Database {
     public function get_client_id_by_user_id($user_id) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_clients';
-        $client_id = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM $table_name WHERE user_id = %d",
-            $user_id
-        ));
-        // Debug logging
-        $epm_log_file = dirname(__DIR__, 2) . '/logs/epm.log';
-        file_put_contents($epm_log_file, "EPM DEBUG: get_client_id_by_user_id: user_id=$user_id, client_id=" . var_export($client_id, true) . "\n", FILE_APPEND);
+        if (!class_exists('EstatePlanningManager\\Logger')) {
+            require_once __DIR__ . '/class-epm-logger.php';
+        }
+        \EstatePlanningManager\Logger::debug("get_client_id_by_user_id called with user_id=" . var_export($user_id, true));
+        $sql = $wpdb->prepare("SELECT id FROM $table_name WHERE user_id = %d", $user_id);
+        \EstatePlanningManager\Logger::debug("SQL: $sql");
+        $client_id = $wpdb->get_var($sql);
+        \EstatePlanningManager\Logger::debug("Result client_id=" . var_export($client_id, true));
         return $client_id;
     }
     

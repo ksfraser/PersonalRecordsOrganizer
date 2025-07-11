@@ -1,48 +1,72 @@
 <?php
+namespace EstatePlanningManager;
 /**
- * EPM_Logger - Logging utility for Estate Planning Manager
- * Supports log levels: ERROR, WARNING, INFO, DEBUG (PEAR style)
+ * Logger Class for Estate Planning Manager
+ * Handles all plugin logging, ensures log directory exists, supports configurable log file path.
+ * @phpdoc
+ * @class Logger
+ * @description Centralized logger for plugin debug and audit logs.
+ * @uml class EstatePlanningManager\Logger {
+ *   +log($message)
+ *   +setLogDir($dir)
+ *   +getLogDir()
+ * }
  */
-class EPM_Logger {
-    const ERROR = 1;
-    const WARNING = 2;
-    const INFO = 3;
-    const DEBUG = 4;
-
-    private static $log_file = null;
-    private static $log_level = null;
-
-    public static function set_log_level($level) {
-        self::$log_level = $level;
+class Logger {
+    /**
+     * Log a debug message (helper)
+     */
+    public static function debug($message) {
+        self::log('[DEBUG] ' . $message);
     }
-
-    public static function get_log_level() {
-        if (self::$log_level !== null) return self::$log_level;
-        $level = get_option('epm_log_level', self::ERROR);
-        self::$log_level = $level;
-        return $level;
+    /**
+     * Log directory path
+     * @var string
+     */
+    private static $logDir = null;
+    /**
+     * Log file name
+     * @var string
+     */
+    private static $logFile = 'epm.log';
+    /**
+     * Set log directory
+     * @param string $dir
+     */
+    public static function setLogDir($dir) {
+        self::$logDir = rtrim($dir, '/');
     }
-
-    public static function log($message, $level = self::INFO) {
-        if ($level > self::get_log_level() && $level !== self::ERROR) return;
-        if (!self::$log_file) {
-            $plugin_dir = plugin_dir_path(__FILE__) . '../logs';
-            if (!file_exists($plugin_dir)) @mkdir($plugin_dir, 0755, true);
-            self::$log_file = $plugin_dir . '/epm.log';
+    /**
+     * Get log directory (from DB option, fallback to default)
+     * @return string
+     */
+    public static function getLogDir() {
+        if (self::$logDir !== null) {
+            return self::$logDir;
         }
-        $date = date('Y-m-d H:i:s');
-        $level_str = self::level_to_string($level);
-        $line = "[$date] [$level_str] $message\n";
-        error_log($line, 3, self::$log_file);
-    }
-
-    private static function level_to_string($level) {
-        switch ($level) {
-            case self::ERROR: return 'ERROR';
-            case self::WARNING: return 'WARNING';
-            case self::INFO: return 'INFO';
-            case self::DEBUG: return 'DEBUG';
-            default: return 'LOG';
+        // Try DB option first
+        if (function_exists('get_option')) {
+            $dbDir = get_option('epm_log_dir');
+            if (!empty($dbDir)) {
+                self::$logDir = rtrim($dbDir, '/');
+                return self::$logDir;
+            }
         }
+        // Fallback to default
+        self::$logDir = dirname(__DIR__, 2) . '/logs';
+        return self::$logDir;
+    }
+    /**
+     * Write a message to the log file
+     * @param string $message
+     */
+    public static function log($message) {
+        $dir = self::getLogDir();
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $file = $dir . '/' . self::$logFile;
+        $datetime = date('Y-m-d H:i:s'); // Date and time
+        file_put_contents($file, "[$datetime] $message\n", FILE_APPEND);
     }
 }

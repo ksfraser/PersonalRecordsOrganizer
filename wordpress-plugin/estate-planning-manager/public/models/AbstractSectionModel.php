@@ -5,6 +5,27 @@ abstract class AbstractSectionModel {
     abstract public function getTableName();
 
     /**
+     * Generic getByClientId for all section models
+     * @param int $client_id
+     * @return array
+     */
+    public function getByClientId($client_id) {
+        global $wpdb;
+        $table = $this->getTableName();
+        if (!method_exists($wpdb, 'get_results') || !method_exists($wpdb, 'prepare')) {
+            return [];
+        }
+        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $client_id), 'ARRAY_A');
+        if (!class_exists('EstatePlanningManager\\Logger')) {
+            require_once dirname(__DIR__, 2) . '/includes/class-epm-logger.php';
+        }
+        $model_name = get_class($this);
+        \EstatePlanningManager\Logger::debug("$model_name getByClientId SQL: " . (isset($wpdb->last_query) ? $wpdb->last_query : 'N/A'));
+        \EstatePlanningManager\Logger::debug("$model_name getByClientId Results: " . print_r($results, true));
+        return $results ? $results : [];
+    }
+
+    /**
      * Fetch all records for a client, with debug logging to epm.log for troubleshooting.
      * @param int $client_id
      * @return array
@@ -16,11 +37,13 @@ abstract class AbstractSectionModel {
             return [];
         }
         $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $client_id), 'ARRAY_A');
-        // Debug logging for EPM Log Viewer
-        $epm_log_file = dirname(__DIR__, 2) . '/logs/epm.log';
+        // Use centralized logger for debug output
+        if (!class_exists('EstatePlanningManager\\Logger')) {
+            require_once dirname(__DIR__, 2) . '/includes/class-epm-logger.php';
+        }
         $model_name = get_class($this);
-        file_put_contents($epm_log_file, "EPM DEBUG: $model_name getAllRecordsForClient SQL: " . $wpdb->last_query . "\n", FILE_APPEND);
-        file_put_contents($epm_log_file, "EPM DEBUG: $model_name getAllRecordsForClient Results: " . print_r($results, true) . "\n", FILE_APPEND);
+        \EstatePlanningManager\Logger::debug("$model_name getAllRecordsForClient SQL: " . (isset($wpdb->last_query) ? $wpdb->last_query : 'N/A'));
+        \EstatePlanningManager\Logger::debug("$model_name getAllRecordsForClient Results: " . print_r($results, true));
         return $results ? $results : [];
     }
 
@@ -33,7 +56,6 @@ abstract class AbstractSectionModel {
         if (!isset($data['client_id']) || !is_numeric($data['client_id'])) {
             return false;
         }
-        // Remove fields not in table definition
         $fields = method_exists($this, 'getFieldDefinitions') ? array_keys($this->getFieldDefinitions()) : array_keys($data);
         $insert = [];
         foreach ($fields as $field) {
@@ -42,8 +64,13 @@ abstract class AbstractSectionModel {
             }
         }
         $insert['client_id'] = $data['client_id'];
-        // Insert row
         $result = $wpdb->insert($table, $insert);
+        if (!class_exists('EstatePlanningManager\\Logger')) {
+            require_once dirname(__DIR__, 2) . '/includes/class-epm-logger.php';
+        }
+        $model_name = get_class($this);
+        \EstatePlanningManager\Logger::debug("$model_name saveRecord SQL: " . (isset($wpdb->last_query) ? $wpdb->last_query : 'N/A'));
+        \EstatePlanningManager\Logger::debug("$model_name saveRecord Result: " . var_export($result, true));
         return $result !== false;
     }
 
