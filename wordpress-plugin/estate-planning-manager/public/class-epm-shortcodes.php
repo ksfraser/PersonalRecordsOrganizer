@@ -75,7 +75,9 @@ class EPM_Shortcodes {
         ), $atts);
         
         ob_start();
-        $this->render_client_data($atts['section'], $atts['client_id']);
+        $db = EPM_Database::instance();
+        $client_id = $atts['client_id'] ? $atts['client_id'] : $db->get_client_id_by_user_id(get_current_user_id());
+        $this->render_client_data($atts['section'], $client_id);
         return ob_get_clean();
     }
     
@@ -228,9 +230,11 @@ class EPM_Shortcodes {
             return;
         }
         $current_user = wp_get_current_user();
-        // Use client_id everywhere, fallback to current user's client_id if not provided
         $db = EPM_Database::instance();
         $display_client_id = $client_id ? $client_id : $db->get_client_id_by_user_id($current_user->ID);
+        // Log resolved client_id
+        $epm_log_file = dirname(__DIR__, 2) . '/logs/epm.log';
+        file_put_contents($epm_log_file, "EPM DEBUG: render_client_data: section=$section, user_id=" . $current_user->ID . ", resolved_client_id=" . var_export($display_client_id, true) . "\n", FILE_APPEND);
         $is_owner = ($display_client_id == $db->get_client_id_by_user_id($current_user->ID));
         $sections = $this->get_form_sections();
         $edit_mode = isset($_GET['edit']) && $_GET['edit'] == '1';

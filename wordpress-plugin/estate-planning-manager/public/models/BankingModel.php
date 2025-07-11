@@ -53,11 +53,6 @@ class BankingModel extends AbstractSectionModel {
         global $wpdb;
         return $wpdb->prefix . 'epm_bank_accounts';
     }
-        $epm_log_file = dirname(__DIR__, 2) . '/logs/epm.log';
-        file_put_contents($epm_log_file, "EPM DEBUG: BankingModel getAllRecordsForClient SQL: " . $wpdb->last_query . "\n", FILE_APPEND);
-        file_put_contents($epm_log_file, "EPM DEBUG: BankingModel getAllRecordsForClient Results: " . print_r($results, true) . "\n", FILE_APPEND);
-        return $results;
-    }
 
     public function getOwnerIdForSection($section, $client_id) {
         return $client_id;

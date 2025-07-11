@@ -83,13 +83,15 @@ class EPM_Database {
      */
     public function get_client_id_by_user_id($user_id) {
         global $wpdb;
-        
         $table_name = $wpdb->prefix . 'epm_clients';
-        
-        return $wpdb->get_var($wpdb->prepare(
+        $client_id = $wpdb->get_var($wpdb->prepare(
             "SELECT id FROM $table_name WHERE user_id = %d",
             $user_id
         ));
+        // Debug logging
+        $epm_log_file = dirname(__DIR__, 2) . '/logs/epm.log';
+        file_put_contents($epm_log_file, "EPM DEBUG: get_client_id_by_user_id: user_id=$user_id, client_id=" . var_export($client_id, true) . "\n", FILE_APPEND);
+        return $client_id;
     }
     
     /**

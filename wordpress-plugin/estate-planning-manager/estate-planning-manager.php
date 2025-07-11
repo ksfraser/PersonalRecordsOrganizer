@@ -298,7 +298,18 @@ add_action('init', function() {
                 unset($data['section'], $data['nonce']);
                 if (is_user_logged_in()) {
                     $current_user_id = get_current_user_id();
-                    $data['client_id'] = $current_user_id;
+                    // Map WP user ID to EPM client ID
+                    if (class_exists('EPM_Database')) {
+                        $db = EPM_Database::instance();
+                        $client_id = $db->get_client_id_by_user_id($current_user_id);
+                        if ($client_id) {
+                            $data['client_id'] = $client_id;
+                        } else {
+                            $data['client_id'] = $current_user_id; // fallback
+                        }
+                    } else {
+                        $data['client_id'] = $current_user_id;
+                    }
                 }
                 $result = $model->saveRecord($data);
                 if ($result) {
