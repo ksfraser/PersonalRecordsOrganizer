@@ -4,6 +4,11 @@ namespace EstatePlanningManager\Models;
 abstract class AbstractSectionModel {
     abstract public function getTableName();
 
+    /**
+     * Fetch all records for a client, with debug logging to epm.log for troubleshooting.
+     * @param int $client_id
+     * @return array
+     */
     public function getAllRecordsForClient($client_id) {
         global $wpdb;
         $table = $this->getTableName();
@@ -11,6 +16,11 @@ abstract class AbstractSectionModel {
             return [];
         }
         $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $client_id), 'ARRAY_A');
+        // Debug logging for EPM Log Viewer
+        $epm_log_file = dirname(__DIR__, 2) . '/logs/epm.log';
+        $model_name = get_class($this);
+        file_put_contents($epm_log_file, "EPM DEBUG: $model_name getAllRecordsForClient SQL: " . $wpdb->last_query . "\n", FILE_APPEND);
+        file_put_contents($epm_log_file, "EPM DEBUG: $model_name getAllRecordsForClient Results: " . print_r($results, true) . "\n", FILE_APPEND);
         return $results ? $results : [];
     }
 
