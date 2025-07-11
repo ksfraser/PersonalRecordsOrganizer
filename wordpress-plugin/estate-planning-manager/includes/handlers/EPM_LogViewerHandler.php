@@ -20,8 +20,14 @@ class EPM_LogViewerHandler {
     }
 
     public static function render_log_viewer() {
-        $log_file = WP_CONTENT_DIR . '/uploads/epm-log.txt';
+        // Get log directory from option or default
+        $log_dir = get_option('epm_log_dir', dirname(__DIR__, 3) . '/logs');
+        $log_file = $log_dir . '/epm.log';
         echo '<div class="wrap"><h1>EPM Log Viewer</h1>';
+        echo '<div style="margin-bottom:20px;padding:10px;background:#f9f9f9;border:1px solid #ccc;">';
+        echo '<strong>Log Directory Setting:</strong> <code>' . esc_html($log_dir) . '</code><br>';
+        echo '<strong>Log File:</strong> <code>' . esc_html($log_file) . '</code>';
+        echo '</div>';
         if (file_exists($log_file) && is_readable($log_file)) {
             echo '<pre style="background:#fff;max-height:600px;overflow:auto;border:1px solid #ccc;padding:10px;">';
             echo esc_html(file_get_contents($log_file));
