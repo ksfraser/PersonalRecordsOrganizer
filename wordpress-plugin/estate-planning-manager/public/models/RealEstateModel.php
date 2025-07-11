@@ -8,11 +8,7 @@ require_once __DIR__ . '/Sanitizer.php';
 if (!defined('ABSPATH')) exit;
 
 class RealEstateModel extends AbstractSectionModel {
-    public static function getByClientId($clientId) {
-        global $wpdb;
-        $table = $wpdb->prefix . 'epm_real_estate';
-        return $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $clientId));
-    }
+    // Use inherited getByClientId instance method.
 
     /**
      * Validate and sanitize real estate data before insert/update

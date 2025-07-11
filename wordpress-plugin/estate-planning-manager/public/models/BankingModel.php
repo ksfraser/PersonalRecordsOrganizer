@@ -19,12 +19,7 @@ if (!defined('ABSPATH')) exit;
  * }
  */
 class BankingModel extends AbstractSectionModel {
-    // Table creation is handled by BankAccountsTable. This method is intentionally omitted to avoid duplication.
-    public static function getByClientId($clientId) {
-        global $wpdb;
-        $table = $wpdb->prefix . 'epm_bank_accounts';
-        return $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $clientId));
-    }
+    // Table creation is handled by BankAccountsTable. Use inherited getByClientId instance method.
 
     /**
      * Validate and sanitize banking data before insert/update

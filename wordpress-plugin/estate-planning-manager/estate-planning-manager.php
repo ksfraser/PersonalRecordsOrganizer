@@ -299,37 +299,39 @@ add_action('init', function() {
         if (isset($epm_section_models[$section])) {
             $model_class = $epm_section_models[$section];
             if (class_exists($model_class)) {
-                $model = new $model_class();
-                $data = $_POST;
-                unset($data['section'], $data['nonce']);
-                if (is_user_logged_in()) {
-                    $current_user_id = get_current_user_id();
-                    // Map WP user ID to EPM client ID
-                    if (class_exists('EPM_Database')) {
-                        $db = EPM_Database::instance();
-                        $client_id = $db->get_client_id_by_user_id($current_user_id);
-                        if ($client_id) {
-                            $data['client_id'] = $client_id;
-                        } else {
-                            $data['client_id'] = $current_user_id; // fallback
-                        }
+            $model = new $model_class();
+            $data = $_POST;
+            unset($data['section'], $data['nonce']);
+            if (is_user_logged_in()) {
+                $current_user_id = get_current_user_id();
+                // Map WP user ID to EPM client ID
+                if (class_exists('EPM_Database')) {
+                    $db = EPM_Database::instance();
+                    $client_id = $db->get_client_id_by_user_id($current_user_id);
+                    if ($client_id) {
+                        $data['client_id'] = $client_id;
                     } else {
-                        $data['client_id'] = $current_user_id;
+                        $data['client_id'] = $current_user_id; // fallback
                     }
-                }
-                $result = $model->saveRecord($data);
-                if ($result) {
-                    // === SuiteCRM sync stub ===
-                    // TODO: Implement SuiteCRM sync for $section and $result
-                    // =========================
-                    wp_redirect($_SERVER['REQUEST_URI']);
-                    exit;
                 } else {
-                    error_log('[EPM] Save failed for section: ' . $section);
-                    add_action('admin_notices', function() {
-                        echo '<div class="notice notice-error"><p>Failed to save record.</p></div>';
-                    });
+                    $data['client_id'] = $current_user_id;
                 }
+            }
+            // Use instance method for getByClientId if needed elsewhere
+            // $records = $model->getByClientId($data['client_id']);
+            $result = $model->saveRecord($data);
+            if ($result) {
+                // === SuiteCRM sync stub ===
+                // TODO: Implement SuiteCRM sync for $section and $result
+                // =========================
+                wp_redirect($_SERVER['REQUEST_URI']);
+                exit;
+            } else {
+                error_log('[EPM] Save failed for section: ' . $section);
+                add_action('admin_notices', function() {
+                    echo '<div class="notice notice-error"><p>Failed to save record.</p></div>';
+                });
+            }
             } else {
                 error_log('[EPM] Model class does not exist for section: ' . $section . ' (Class: ' . $model_class . ')');
             }

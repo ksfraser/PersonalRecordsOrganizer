@@ -8,11 +8,7 @@ require_once __DIR__ . '/PeopleModel.php';
 if (!defined('ABSPATH')) exit;
 
 class AutoModel extends AbstractSectionModel {
-    public static function getByClientId($clientId) {
-        global $wpdb;
-        $table = $wpdb->prefix . 'epm_auto_property';
-        return $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $clientId));
-    }
+    // Use inherited getByClientId instance method.
 
     /**
      * Validate and sanitize auto property data before insert/update
