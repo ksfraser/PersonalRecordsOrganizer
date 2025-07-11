@@ -64,5 +64,58 @@ This repository contains the Estate Planning Manager WordPress plugin and relate
 - Separate Data Access Logic from Business Logic as much as possible.
 
 
+
+
+# Estate Planning Manager – AI Coding Agent Instructions
+
+## Architecture & Major Components
+- **WordPress Plugin**: Modular, OOP structure. Main entry: `estate-planning-manager.php`.
+- **Core Classes**: Located in `includes/` (database, security, SuiteCRM API, PDF generation, audit logging).
+- **Section Models & Views**: Each data section (e.g., banking, insurance) has a model in `public/models/` and a view in `public/sections/`. Mapped via `public/model-map.php`.
+- **Admin & Frontend**: Admin UI in `admin/`, user-facing UI in `public/`, assets in `assets/`.
+- **SuiteCRM Integration**: Sync logic in `includes/class-epm-suitecrm-api.php`, custom modules in `/suitecrm-customizations/`.
+- **Testing**: PHPUnit tests in `tests/`, with test factories and base cases for modular coverage.
+
+## Key Patterns & Conventions
+- **Section Mapping**: Use `ModelMap::getSectionModelMap()` for section-to-model resolution. All CRUD and UI logic should reference this map.
+- **Table Creation**: All tables are created on plugin activation. Table classes are in `includes/tables/`.
+- **AJAX & Security**: All CRUD and admin actions use AJAX with nonce and capability checks. See `public/class-epm-ajax-handler.php`.
+- **Modular UI**: Section views use a common `renderSectionView()` method. No inline rendering in shortcode handlers.
+- **Data Sync**: Data saved in WordPress is automatically synced to SuiteCRM. Sync hooks: `do_action('epm_sync_client_data', ...)`.
+- **Audit Logging**: All data changes and security events are logged via `includes/class-epm-audit-logger.php`.
+- **Testing**: Add/maintain unit tests for all new features. Use mocks for WordPress functions/classes. Run tests with `composer test` or `php run-tests.php`.
+
+## Developer Workflows
+- **Build**: Use `build-plugin.bat` (Windows) or `build-plugin.sh` (Linux/Mac) in `wordpress-plugin/`.
+- **Test**: Run all tests with `composer test` or individual files with `phpunit tests/test-epm-database.php`.
+- **Debug**: Enable WordPress debug mode and review audit logs. Use modular logging for troubleshooting.
+- **SuiteCRM Integration**: Configure via admin settings. Test sync with dedicated test cases in `tests/test-epm-suitecrm-api.php`.
+
+## Project-Specific Practices
+- **Namespace**: All PHP classes use `EstatePlanningManager`.
+- **Autoloading**: PSR-4 via Composer. All new classes must be autoloadable.
+- **Data Flow**: All section data flows through mapped models and views. No direct DB access in views.
+- **Extensibility**: Add new sections by updating model map, creating model/view, and adding tests.
+- **Compliance**: All code must pass static analysis (see `wp-stubs.php` for WordPress mocks).
+- **Documentation**: Update README and UML docs for new features. Use PHPDoc with UML for all classes.
+
+## Integration Points
+- **SuiteCRM**: Data sync via API, custom modules in `/suitecrm-customizations/`.
+- **PDF Generation**: Templates in `includes/class-epm-pdf-generator.php`.
+- **Audit Logging**: All changes tracked for compliance.
+
+## Example: Adding a New Section
+1. Create a failing unit test for the new section in `tests/`.
+2. Add model to `public/models/` and view to `public/sections/`.
+3. Update `ModelMap::getSectionModelMap()` and `get_form_sections()` in `public/class-epm-shortcodes.php`.
+4. Ensure table creation logic is present.
+5. Add admin CRUD if needed.
+6. Run and pass all tests.
+
+## Contact & Support
+For questions, open a GitHub issue or contact the maintainer.
+
 ## Contact
 For questions, open an issue or contact the project maintainer.
+
+
