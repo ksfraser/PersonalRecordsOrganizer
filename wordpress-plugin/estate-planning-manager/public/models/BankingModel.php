@@ -8,7 +8,18 @@ require_once __DIR__ . '/PeopleModel.php';
 
 if (!defined('ABSPATH')) exit;
 
+/**
+ * Class BankingModel
+ * Model for managing bank account records.
+ *
+ * @phpdoc
+ * @uml
+ * class BankingModel extends AbstractSectionModel {
+ *   +static createTable($charset_collate)
+ * }
+ */
 class BankingModel extends AbstractSectionModel {
+    // Table creation is handled by BankAccountsTable. This method is intentionally omitted to avoid duplication.
     public static function getByClientId($clientId) {
         global $wpdb;
         $table = $wpdb->prefix . 'epm_bank_accounts';

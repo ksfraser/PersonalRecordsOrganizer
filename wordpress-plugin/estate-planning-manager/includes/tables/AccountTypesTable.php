@@ -34,23 +34,15 @@ class AccountTypesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
     public function populate($charset_collate) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'epm_account_types';
-        $defaults = [
-            ['chequing', 'Chequing'],
-            ['savings', 'Savings'],
-            ['investment', 'Investment'],
-            ['credit_line', 'Line of Credit'],
-            ['mortgage', 'Mortgage'],
-            ['loan', 'Loan'],
-            ['other', 'Other']
-        ];
+        $defaults = AccountTypesModel::getDefaultRows();
         $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
         if ($count > 0) return;
         $sort_order = 0;
         foreach ($defaults as $row) {
             $wpdb->insert($table_name, [
-                'value' => $row[0],
-                'label' => $row[1],
-                'is_active' => 1,
+                'value' => $row['value'],
+                'label' => $row['label'],
+                'is_active' => isset($row['is_active']) ? $row['is_active'] : 1,
                 'sort_order' => $sort_order
             ], ['%s', '%s', '%d', '%d']);
             $sort_order += 10;

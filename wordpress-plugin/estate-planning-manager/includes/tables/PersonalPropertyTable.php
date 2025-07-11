@@ -5,38 +5,26 @@ require_once __DIR__ . '/../../public/models/PersonalPropertyModel.php';
 use EstatePlanningManager\Models\PersonalPropertyModel;
 
 class PersonalPropertyTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {
-    /**
-     * Helper to map model field definitions to SQL columns
-     */
-    private function getSqlColumnsFromFieldDefinitions($fields) {
-        $columns = [];
-        foreach ($fields as $name => $def) {
-            $dbType = isset($def['db_type']) ? $def['db_type'] : 'VARCHAR(255)';
-            $columns[] = "$name $dbType DEFAULT NULL";
-        }
-        return $columns;
-    }
-
-    public function create($charset_collate) {
+    public function getTableName() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'epm_personal_property';
-        $modelFields = PersonalPropertyModel::getFieldDefinitions();
-        $modelColumns = $this->getSqlColumnsFromFieldDefinitions($modelFields);
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (\n"
-            . "id bigint(20) NOT NULL AUTO_INCREMENT,\n"
-            . "client_id bigint(20) NOT NULL,\n"
-            . "suitecrm_guid varchar(36) DEFAULT NULL,\n"
-            . "wp_record_id bigint(20) DEFAULT NULL,\n"
-            . implode(",\n", $modelColumns) . ",\n"
-            . "created datetime DEFAULT CURRENT_TIMESTAMP,\n"
-            . "lastupdated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n"
-            . "PRIMARY KEY (id),\n"
-            . "KEY client_id (client_id),\n"
-            . "KEY suitecrm_guid (suitecrm_guid),\n"
-            . "KEY wp_record_id (wp_record_id)\n"
-            . ") $charset_collate;";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
+        return $wpdb->prefix . 'epm_personal_property';
+    }
+    public function create($charset_collate) {
+        $this->createGenericTable(
+            $this->getTableName(),
+            \EstatePlanningManager\Models\PersonalPropertyModel::class,
+            $charset_collate,
+            [
+                'client_id BIGINT UNSIGNED NOT NULL',
+                'suitecrm_guid VARCHAR(36) DEFAULT NULL',
+                'wp_record_id BIGINT(20) DEFAULT NULL',
+            ],
+            [
+                'KEY client_id (client_id)',
+                'KEY suitecrm_guid (suitecrm_guid)',
+                'KEY wp_record_id (wp_record_id)'
+            ]
+        );
     }
     public function populate($charset_collate) {
         // No default data for user data tables

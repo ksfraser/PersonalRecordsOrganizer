@@ -13,14 +13,18 @@ class AccountTypesModel {
                 'label' => 'Sort Order', 'type' => 'number', 'required' => false, 'db_type' => 'INT(11) DEFAULT 0'],
         ];
     }
+    /**
+     * Get default account type rows for pre-population
+     * @return array[]
+     */
     public static function getDefaultRows() {
         return [
-            ['value' => 'checking', 'label' => 'Checking', 'is_active' => 1],
+            ['value' => 'chequing', 'label' => 'Chequing', 'is_active' => 1],
             ['value' => 'savings', 'label' => 'Savings', 'is_active' => 1],
-            ['value' => 'money_market', 'label' => 'Money Market', 'is_active' => 1],
-            ['value' => 'cd', 'label' => 'Certificate of Deposit', 'is_active' => 1],
-            ['value' => 'brokerage', 'label' => 'Brokerage', 'is_active' => 1],
-            ['value' => 'retirement', 'label' => 'Retirement', 'is_active' => 1],
+            ['value' => 'investment', 'label' => 'Investment', 'is_active' => 1],
+            ['value' => 'credit_line', 'label' => 'Line of Credit', 'is_active' => 1],
+            ['value' => 'mortgage', 'label' => 'Mortgage', 'is_active' => 1],
+            ['value' => 'loan', 'label' => 'Loan', 'is_active' => 1],
             ['value' => 'other', 'label' => 'Other', 'is_active' => 1],
         ];
     }

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/PersonalTable.php';
 require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/RelationshipTypesTable.php';
 require_once __DIR__ . '/AccountTypesTable.php';
@@ -81,6 +82,7 @@ class TableFactory {
             new BankAccountsTable(),
             new InvestmentsTable(),
             new RealEstateTable(),
+            new PersonalTable(), // <-- Added for Personal section
             new PersonalPropertyTable(),
             new DigitalAssetsTable(),
             new ScheduledPaymentsTable(),
