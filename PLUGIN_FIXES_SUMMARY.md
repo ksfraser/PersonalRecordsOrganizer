@@ -1,3 +1,20 @@
+# Foreign Key Creation Logic in Abstract Table
+
+## Change Summary
+- Foreign key creation for all plugin tables is now handled by generic methods in `EPM_AbstractTable`.
+- The method `createForeignKeys` ensures foreign keys are only added if they do not already exist, preventing duplicate constraint errors.
+- All table classes use this centralized logic for DRYness and consistency.
+
+## Impact
+- Prevents duplicate foreign key errors during table creation and migration.
+- Ensures all foreign key relationships are defined in one place and are easy to maintain.
+- Makes it easier to add or update foreign key relationships for new or existing tables.
+
+## Developer Notes
+- When adding a new table/model, define foreign key relationships in the model's `getFieldDefinitions()` and use the abstract table's `createForeignKeys` method.
+- Always use the generic table and foreign key creation logic in `EPM_AbstractTable` for new tables.
+
+---
 # Estate Planning Manager Plugin - Fixes and Improvements Summary
 
 ## Issue Resolution

@@ -5,6 +5,46 @@ if (!defined('ABSPATH')) exit;
 
 abstract class EPM_AbstractTable {
     /**
+     * Create foreign key constraints for a table.
+     * @param string $table_name
+     * @param array $foreignKeys Array of foreign key definitions. Each item: [
+     *   'column' => 'category_id',
+     *   'ref_table' => 'wp_epm_insurance_category',
+     *   'ref_column' => 'id',
+     *   'constraint' => 'fk_category_id',
+     *   'on_delete' => 'CASCADE',
+     *   'on_update' => 'CASCADE'
+     * ]
+     */
+    protected function createForeignKeys($table_name, $foreignKeys = []) {
+        global $wpdb;
+        foreach ($foreignKeys as $fk) {
+            $constraint = isset($fk['constraint']) ? $fk['constraint'] : 'fk_' . $fk['column'];
+            $onDelete = isset($fk['on_delete']) ? 'ON DELETE ' . $fk['on_delete'] : '';
+            $onUpdate = isset($fk['on_update']) ? 'ON UPDATE ' . $fk['on_update'] : '';
+            // Check if constraint already exists
+            $exists = $wpdb->get_var($wpdb->prepare(
+                "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND CONSTRAINT_NAME = %s AND CONSTRAINT_TYPE = 'FOREIGN KEY'",
+                DB_NAME,
+                str_replace($wpdb->prefix, '', $table_name),
+                $constraint
+            ));
+            if (!$exists) {
+                $sql = sprintf(
+                    'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s(%s) %s %s;',
+                    $table_name,
+                    $constraint,
+                    $fk['column'],
+                    $fk['ref_table'],
+                    $fk['ref_column'],
+                    $onDelete,
+                    $onUpdate
+                );
+                $wpdb->query($sql);
+            }
+        }
+    }
+    /**
      * Generic table creation utility for EPM tables.
      * @param string $table_name
      * @param string $modelClass (must have getFieldDefinitions())

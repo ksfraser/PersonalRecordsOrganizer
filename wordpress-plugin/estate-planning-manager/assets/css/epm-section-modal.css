@@ -1,0 +1,30 @@
+/* Modal scroll and responsive fixes for tall modals */
+.epm-modal {
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+}
+.epm-modal-content {
+    background: #fff;
+    padding: 2em;
+    border-radius: 8px;
+    min-width: 320px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-sizing: border-box;
+}
+@media (max-width: 600px) {
+    .epm-modal-content {
+        max-width: 95vw;
+        padding: 1em;
+    }
+}

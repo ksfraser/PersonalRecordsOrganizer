@@ -18,7 +18,6 @@ class InsuranceTypeTable extends \EstatePlanningManager\Tables\EPM_AbstractTable
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             name VARCHAR(100) NOT NULL,
             category_id BIGINT UNSIGNED NOT NULL,
-            FOREIGN KEY (category_id) REFERENCES {$wpdb->prefix}epm_insurance_category(id) ON DELETE CASCADE,
             PRIMARY KEY (id)
         ) $charset_collate;";
     }
@@ -41,6 +40,20 @@ class InsuranceTypeTable extends \EstatePlanningManager\Tables\EPM_AbstractTable
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         $sql = self::getCreateTableSql();
         dbDelta($sql);
+        // Add foreign key constraint after table creation
+        $this->createForeignKeys(
+            self::getTableName(),
+            [
+                [
+                    'column' => 'category_id',
+                    'ref_table' => $GLOBALS['wpdb']->prefix . 'epm_insurance_category',
+                    'ref_column' => 'id',
+                    'constraint' => 'fk_category_id',
+                    'on_delete' => 'CASCADE',
+                    'on_update' => 'CASCADE'
+                ]
+            ]
+        );
     }
     public function populate($charset_collate) {
         global $wpdb;

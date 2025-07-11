@@ -2,6 +2,8 @@
 require_once __DIR__ . '/EPM_AbstractTable.php';
 require_once __DIR__ . '/TableInterface.php';
 
+
+require_once __DIR__ . '/../../public/models/SuggestedUpdatesModel.php';
 use EstatePlanningManager\Models\SuggestedUpdatesModel;
 
 class SuggestedUpdatesTable extends \EstatePlanningManager\Tables\EPM_AbstractTable implements \EstatePlanningManager\Tables\TableInterface {

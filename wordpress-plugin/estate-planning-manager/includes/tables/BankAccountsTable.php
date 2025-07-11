@@ -18,8 +18,6 @@ class BankAccountsTable extends \EstatePlanningManager\Tables\EPM_AbstractTable 
                 'client_id BIGINT UNSIGNED NOT NULL',
                 'suitecrm_guid VARCHAR(36) DEFAULT NULL',
                 'wp_record_id BIGINT(20) DEFAULT NULL',
-                'bank_location VARCHAR(32) DEFAULT NULL',
-                'bank_name VARCHAR(255) DEFAULT NULL',
             ],
             [
                 'KEY client_id (client_id)',

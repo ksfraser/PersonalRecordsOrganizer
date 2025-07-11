@@ -21,6 +21,7 @@ class EPM_PersonalView extends AbstractSectionView {
         return $shortcodes->get_form_sections()['personal']['fields'];
     }
     public static function render($client_id, $readonly = false) {
+        echo '<link rel="stylesheet" type="text/css" href="' . plugin_dir_url(dirname(__DIR__, 2)) . 'assets/css/epm-section-modal.css" />';
         $instance = new self();
         $instance->renderSectionView($client_id, $readonly);
     }

@@ -1,129 +1,94 @@
 <?php
-require_once __DIR__ . '/PersonalTable.php';
+// Always require the abstract table base
 require_once __DIR__ . '/EPM_AbstractTable.php';
-require_once __DIR__ . '/RelationshipTypesTable.php';
-require_once __DIR__ . '/AccountTypesTable.php';
-require_once __DIR__ . '/ContactTypesTable.php';
-require_once __DIR__ . '/InsuranceCategoryTable.php';
-require_once __DIR__ . '/InsuranceTypeTable.php';
-require_once __DIR__ . '/PropertyTypesTable.php';
-require_once __DIR__ . '/InvestmentTypesTable.php';
-require_once __DIR__ . '/PaymentTypesTable.php';
-require_once __DIR__ . '/DebtTypesTable.php';
-require_once __DIR__ . '/EmploymentStatusTable.php';
-require_once __DIR__ . '/DocumentTypesTable.php';
-require_once __DIR__ . '/DigitalAssetTypesTable.php';
-require_once __DIR__ . '/PersonalPropertyCategoriesTable.php';
-require_once __DIR__ . '/BankAccountsTable.php';
-require_once __DIR__ . '/InvestmentsTable.php';
-require_once __DIR__ . '/RealEstateTable.php';
-require_once __DIR__ . '/PersonalPropertyTable.php';
-require_once __DIR__ . '/DigitalAssetsTable.php';
-require_once __DIR__ . '/ScheduledPaymentsTable.php';
-require_once __DIR__ . '/ScheduledPaymentTypesTable.php';
-require_once __DIR__ . '/DebtorsTable.php';
-require_once __DIR__ . '/CreditorsTable.php';
-require_once __DIR__ . '/InsuranceTable.php';
-require_once __DIR__ . '/PersonTable.php';
-require_once __DIR__ . '/PersonXrefTable.php';
-require_once __DIR__ . '/ClientsTable.php';
-require_once __DIR__ . '/UserPreferencesTable.php';
-require_once __DIR__ . '/FamilyContactsTable.php';
-require_once __DIR__ . '/KeyContactsTable.php';
-require_once __DIR__ . '/FamilyContactsTable.php';
-require_once __DIR__ . '/KeyContactsTable.php';
-require_once __DIR__ . '/SuggestedUpdatesTable.php';
-require_once __DIR__ . '/BankNamesTable.php';
-require_once __DIR__ . '/BankLocationTypesTable.php';
-require_once __DIR__ . '/EmergencyContactsTable.php';
-require_once __DIR__ . '/AutoPropertyTable.php';
-require_once __DIR__ . '/ContactsTable.php';
-require_once __DIR__ . '/SafetyDepositBoxTable.php';
-require_once __DIR__ . '/EmploymentRecordsTable.php';
-require_once __DIR__ . '/VolunteeringTable.php';
-require_once __DIR__ . '/CharitableGiftsTable.php';
-require_once __DIR__ . '/FrequencyTypesTable.php';
-require_once __DIR__ . '/PasswordManagementTable.php';
-require_once __DIR__ . '/EmailAccountsTable.php';
-require_once __DIR__ . '/SocialMediaAccountsTable.php';
-require_once __DIR__ . '/OnlineAccountsTable.php';
-require_once __DIR__ . '/HostingServicesTable.php';
-require_once __DIR__ . '/SocialMediaPlatformTypesTable.php';
-require_once __DIR__ . '/PasswordStorageTypesTable.php';
-require_once __DIR__ . '/OtherContractualObligationsTable.php';
-require_once __DIR__ . '/ContactPhonesTable.php';
-require_once __DIR__ . '/ContactEmailsTable.php';
-require_once __DIR__ . '/DefaultsTable.php';
-require_once __DIR__ . '/ContactAddressesTable.php';
-require_once __DIR__ . '/PhoneLineTypesTable.php';
-
-use EstatePlanningManager\Tables\InsuranceCategoryTable;
-use EstatePlanningManager\Tables\InsuranceTypeTable;
-use EstatePlanningManager\Tables\DefaultsTable;
 
 class TableFactory {
     public static function getTables() {
-        return [
+        // Dynamically require Table classes managed by ModelMap
+        require_once dirname(__DIR__, 2) . '/public/model-map.php';
+        $sectionTableMap = \EstatePlanningManager\ModelMap::getSectionModelMap();
+        $typesTableMap = \EstatePlanningManager\ModelMap::getTypesTableMap();
+
+        // Section tables
+        foreach ($sectionTableMap as $section => $model_class) {
+            $table_class_name = str_replace('Model', 'Table', substr($model_class, strrpos($model_class, '\\') + 1));
+            $table_file = __DIR__ . "/{$table_class_name}.php";
+            if (file_exists($table_file)) {
+                require_once $table_file;
+            }
+        }
+        // Types/admin tables
+        foreach ($typesTableMap as $typesClass) {
+            $table_file = __DIR__ . "/{$typesClass}.php";
+            if (file_exists($table_file)) {
+                require_once $table_file;
+            }
+        }
+        // Manually require Table classes not managed by ModelMap
+        $manualTables = array(
+            'PersonTable',
+            'PersonXrefTable',
+            'ClientsTable',
+            'UserPreferencesTable',
+            'SuggestedUpdatesTable',
+            'EmergencyContactsTable',
+            'ContactsTable',
+            'DefaultsTable'
+        );
+        foreach ($manualTables as $manualClass) {
+            $table_file = __DIR__ . "/{$manualClass}.php";
+            if (file_exists($table_file)) {
+                require_once $table_file;
+            }
+        }
+
+        $tables = array();
+        // Instantiate section tables
+        foreach ($sectionTableMap as $section => $model_class) {
+            $table_class_name = str_replace('Model', 'Table', substr($model_class, strrpos($model_class, '\\') + 1));
+            $fqcn = "EstatePlanningManager\\Tables\\$table_class_name";
+            if (class_exists($fqcn)) {
+                $tables[] = new $fqcn();
+            } elseif (class_exists($table_class_name)) {
+                $tables[] = new $table_class_name();
+            }
+        }
+        // Add any additional tables not covered by the model map
+        $extraTables = array(
             new ClientsTable(),
             new UserPreferencesTable(),
-            new RelationshipTypesTable(),
-            new AccountTypesTable(),
-            new ContactTypesTable(),
-            new InsuranceCategoryTable(),
-            new InsuranceTypeTable(),
-            new PropertyTypesTable(),
-            new InvestmentTypesTable(),
-            new PaymentTypesTable(),
-            new DebtTypesTable(),
-            new EmploymentStatusTable(),
-            new DocumentTypesTable(),
-            new DigitalAssetTypesTable(),
-            new PersonalPropertyCategoriesTable(),
-            new BankAccountsTable(),
-            new InvestmentsTable(),
-            new RealEstateTable(),
-            new PersonalTable(), // <-- Added for Personal section
-            new PersonalPropertyTable(),
-            new DigitalAssetsTable(),
-            new ScheduledPaymentsTable(),
-            new ScheduledPaymentTypesTable(),
-            new DebtorsTable(),
-            new CreditorsTable(),
-            new InsuranceTable(),
             new PersonTable(),
             new PersonXrefTable(),
-            new FamilyContactsTable(),
-            new KeyContactsTable(),
             new SuggestedUpdatesTable(),
-            new BankNamesTable(),
-            new BankLocationTypesTable(),
             new EmergencyContactsTable(),
-            new AutoPropertyTable(),
             new ContactsTable(),
-            new SafetyDepositBoxTable(),
-            new EmploymentRecordsTable(),
-            new VolunteeringTable(),
-            new CharitableGiftsTable(),
-            new FrequencyTypesTable(),
-            new PasswordManagementTable(),
-            new EmailAccountsTable(),
-            new SocialMediaAccountsTable(),
-            new OnlineAccountsTable(),
-            new HostingServicesTable(),
-            new SocialMediaPlatformTypesTable(),
-            new PasswordStorageTypesTable(),
-            new OtherContractualObligationsTable(),
-            new ContactPhonesTable(),
-            new ContactEmailsTable(),
-            new DefaultsTable(),
-            new ContactAddressesTable(),
-            new PhoneLineTypesTable(),
-        ];
+            new DefaultsTable()
+        );
+        // Add all admin/fk tables
+        foreach ($typesTableMap as $typesClass) {
+            $fqcn = "EstatePlanningManager\\Tables\\$typesClass";
+            if (class_exists($fqcn)) {
+                $extraTables[] = new $fqcn();
+            } elseif (class_exists($typesClass)) {
+                $extraTables[] = new $typesClass();
+            }
+        }
+        // Only add if not already present
+        $added = array();
+        foreach ($tables as $t) {
+            $added[get_class($t)] = true;
+        }
+        foreach ($extraTables as $t) {
+            if (!isset($added[get_class($t)])) {
+                $tables[] = $t;
+            }
+        }
+        return $tables;
     }
 
     public static function dropAllTables() {
         global $wpdb;
-        $tables = [
+        $tables = array(
             'epm_investments',
             'epm_bank_accounts',
             'epm_real_estate',
@@ -135,7 +100,7 @@ class TableFactory {
             'epm_persons',
             'epm_organizations',
             'epm_clients'
-        ];
+        );
         foreach ($tables as $table) {
             $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}$table");
         }

@@ -812,8 +812,18 @@ class EPM_Shortcodes {
      */
     public function get_client_data($section, $client_id) {
         global $wpdb;
-        $table = $wpdb->prefix . 'epm_clients';
-        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $client_id));
+        // Use centralized model map class
+        require_once __DIR__ . '/model-map.php';
+        $model_map = \EstatePlanningManager\ModelMap::getSectionModelMap();
+        if (isset($model_map[$section]) && class_exists($model_map[$section])) {
+            $model = new $model_map[$section]();
+            $records = $model->getAllRecordsForClient($client_id);
+            return !empty($records) ? (object)$records[0] : null;
+        } else {
+            // Fallback to clients table for unknown section
+            $table = $wpdb->prefix . 'epm_clients';
+            return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $client_id));
+        }
     }
 
     /**
