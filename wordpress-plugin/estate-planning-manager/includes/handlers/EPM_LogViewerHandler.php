@@ -20,17 +20,23 @@ class EPM_LogViewerHandler {
     }
 
     public static function render_log_viewer() {
-        // Get log directory from option or default
-        $log_dir = get_option('epm_log_dir', dirname(__DIR__, 3) . '/logs');
+        // Use Logger abstraction to get log location and logs
+        if (!class_exists('EstatePlanningManager\\Logger')) {
+            require_once dirname(__DIR__, 2) . '/class-epm-logger.php';
+        }
+        $log_dir = \EstatePlanningManager\Logger::getLogDir();
         $log_file = $log_dir . '/epm.log';
         echo '<div class="wrap"><h1>EPM Log Viewer</h1>';
         echo '<div style="margin-bottom:20px;padding:10px;background:#f9f9f9;border:1px solid #ccc;">';
         echo '<strong>Log Directory Setting:</strong> <code>' . esc_html($log_dir) . '</code><br>';
         echo '<strong>Log File:</strong> <code>' . esc_html($log_file) . '</code>';
         echo '</div>';
-        if (file_exists($log_file) && is_readable($log_file)) {
+        $logs = \EstatePlanningManager\Logger::getLogs(1000);
+        if (!empty($logs)) {
             echo '<pre style="background:#fff;max-height:600px;overflow:auto;border:1px solid #ccc;padding:10px;">';
-            echo esc_html(file_get_contents($log_file));
+            foreach ($logs as $line) {
+                echo esc_html($line) . "\n";
+            }
             echo '</pre>';
         } else {
             echo '<p>Log file not found or not readable: ' . esc_html($log_file) . '</p>';

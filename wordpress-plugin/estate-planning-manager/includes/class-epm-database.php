@@ -100,25 +100,35 @@ class EPM_Database {
     /**
      * Create new client record
      */
+    /**
+     * Create new client record using WP user info if available
+     */
     public function create_client($user_id, $advisor_id = null) {
         global $wpdb;
-        
         $table_name = $wpdb->prefix . 'epm_clients';
-        
+        $user_info = false;
+        if (function_exists('get_userdata')) {
+            $user_info = get_userdata($user_id);
+        }
+        $data = array(
+            'user_id' => $user_id,
+            'advisor_id' => $advisor_id,
+            'status' => 'active'
+        );
+        // Add WP user info if available
+        if ($user_info) {
+            $data['first_name'] = isset($user_info->first_name) ? $user_info->first_name : '';
+            $data['last_name'] = isset($user_info->last_name) ? $user_info->last_name : '';
+            $data['email'] = isset($user_info->user_email) ? $user_info->user_email : '';
+        }
         $result = $wpdb->insert(
             $table_name,
-            array(
-                'user_id' => $user_id,
-                'advisor_id' => $advisor_id,
-                'status' => 'active'
-            ),
-            array('%d', '%d', '%s')
+            $data,
+            array('%d', '%d', '%s', '%s', '%s', '%s')
         );
-        
         if ($result !== false) {
             return $wpdb->insert_id;
         }
-        
         return false;
     }
     

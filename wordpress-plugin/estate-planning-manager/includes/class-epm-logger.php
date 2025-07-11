@@ -14,6 +14,23 @@ namespace EstatePlanningManager;
  */
 class Logger {
     /**
+     * Retrieve logs (file backend)
+     * @param int $limit
+     * @return array log lines
+     */
+    public static function getLogs($limit = 1000) {
+        $dir = self::getLogDir();
+        $file = $dir . '/' . self::$logFile;
+        if (!file_exists($file) || !is_readable($file)) {
+            return [];
+        }
+        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($limit > 0 && count($lines) > $limit) {
+            $lines = array_slice($lines, -$limit);
+        }
+        return $lines;
+    }
+    /**
      * Log a debug message (helper)
      */
     public static function debug($message) {

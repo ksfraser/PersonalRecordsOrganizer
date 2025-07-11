@@ -118,7 +118,7 @@ class EPM_Ajax_Handler {
         $db = EPM_Database::instance();
         $client_id = $db->get_client_id_by_user_id($user_id);
         if (!$client_id) {
-            // Create client record if not exists
+            // Create client record if not exists, using WP user info
             $client_id = $db->create_client($user_id);
         }
 
