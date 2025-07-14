@@ -16,12 +16,25 @@ require_once __DIR__ . '/EPM_NonceTrait.php';
 abstract class EPM_AbstractAddModal implements ModalViewInterface {
     use EPM_NonceTrait;
     // Child classes must implement these
-    abstract protected function getFields();
+    // getModelClass should return the fully qualified model class name
+    abstract protected function getModelClass();
     abstract protected function getTitle();
-    protected function getModalId() { return 'epm-add-record-modal'; }
-    protected function getFormId() { return 'epm-add-record-form'; }
+
+    // By default, getFields uses the model's getFieldDefinitions
+    protected function getFields() {
+        $modelClass = $this->getModelClass();
+        if (class_exists($modelClass) && method_exists($modelClass, 'getFieldDefinitions')) {
+            return $modelClass::getFieldDefinitions();
+        }
+        return [];
+    }
+    protected $modalKey = '';
+    protected function getModalId() { return 'epm-add-' . $this->modalKey . '-modal'; }
+    protected function getFormId() { return 'epm-add-' . $this->modalKey . '-form'; }
     protected function getFormAction() { return admin_url('admin-post.php'); }
-    protected function getActionName() { return 'epm_add_record'; }
+    protected function getActionName() { return 'epm_add_' . $this->modalKey; }
+    protected function getNonceAction() { return 'epm_add_' . $this->modalKey; }
+    protected function getNonceName() { return 'epm_add_' . $this->modalKey . '_nonce'; }
 
     public function render($user_id = null) {
         $fields = $this->getFields();
