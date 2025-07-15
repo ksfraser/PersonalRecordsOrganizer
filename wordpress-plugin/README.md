@@ -181,6 +181,21 @@ If you have SuiteCRM, configure the integration:
 - **Action Handlers**: All major plugin actions (form submissions, AJAX, admin screens) are now handled by dedicated classes in `includes/handlers/`
 - **Modal Logic**: Modal forms are modularized in `public/modals/`
 
+## Model and Table Architecture
+
+- All section models (e.g., ContactModel, PersonModel, InstituteModel) are responsible for business logic and field definitions only.
+- Database table creation and schema management are handled by dedicated table classes in `includes/tables/` (e.g., `ContactsTable`, `PersonTable`, `OrganizationTable`).
+- Models no longer contain `createTable` methods. This ensures a single source of truth for table structure and easier maintenance.
+- Unit tests verify that models do not contain table creation logic and that field definitions are present and correct.
+
+## Test Requirements
+
+- Unit tests for ContactModel, PersonModel, and InstituteModel ensure:
+  - Field definitions are present and correct.
+  - The model returns the correct table name.
+  - No `createTable` method exists in the model (table creation is handled by the table class).
+- See `tests/test-contact-model-requirements.php`, `tests/test-person-model-requirements.php`, and `tests/test-institute-model-requirements.php` for details.
+
 ## Troubleshooting
 
 ### Common Issues

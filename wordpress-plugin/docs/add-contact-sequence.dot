@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User
+    participant Modal
+    participant AJAX
+    participant Handler
+    participant Model
+    participant Table
+    participant DB
+    participant SuiteCRM
+    User->>Modal: Open Add Contact
+    Modal->>AJAX: Submit form data
+    AJAX->>Handler: Send data
+    Handler->>Model: Validate fields
+    Handler->>Table: Save data
+    Table->>DB: Insert row
+    Handler->>SuiteCRM: Sync (optional)
+    Handler->>Modal: Return result
