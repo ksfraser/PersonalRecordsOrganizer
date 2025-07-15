@@ -1,7 +1,9 @@
 <?php
 namespace EstatePlanningManager\Models;
 
-class InstituteModel {
+require_once __DIR__ . '/AbstractSectionModel.php';
+
+class InstituteModel extends AbstractSectionModel {
     public static function getFieldDefinitions() {
         return [
             ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true],
@@ -12,4 +14,11 @@ class InstituteModel {
             ['name' => 'branch', 'label' => 'Branch', 'type' => 'text'],
         ];
     }
+
+    public function getTableName() {
+        global $wpdb;
+        return $wpdb->prefix . 'epm_institutes';
+    }
+
+    // Table creation is handled by OrganizationTable in includes/tables/
 }

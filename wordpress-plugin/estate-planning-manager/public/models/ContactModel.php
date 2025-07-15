@@ -1,7 +1,9 @@
 <?php
 namespace EstatePlanningManager\Models;
 
-class ContactModel {
+require_once __DIR__ . '/AbstractSectionModel.php';
+
+class ContactModel extends AbstractSectionModel {
     public static function getFieldDefinitions() {
         return [
             ['name' => 'full_name', 'label' => 'Name', 'type' => 'text', 'required' => true],
@@ -10,4 +12,11 @@ class ContactModel {
             ['name' => 'address', 'label' => 'Address', 'type' => 'text'],
         ];
     }
+
+    public function getTableName() {
+        global $wpdb;
+        return $wpdb->prefix . 'epm_contacts';
+    }
+
+    // Table creation is handled by ContactsTable in includes/tables/
 }
