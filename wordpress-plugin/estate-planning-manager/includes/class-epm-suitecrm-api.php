@@ -1053,4 +1053,75 @@ class EPM_SuiteCRM_API {
         }
         return false;
     }
+
+    /**
+     * Handle SuiteCRM sync for any section (contacts, accounts, etc.)
+     * @param array $sync_data
+     */
+    public function handle_suitecrm_sync($sync_data) {
+        global $wpdb;
+        $section = $sync_data['module'] ?? '';
+        $source_record_id = $sync_data['data']['id'] ?? '';
+        $wp_guid = $sync_data['data']['wp_guid'] ?? '';
+        $client_id = $this->find_client_id_by_guid($source_record_id, $wp_guid);
+        if (!$client_id) {
+            // Optionally log or create new client
+            return;
+        }
+        // Get current data for section
+        $current_data = $this->get_client_section_data($client_id, $section);
+        // Compare each field
+        foreach ($sync_data['data'] as $field => $new_value) {
+            if ($field === 'id' || $field === 'wp_guid') continue;
+            $old_value = isset($current_data[$field]) ? $current_data[$field] : '';
+            if ($new_value !== $old_value) {
+                // Store both values as JSON for flexible display
+                $wpdb->insert(
+                    $wpdb->prefix . 'epm_suggested_updates',
+                    array(
+                        'client_id' => $client_id,
+                        'section' => $section,
+                        'field' => $field,
+                        'old_value' => json_encode($old_value),
+                        'new_value' => json_encode($new_value),
+                        'notes' => '',
+                        'status' => 'pending',
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql')
+                    ),
+                    array('%d','%s','%s','%s','%s','%s','%s','%s','%s')
+                );
+            }
+        }
+    }
+
+    /**
+     * Find client by SuiteCRM GUID or WordPress GUID
+     */
+    private function find_client_id_by_guid($suitecrm_guid, $wp_guid) {
+        global $wpdb;
+        $client_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}epm_clients WHERE suitecrm_guid = %s",
+            $suitecrm_guid
+        ));
+        if ($client_id) return $client_id;
+        if ($wp_guid) {
+            $client_id = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}epm_clients WHERE wp_guid = %s",
+                $wp_guid
+            ));
+            if ($client_id) return $client_id;
+        }
+        return null;
+    }
+
+    /**
+     * Get current section data for client
+     */
+    private function get_client_section_data($client_id, $section) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'epm_' . $section;
+        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE client_id = %d", $client_id), ARRAY_A);
+        return $row ? $row : array();
+    }
 }

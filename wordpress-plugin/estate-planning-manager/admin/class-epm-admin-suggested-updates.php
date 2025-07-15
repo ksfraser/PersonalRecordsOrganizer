@@ -25,6 +25,7 @@ class EPM_Admin_Suggested_Updates {
         add_action('wp_ajax_epm_bulk_approve_updates', array($this, 'bulk_approve_updates'));
         add_action('wp_ajax_epm_bulk_reject_updates', array($this, 'bulk_reject_updates'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
+        add_action('admin_post_epm_handle_suggested_update_review', array($this, 'handle_suggested_update_review'));
     }
     
     /**
@@ -551,5 +552,73 @@ class EPM_Admin_Suggested_Updates {
         }
         
         return $result !== false;
+    }
+    
+    /**
+     * Render suggested update comparison UI for admin review
+     * @param object $suggested_update
+     */
+    public static function render_suggested_update_comparison($suggested_update) {
+        $old_value = json_decode($suggested_update->old_value, true);
+        $new_value = json_decode($suggested_update->new_value, true);
+        echo '<div class="wrap"><h2>Review Suggested Update</h2>';
+        echo '<form method="post">';
+        wp_nonce_field('epm_review_suggested_update_' . $suggested_update->id);
+        echo '<input type="hidden" name="suggested_update_id" value="' . esc_attr($suggested_update->id) . '">';
+        // Old value table
+        echo '<h3>Current Value</h3>';
+        echo '<table class="widefat"><tbody>';
+        foreach ($old_value as $field => $value) {
+            echo '<tr><th>' . esc_html(ucwords(str_replace('_', ' ', $field))) . '</th><td>' . esc_html($value) . '</td></tr>';
+        }
+        echo '</tbody></table>';
+        // New value table
+        echo '<h3>Suggested Value</h3>';
+        echo '<table class="widefat"><tbody>';
+        foreach ($new_value as $field => $value) {
+            echo '<tr><th>' . esc_html(ucwords(str_replace('_', ' ', $field))) . '</th><td>' . esc_html($value) . '</td></tr>';
+        }
+        echo '</tbody></table>';
+        // Action buttons
+        echo '<p style="margin-top:20px;">';
+        echo '<button type="submit" name="epm_accept_suggested_update" class="button button-primary">Accept</button> ';
+        echo '<button type="submit" name="epm_deny_suggested_update" class="button">Deny</button> ';
+        echo '<button type="submit" name="epm_cancel_suggested_update" class="button">Cancel</button>';
+        echo '</p>';
+        echo '</form></div>';
+    }
+
+    /**
+     * Handle suggested update review actions
+     */
+    public function handle_suggested_update_review() {
+        if (!isset($_POST['suggested_update_id']) || !wp_verify_nonce($_POST['_wpnonce'], 'epm_review_suggested_update_' . $_POST['suggested_update_id'])) {
+            return false;
+        }
+        global $wpdb;
+        $update_id = intval($_POST['suggested_update_id']);
+        $table_suggested = $wpdb->prefix . 'epm_suggested_updates';
+        if (isset($_POST['epm_accept_suggested_update'])) {
+            // Accept: update record and set status
+            $update = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_suggested WHERE id = %d", $update_id));
+            $section = $update->section;
+            $client_id = $update->client_id;
+            $field = $update->field;
+            $new_value = json_decode($update->new_value, true);
+            $table = $wpdb->prefix . 'epm_' . $section;
+            // Update the record
+            $wpdb->update($table, [$field => $new_value[$field]], ['client_id' => $client_id]);
+            // Set status to accepted
+            $wpdb->update($table_suggested, ['status' => 'accepted'], ['id' => $update_id]);
+            return true;
+        } elseif (isset($_POST['epm_deny_suggested_update'])) {
+            // Deny: set status only
+            $wpdb->update($table_suggested, ['status' => 'denied'], ['id' => $update_id]);
+            return true;
+        } elseif (isset($_POST['epm_cancel_suggested_update'])) {
+            // Cancel: do nothing
+            return false;
+        }
+        return false;
     }
 }
